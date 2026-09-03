@@ -43,7 +43,7 @@ export function rankDrivers(views: DriverView[], alerts: Alert[], snoozes: Recor
     return (
       SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity] ||
       Number(a.snoozed) - Number(b.snoozed) ||
-      va.minutesUntilLimit - vb.minutesUntilLimit ||
+      Math.floor(va.minutesUntilLimit) - Math.floor(vb.minutesUntilLimit) || // whole minutes: sub-minute drift never jostles cards
       STALE_RANK[va.staleness] - STALE_RANK[vb.staleness] ||
       a.driverId.localeCompare(b.driverId)
     )

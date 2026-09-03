@@ -244,7 +244,7 @@ Copy is written in `message()` in Lookout's voice (`lookout/voice.ts` holds the 
 
 ### Ranking (`alerts/rank.ts`)
 
-`rankDrivers(views, alerts, now): DriverCard[]` groups alerts by driver into one card with several reasons. Sort key, in order: severity rank (critical, act_now, watch, info), snoozed after unsnoozed at equal severity, minutes-to-violation ascending (offline continuation counts), staleness (offline before stale before fresh), driver id. Stable across ticks so cards never jump. Snooze de-emphasizes; it never removes a critical or act-now card.
+`rankDrivers(views, alerts, now): DriverCard[]` groups alerts by driver into one card with several reasons. Sort key, in order: severity rank (critical, act_now, watch, info), snoozed after unsnoozed at equal severity, minutes-to-violation ascending in whole minutes, so sub-minute drift never jostles cards (offline continuation counts), staleness (offline before stale before fresh), driver id. Stable across ticks so cards never jump. Snooze de-emphasizes; it never removes a critical or act-now card.
 
 `alertBar = ranked.slice(0, 3)`. If the bar ever needs its own logic, something upstream is wrong.
 

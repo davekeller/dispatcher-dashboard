@@ -22,16 +22,16 @@ describe('rankDrivers', () => {
     const top = rankedAt(anchor).slice(0, 3).map((c) => c.driverId)
     expect(top).toEqual(['drv-02', 'drv-01', 'drv-03']) // Priya (critical), Marcus (12 min), Dre (~40, offline)
   })
-  it('is stable across a tick for every driver whose alerts did not change', () => {
-    // A driver can legitimately move when a rule starts or stops firing inside the tick
-    // (drift crossing 15 min, say). Everyone else must hold their relative order.
+  it('is deterministic, and the alerted order holds across a tick', () => {
     const a = rankedAt(anchor)
-    const b = rankedAt(anchor + 5000)
-    const key = (c: { severity: string; alerts: { id: string }[] }) => `${c.severity}:${c.alerts.map((x) => x.id).join(',')}`
-    const keyA = new Map(a.map((c) => [c.driverId, key(c)]))
-    const unchanged = new Set(b.filter((c) => keyA.get(c.driverId) === key(c)).map((c) => c.driverId))
-    expect(unchanged.size).toBeGreaterThan(40)
-    expect(b.filter((c) => unchanged.has(c.driverId)).map((c) => c.driverId)).toEqual(a.filter((c) => unchanged.has(c.driverId)).map((c) => c.driverId))
+    expect(rankedAt(anchor).map((c) => c.driverId)).toEqual(a.map((c) => c.driverId))
+    const alerted = (cards: ReturnType<typeof rankedAt>) => cards.filter((c) => c.alerts.length > 0).map((c) => c.driverId)
+    const before = alerted(a)
+    const after = alerted(rankedAt(anchor + 5000))
+    // Same drivers in the same order five seconds later. A driver may only move when a
+    // rule starts or stops firing inside the tick, which none do at the anchor.
+    expect(after).toEqual(before)
+    expect(before.slice(0, 3)).toEqual(['drv-02', 'drv-01', 'drv-03'])
   })
   it('snooze demotes within a severity but never removes an act-now card', () => {
     const snoozes = { 'limit_act_now:drv-01': anchor + 10 * MIN, 'wont_finish:drv-01': anchor + 10 * MIN, 'behind_schedule:drv-01': anchor + 10 * MIN }
