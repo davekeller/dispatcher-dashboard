@@ -229,15 +229,15 @@ export default function App() {
   --color-watch-fill: #d19a2a;
   --color-watch-soft: #fbf3e3;
 
-  --color-clear: #2f7d5a;
+  --color-clear: #266b4c;
   --color-clear-fill: #5aa37f;
   --color-clear-soft: #e8f4ee;
 
-  --color-offline: #6b7280;
+  --color-offline: #5b6370;
   --color-offline-fill: #9aa0ab;
   --color-offline-soft: #eef0f3;
 
-  --color-break: #3b6fb6;
+  --color-break: #3262a8;
   --color-break-fill: #6f9bd6;
   --color-break-soft: #e9f0fa;
 
@@ -4465,7 +4465,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: `useStore.corrections`.
 - Produces: `<CorrectionChip driverId />` in `src/ui/CorrectionChip.tsx`.
 
-- [ ] **Step 1: Write `src/ui/CorrectionChip.tsx` and place it**
+- [x] **Step 1: Write `src/ui/CorrectionChip.tsx` and place it**
 
 ```tsx
 import { fmtHm } from '../lib/format'
@@ -4490,7 +4490,7 @@ export default function CorrectionChip({ driverId }: { driverId: string }) {
 
 Place it: in `RouteHeader.tsx` after the drift chip; in `RouteCard.tsx` inside the badge row (render the row when a correction exists too: change the condition to `card.alerts.length > 0 || pick || hasCorrection`, reading `hasCorrection` with `useStore((s) => Boolean(s.corrections[view.driver.id]))`); in `RecommendationCard.tsx` in the footer line.
 
-- [ ] **Step 2: Extend the rules test with the edge paths that are copy-driven**
+- [x] **Step 2: Extend the rules test with the edge paths that are copy-driven**
 
 Add the three imports below to the top of `src/alerts/rules.test.ts`, then append the `describe` block:
 ```ts
@@ -4526,7 +4526,7 @@ describe('edge paths change the copy, not just the numbers', () => {
 Run: `npx vitest run src/alerts/rules.test.ts`
 Expected: PASS. If `limit_act_now` also fires for Marcus an hour later, its `when` is missing `v.minutesUntilLimit > 0`.
 
-- [ ] **Step 3: Walk every edge path in the browser and fix what's off**
+- [x] **Step 3: Walk every edge path in the browser and fix what's off**
 
 Using the dev panel and the planted drivers, confirm each row of `docs/ARCHITECTURE.md` §10:
 
@@ -4550,11 +4550,11 @@ Using the dev panel and the planted drivers, confirm each row of `docs/ARCHITECT
 
 Fix anything that fails in the component that owns it. Keep fixes to the file responsible; do not add logic to views that belongs in `compute.ts` or `rules.ts`.
 
-- [ ] **Step 4: Copy pass**
+- [x] **Step 4: Copy pass**
 
 Read every string in `rules.ts`, `voice.ts`, the dialogs, and the empty states aloud. Each must read like a competent colleague talking to Lena. No "Error", no "Invalid", no "N/A", no system-log tone. Every figure that comes from stale data carries a tilde. Fix inline.
 
-- [ ] **Step 5: Run everything and commit**
+- [x] **Step 5: Run everything and commit**
 
 Run: `npm test && npm run lint && npm run build`
 Expected: green.
@@ -4583,7 +4583,7 @@ const tokens = {
   panel: '#ffffff', canvas: '#f4f3f0', well: '#ebe9e4',
   ink: '#1c1a17', muted: '#6b665e', label: '#7a746a',
   'lookout-strong': '#a83a15', lookout: '#cf4620',
-  'act-now': '#b3323f', watch: '#8f5f0e', clear: '#2f7d5a', offline: '#6b7280', break: '#3b6fb6',
+  'act-now': '#b3323f', watch: '#8f5f0e', clear: '#266b4c', offline: '#5b6370', break: '#3262a8',
   'act-now-soft': '#fbeaec', 'watch-soft': '#fbf3e3', 'clear-soft': '#e8f4ee', 'offline-soft': '#eef0f3', 'break-soft': '#e9f0fa', 'lookout-soft': '#ffe9e2',
 }
 const lum = (hex) => {

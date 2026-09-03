@@ -21,3 +21,10 @@ One line per meaningful choice or cut. Newest at the bottom.
 | 15 | Behind-schedule and won't-finish rules ship in Phase 1 | The ribbon and the rules share one math; five rules make the pattern obvious before the live change |
 | 16 | Driver phone and map are Phase 2, but positions and work-order fields are seeded from day one | Cheap now, expensive later |
 | 17 | Phase 1 deliberately exceeds the 2–3h guidance; the README states the real time spent | Core scoped with discipline; extras labeled as extras |
+| 18 | Scenario anchor moved from 12:47 PM to 2:47 PM | A driver near the 11-hour limit has been on duty ~12h; a 2:40 AM start reads as freight, a 12:40 AM start reads as a bug |
+| 19 | Lookout reads derived state directly; pages set a focus driver through context, no per-page portal | Simpler to read on a shared screen; same behavior |
+| 20 | Limit rules speak only for drivers who are driving or on duty and visible; the offline rules own dark drivers; a break pauses the alert | One card per driver with one story; found when the won't-finish rule doubled Dre's offline card |
+| 21 | Rank sorts time-to-limit in whole minutes | Sub-minute differences between a driver at a dock and one on the road were swapping cards every tick |
+| 22 | Generated drivers mostly run within a few minutes of plan; about one in twelve runs late | The first generator crowded the Watch band with a dozen behind-schedule drivers and diluted "exceptions first" |
+| 23 | TICK_MS = 5000 with minute-precision countdowns | No false precision; seconds would jitter and mean nothing at a 5-second ping |
+| 24 | All 18 text/ground token pairs pass AA (`node scripts/contrast.mjs`) | Watch text is darker than its fill on purpose so it clears AA and stays distinct from Lookout's coral |

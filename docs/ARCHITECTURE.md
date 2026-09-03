@@ -388,9 +388,9 @@ Neutral, dense, calm, warm. Ops software used mid-shift. Rhymes with Toast's war
 | `--color-lookout` / `-strong` / `-soft` | `#cf4620` / `#a83a15` / `#ffe9e2` | Lookout, and only Lookout |
 | `--color-act-now` / `-fill` / `-soft` | `#b3323f` / `#c9414f` / `#fbeaec` | Act now and Over limit |
 | `--color-watch` / `-fill` / `-soft` | `#8f5f0e` / `#d19a2a` / `#fbf3e3` | Watch |
-| `--color-clear` / `-fill` / `-soft` | `#2f7d5a` / `#5aa37f` / `#e8f4ee` | Clear (muted) |
-| `--color-offline` / `-fill` / `-soft` | `#6b7280` / `#9aa0ab` / `#eef0f3` | Offline, dashed/hollow |
-| `--color-break` / `-fill` / `-soft` | `#3b6fb6` / `#6f9bd6` / `#e9f0fa` | On break |
+| `--color-clear` / `-fill` / `-soft` | `#266b4c` / `#5aa37f` / `#e8f4ee` | Clear (muted) |
+| `--color-offline` / `-fill` / `-soft` | `#5b6370` / `#9aa0ab` / `#eef0f3` | Offline, dashed/hollow |
+| `--color-break` / `-fill` / `-soft` | `#3262a8` / `#6f9bd6` / `#e9f0fa` | On break |
 | `--color-on-accent` | `#ffffff` | Text on saturated grounds |
 
 Text variants must pass AA on panel; fills are for bars and markers. Validate the pairs once during theme setup and note the results in `DECISIONS.md`. Watch's text color is deliberately darker than its fill so it clears AA while staying distinct from Lookout's coral.
