@@ -669,7 +669,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: `Driver`, `DutySegment`, `DutyStatus`, `Route`, `Stop` from `src/data/types.ts`; `hashString` from `src/data/prng.ts`; `MIN` from `src/time/clock.ts`.
 - Produces: `HosStatus = 'over' | 'act_now' | 'watch' | 'clear'`, `Staleness = 'fresh' | 'stale' | 'offline'`, and the functions listed in Step 3. Later tasks call `effectiveLastPingAt`, `knownSegments`, `drivingMinutes`, `minutesUntilLimit`, `hosStatusOf`, `hosStatus`, `pingAgeMinutes`, `stalenessOf`, `staleness`, `currentStatus`, `remainingStops`, `doneStops`, `unassignedStops`, `nextStop`, `remainingDriveMinutes`, `remainingServiceMinutes`, `scheduleDrift`, `projectedEta`, `projectedFinishAt`, `projectedDepartureAt`, `limitHitAt`, `drivingSinceBreak`, `plannedReset`.
 
-- [ ] **Step 1: Write `src/hos/constants.ts`**
+- [x] **Step 1: Write `src/hos/constants.ts`**
 
 ```ts
 // Thresholds. Every one of these is a guess a real deployment would tune; the
@@ -689,7 +689,7 @@ export const RESET_MIN = 600 // 10 consecutive hours off duty
 export const PING_JITTER_MS = 90_000
 ```
 
-- [ ] **Step 2: Write the failing compute tests**
+- [x] **Step 2: Write the failing compute tests**
 
 `src/hos/compute.test.ts`:
 ```ts
@@ -830,12 +830,12 @@ describe('drivingSinceBreak', () => {
 })
 ```
 
-- [ ] **Step 3: Run tests to verify they fail**
+- [x] **Step 3: Run tests to verify they fail**
 
 Run: `npx vitest run src/hos`
 Expected: FAIL — `./compute` not found.
 
-- [ ] **Step 4: Write `src/hos/compute.ts`**
+- [x] **Step 4: Write `src/hos/compute.ts`**
 
 ```ts
 import type { Driver, DutySegment, DutyStatus, Route, Stop } from '../data/types'
@@ -1030,12 +1030,12 @@ export function drivingSinceBreak(driver: Driver, now: number): number {
 }
 ```
 
-- [ ] **Step 5: Run tests and typecheck**
+- [x] **Step 5: Run tests and typecheck**
 
 Run: `npx vitest run src/hos && npx tsc --noEmit`
 Expected: all compute tests pass. If `scheduleDrift` at `m(135)` fails, check that `last.serviceMinutes * MIN` is added to the planned ETA before subtracting.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add -A
