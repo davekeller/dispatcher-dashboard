@@ -3652,7 +3652,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: `useDerived`, `useStore.fleet.deliveries`, `useLookout().setFocus`, `useActions().open`, `AlertActions`, compute helpers (`projectedEta`, `knownSegments`), `WINDOW_14H_MIN`, format, tones, primitives.
 - Produces: `ribbonAxis(view): { start: number; end: number; pct(t: number): number }` exported from `RouteRibbon.tsx` and shared with `DutyTimeline`, so both draw on one axis.
 
-- [ ] **Step 1: Write `src/views/route/RouteHeader.tsx`**
+- [x] **Step 1: Write `src/views/route/RouteHeader.tsx`**
 
 ```tsx
 import type { DriverCard } from '../../alerts/types'
@@ -3697,7 +3697,7 @@ export default function RouteHeader({ view, card }: { view: DriverView; card: Dr
 }
 ```
 
-- [ ] **Step 2: Write `src/views/route/StaleBanner.tsx` and `src/views/route/AlertStrip.tsx`**
+- [x] **Step 2: Write `src/views/route/StaleBanner.tsx` and `src/views/route/AlertStrip.tsx`**
 
 `StaleBanner.tsx`:
 ```tsx
@@ -3754,7 +3754,7 @@ export default function AlertStrip({ view, card }: { view: DriverView; card: Dri
 }
 ```
 
-- [ ] **Step 3: Write `src/views/route/DayMetrics.tsx`**
+- [x] **Step 3: Write `src/views/route/DayMetrics.tsx`**
 
 ```tsx
 import { fmtClock, fmtCountdown, fmtHm } from '../../lib/format'
@@ -3785,7 +3785,7 @@ export default function DayMetrics({ view }: { view: DriverView }) {
 }
 ```
 
-- [ ] **Step 4: Write `src/views/route/RouteRibbon.tsx`**
+- [x] **Step 4: Write `src/views/route/RouteRibbon.tsx`**
 
 ```tsx
 import type { ReactNode } from 'react'
@@ -3868,7 +3868,7 @@ export default function RouteRibbon({ view }: { view: DriverView }) {
 }
 ```
 
-- [ ] **Step 5: Write `src/views/route/DutyTimeline.tsx`**
+- [x] **Step 5: Write `src/views/route/DutyTimeline.tsx`**
 
 ```tsx
 import type { DutyStatus } from '../../data/types'
@@ -3904,7 +3904,7 @@ export default function DutyTimeline({ view, className = '' }: { view: DriverVie
 }
 ```
 
-- [ ] **Step 6: Write `src/views/route/StopReceipt.tsx`**
+- [x] **Step 6: Write `src/views/route/StopReceipt.tsx`**
 
 ```tsx
 import type { Delivery, Stop } from '../../data/types'
@@ -3969,7 +3969,7 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle }
 }
 ```
 
-- [ ] **Step 7: Write `src/views/route/RouteFilePage.tsx` and wire the route**
+- [x] **Step 7: Write `src/views/route/RouteFilePage.tsx` and wire the route**
 
 ```tsx
 import { useEffect, useMemo, useState } from 'react'
@@ -4060,7 +4060,7 @@ import RouteFilePage from './views/route/RouteFilePage'
 <Route path="routes/:driverId" element={<RouteFilePage />} />
 ```
 
-- [ ] **Step 8: Verify in the browser**
+- [x] **Step 8: Verify in the browser**
 
 Run: `npx tsc --noEmit && npm run dev`, then open `/routes/drv-01` (Marcus):
 - Header: big red `0:12`, "Act now" chip, "Behind 15 min" chip. Lookout pins Marcus's card at the top of the rail.
@@ -4072,7 +4072,7 @@ Run: `npx tsc --noEmit && npm run dev`, then open `/routes/drv-01` (Marcus):
 - `/routes/drv-04` (Elena): "on break", no alerts, no alert strip, a blue break block on the duty timeline ending at the now-line.
 - `/routes/nope`: the not-found empty state.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add -A
