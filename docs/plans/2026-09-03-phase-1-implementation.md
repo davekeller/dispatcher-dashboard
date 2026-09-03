@@ -2495,7 +2495,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 **Interfaces:**
 - Produces: `FilterDef`, `FilterState`, `FILTERS`, `EMPTY_FILTERS`, `applyFilters(cards, byId, state)`, `isFiltering(state)`; `Grouping`, `GROUPINGS`, `groupingById(id)`; `Tone`, `BAND_TONE`, `INFO_TONE`, `STALENESS_TONE`, `severityTone(sev)`; components `Chip`, `Button`, `Card`, `Countdown`, `Bar`, `Avatar`, `EmptyState`.
 
-- [ ] **Step 1: Write the failing filter test**
+- [x] **Step 1: Write the failing filter test**
 
 `src/filters.test.ts`:
 ```ts
@@ -2525,12 +2525,12 @@ describe('applyFilters', () => {
 })
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `npx vitest run src/filters.test.ts`
 Expected: FAIL — `./filters` not found.
 
-- [ ] **Step 3: Write `src/filters.ts` and finish `src/groupBy.ts`**
+- [x] **Step 3: Write `src/filters.ts` and finish `src/groupBy.ts`**
 
 `src/filters.ts`:
 ```ts
@@ -2602,7 +2602,7 @@ export function groupingById(id: GroupingId): Grouping {
 }
 ```
 
-- [ ] **Step 4: Write `src/ui/tones.ts`**
+- [x] **Step 4: Write `src/ui/tones.ts`**
 
 Class names live here as literal strings so Tailwind's scanner sees them and so no component invents its own color.
 
@@ -2639,7 +2639,7 @@ export function severityTone(severity: Severity | 'none'): Tone {
 }
 ```
 
-- [ ] **Step 5: Write the primitives**
+- [x] **Step 5: Write the primitives**
 
 `src/ui/Chip.tsx`:
 ```tsx
@@ -2757,12 +2757,12 @@ export default function EmptyState({ title, body, action }: { title: string; bod
 }
 ```
 
-- [ ] **Step 6: Run tests, typecheck, and a Tailwind sanity check**
+- [x] **Step 6: Run tests, typecheck, and a Tailwind sanity check**
 
 Run: `npm test && npx tsc --noEmit && npm run build`
 Expected: green. Open `dist/assets/*.css` and confirm `.bg-act-now-fill` and `.text-lookout-strong` exist; if not, the token names in `index.css` and `tones.ts` disagree.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add -A
