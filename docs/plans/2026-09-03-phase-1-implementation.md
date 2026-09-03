@@ -1056,7 +1056,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: types, `makeRng`, regions, `MIN`, compute functions for the tests.
 - Produces: `SEED`, `DRIVER_COUNT`, `STOPS_PER_ROUTE`, `generateFleet(anchor, seed?) : Fleet` (raw), `makeFleet(anchor) : Fleet` (generated + planted), `applyPlanted(fleet, anchor): Fleet`, and the planted driver ids: `drv-01` Marcus R., `drv-02` Priya S., `drv-03` Dre W., `drv-04` Elena M., `drv-05` Sam K., `drv-06` Nadia F., `drv-07` Tomas B., `drv-08` Ana L., `drv-09` Ravi P., `drv-10` Omar H.
 
-- [ ] **Step 1: Write the failing seed tests**
+- [x] **Step 1: Write the failing seed tests**
 
 `src/data/seed.test.ts`:
 ```ts
@@ -1151,12 +1151,12 @@ describe('planted drivers at the anchor', () => {
 })
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `npx vitest run src/data/seed.test.ts`
 Expected: FAIL — `./seed` not found.
 
-- [ ] **Step 3: Write `src/data/seed.ts`**
+- [x] **Step 3: Write `src/data/seed.ts`**
 
 ```ts
 import { MIN } from '../time/clock'
@@ -1306,7 +1306,7 @@ export function makeFleet(anchor: number): Fleet {
 }
 ```
 
-- [ ] **Step 4: Write `src/data/planted.ts`**
+- [x] **Step 4: Write `src/data/planted.ts`**
 
 Each planted driver is described as duty blocks ending at the anchor (the last block is ongoing) plus a re-timed route. The generated route's deliveries are kept; only timing and status change.
 
@@ -1422,12 +1422,12 @@ export function applyPlanted(fleet: Fleet, anchor: number): Fleet {
 }
 ```
 
-- [ ] **Step 5: Run tests and typecheck**
+- [x] **Step 5: Run tests and typecheck**
 
 Run: `npx vitest run src/data && npx tsc --noEmit`
 Expected: all pass. If Marcus's countdown is off by a minute, check that `segmentsFromBlocks` leaves the last block open (no `endedAt`) so it closes at `now`. If Dre reconnects to fewer than 50 minutes, check that `truthAfterPing` closed his driving block at `lastPingAt + 5 min`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add -A
