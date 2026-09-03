@@ -372,7 +372,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 **Interfaces:**
 - Produces: every entity type in `types.ts` (copied from the spec §4, plus `Fleet` and `LatLng`); `mulberry32(seed)`, `makeRng(seed): Rng`, `hashString(s)`; `REGIONS`, `REGION_CENTER`, `REGION_LEG_MINUTES`; `TICK_MS`, `MIN`, `ANCHOR`, `LOADED_AT`, `scenarioAnchor(from?)`, `simNow(scrubOffsetMs, wall?, loadedAt?, anchor?)`, `toTick(t)`.
 
-- [ ] **Step 1: Write `src/data/types.ts`**
+- [x] **Step 1: Write `src/data/types.ts`**
 
 ```ts
 export type Region = 'North' | 'West' | 'South' | 'Central'
@@ -461,7 +461,7 @@ export interface Fleet {
 }
 ```
 
-- [ ] **Step 2: Write the failing PRNG and clock tests**
+- [x] **Step 2: Write the failing PRNG and clock tests**
 
 `src/data/prng.test.ts`:
 ```ts
@@ -537,12 +537,12 @@ describe('toTick', () => {
 })
 ```
 
-- [ ] **Step 3: Run tests to verify they fail**
+- [x] **Step 3: Run tests to verify they fail**
 
 Run: `npx vitest run src/data src/time`
 Expected: FAIL — modules not found.
 
-- [ ] **Step 4: Write `src/data/prng.ts`**
+- [x] **Step 4: Write `src/data/prng.ts`**
 
 ```ts
 // mulberry32: tiny, seedable, deterministic. Same seed → same fleet in every
@@ -586,7 +586,7 @@ export function hashString(s: string): number {
 }
 ```
 
-- [ ] **Step 5: Write `src/data/regions.ts`**
+- [x] **Step 5: Write `src/data/regions.ts`**
 
 ```ts
 import type { LatLng, Region } from './types'
@@ -611,7 +611,7 @@ export const REGION_LEG_MINUTES: Record<Region, [number, number]> = {
 }
 ```
 
-- [ ] **Step 6: Write `src/time/clock.ts`**
+- [x] **Step 6: Write `src/time/clock.ts`**
 
 ```ts
 // The one clock. The scenario is pinned to 12:47 PM so the demo is the same at
@@ -644,12 +644,12 @@ export function minutesBetween(from: number, to: number): number {
 }
 ```
 
-- [ ] **Step 7: Run tests and typecheck**
+- [x] **Step 7: Run tests and typecheck**
 
 Run: `npm test && npx tsc --noEmit`
 Expected: all green.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add -A
