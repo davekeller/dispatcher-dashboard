@@ -434,7 +434,7 @@ Vitest, `*.test.ts` beside the module. No UI snapshot tests; the panel reads the
 | Deploy + README + DECISIONS | 15 |
 | **Phase 1** | **~6.5h** |
 
-That is over the brief's 2–3 hour guidance. The answer when asked is the honest one: the core was scoped with discipline, and the extras are labeled as extras in `DECISIONS.md` and the README.
+Minutes are focused build effort for a person directing tools; executed by an agent from the implementation plan, the wall-clock is shorter, and the README records the real elapsed time. Either way it is over the brief's 2–3 hour guidance. The answer when asked is the honest one: the core was scoped with discipline, and the extras are labeled as extras in `DECISIONS.md` and the README.
 
 If behind at the two-thirds mark: drop the notify dialog to a single confirm, collapse Clear cards to a count, keep the ribbon, the receipts, and the reassign flow.
 

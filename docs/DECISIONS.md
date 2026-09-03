@@ -20,4 +20,4 @@ One line per meaningful choice or cut. Newest at the bottom.
 | 14 | Fresh scaffold; Meridian patterns ported by hand, not forked | Reviewers read package.json; no drag-and-drop, theme, or SDK baggage |
 | 15 | Behind-schedule and won't-finish rules ship in Phase 1 | The ribbon and the rules share one math; five rules make the pattern obvious before the live change |
 | 16 | Driver phone and map are Phase 2, but positions and work-order fields are seeded from day one | Cheap now, expensive later |
-| 17 | Phase 1 is ~6.5h, over the 2–3h guidance | Core scoped with discipline; extras labeled as extras in the README |
+| 17 | Phase 1 deliberately exceeds the 2–3h guidance; the README states the real time spent | Core scoped with discipline; extras labeled as extras |

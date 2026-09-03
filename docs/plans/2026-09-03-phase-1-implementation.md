@@ -4632,7 +4632,7 @@ Node 20+. No backend, no keys. The shift is simulated: the clock is pinned to 12
 
 ## Scope, honestly
 
-The brief suggests 2–3 hours. Phase 1 here is about six and a half: the board, the route file with receipts and a schedule ribbon, and the Lookout rail. The core was scoped with discipline; the extras are labeled as extras in `docs/DECISIONS.md`. Not built: the driver's phone view, the map, chat, routing, auth, dark mode, mobile layouts.
+The brief suggests 2–3 hours. This took roughly <hours> hours of directing and reviewing, counting the design conversation, and it produced more than the brief asks for: the board, the route file with receipts and a schedule ribbon, and the Lookout rail. The core was scoped with discipline; the extras are labeled as extras in `docs/DECISIONS.md`. Not built: the driver's phone view, the map, chat, routing, auth, dark mode, mobile layouts.
 
 ## The live change
 
@@ -4652,7 +4652,7 @@ Add the 30-minute-break rule by appending one object to `RULES` in `src/alerts/r
 Sam K. trips it.
 ````
 
-Fill in the deployed URL after Step 4.
+Fill in the deployed URL after Step 4, and replace `<hours>` with the real elapsed time from the first design commit to the deploy commit, rounded to the half hour. The number is whatever it is; the README's job is to be honest about it.
 
 - [ ] **Step 3: Append to `docs/DECISIONS.md`**
 
