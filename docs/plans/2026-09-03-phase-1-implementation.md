@@ -74,12 +74,12 @@ Deviation from the spec's §3, recorded here so nobody hunts for it: Lookout is 
 **Interfaces:**
 - Produces: `fmtClock(t: number): string`, `fmtHm(minutes: number): string`, `fmtCountdown(minutes: number, stale: boolean): string`, `fmtMinutes(minutes: number): string`, `fmtAge(minutes: number): string`, `fmtDrift(minutes: number): string`. Every later task formats time through these.
 
-- [ ] **Step 1: Preflight**
+- [x] **Step 1: Preflight**
 
 Run: `node -v && npm -v && git status --short`
 Expected: Node 20 or newer; a clean tree containing only `.gitignore`, `CLAUDE.md`, `docs/`.
 
-- [ ] **Step 2: Write `package.json`**
+- [x] **Step 2: Write `package.json`**
 
 ```json
 {
@@ -98,7 +98,7 @@ Expected: Node 20 or newer; a clean tree containing only `.gitignore`, `CLAUDE.m
 }
 ```
 
-- [ ] **Step 3: Install dependencies**
+- [x] **Step 3: Install dependencies**
 
 Run:
 ```bash
@@ -107,7 +107,7 @@ npm i -D vite @vitejs/plugin-react typescript vitest oxlint @types/react @types/
 ```
 Expected: `package-lock.json` created; no peer warnings that mention React 18.
 
-- [ ] **Step 4: Write `tsconfig.json`**
+- [x] **Step 4: Write `tsconfig.json`**
 
 ```json
 {
@@ -131,7 +131,7 @@ Expected: `package-lock.json` created; no peer warnings that mention React 18.
 }
 ```
 
-- [ ] **Step 5: Write `vite.config.ts`**
+- [x] **Step 5: Write `vite.config.ts`**
 
 ```ts
 import { defineConfig } from 'vitest/config'
@@ -147,7 +147,7 @@ export default defineConfig({
 })
 ```
 
-- [ ] **Step 6: Write `index.html`, `vercel.json`, `src/main.tsx`, `src/App.tsx`**
+- [x] **Step 6: Write `index.html`, `vercel.json`, `src/main.tsx`, `src/App.tsx`**
 
 `index.html`:
 ```html
@@ -194,7 +194,7 @@ export default function App() {
 }
 ```
 
-- [ ] **Step 7: Write `src/index.css` with every token from the spec §11**
+- [x] **Step 7: Write `src/index.css` with every token from the spec §11**
 
 ```css
 @import "tailwindcss";
@@ -252,7 +252,7 @@ body { @apply bg-canvas text-ink font-sans antialiased; }
 .tnum { font-variant-numeric: tabular-nums; }
 ```
 
-- [ ] **Step 8: Write the failing format tests**
+- [x] **Step 8: Write the failing format tests**
 
 `src/lib/format.test.ts`:
 ```ts
@@ -302,12 +302,12 @@ describe('fmtDrift', () => {
 })
 ```
 
-- [ ] **Step 9: Run the test to verify it fails**
+- [x] **Step 9: Run the test to verify it fails**
 
 Run: `npx vitest run src/lib/format.test.ts`
 Expected: FAIL — cannot resolve `./format`.
 
-- [ ] **Step 10: Write `src/lib/format.ts`**
+- [x] **Step 10: Write `src/lib/format.ts`**
 
 ```ts
 // All time formatting lives here so precision rules (tilde for estimates, no
@@ -347,12 +347,12 @@ export function fmtDrift(minutes: number): string {
 }
 ```
 
-- [ ] **Step 11: Run tests, typecheck, and build**
+- [x] **Step 11: Run tests, typecheck, and build**
 
 Run: `npm test && npm run build`
 Expected: 1 test file, 7 tests passing; `tsc` clean; `dist/` produced. Then `npm run dev` and open `http://localhost:5173`: "Active Shift" renders in Bricolage on the warm canvas.
 
-- [ ] **Step 12: Commit**
+- [x] **Step 12: Commit**
 
 ```bash
 git add -A

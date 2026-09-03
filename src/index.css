@@ -1,0 +1,53 @@
+@import "tailwindcss";
+@import "@fontsource-variable/bricolage-grotesque";
+@import "@fontsource-variable/inter";
+
+/* Warm neutral ops palette. Rhymes with a warm, friendly product language without
+   borrowing anyone's brand. Text variants pass AA on panel; fills are for bars and
+   markers only. Lookout wears coral and nothing else does. */
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Bricolage Grotesque Variable", "Inter Variable", ui-sans-serif, sans-serif;
+
+  --color-canvas: #f4f3f0;
+  --color-panel: #ffffff;
+  --color-well: #ebe9e4;
+  --color-line: #e2dfd8;
+  --color-ink: #1c1a17;
+  --color-muted: #6b665e;
+  --color-label: #7a746a;
+  --color-on-accent: #ffffff;
+
+  --color-lookout: #cf4620;
+  --color-lookout-strong: #a83a15;
+  --color-lookout-soft: #ffe9e2;
+
+  --color-act-now: #b3323f;
+  --color-act-now-fill: #c9414f;
+  --color-act-now-soft: #fbeaec;
+
+  --color-watch: #8f5f0e;
+  --color-watch-fill: #d19a2a;
+  --color-watch-soft: #fbf3e3;
+
+  --color-clear: #2f7d5a;
+  --color-clear-fill: #5aa37f;
+  --color-clear-soft: #e8f4ee;
+
+  --color-offline: #6b7280;
+  --color-offline-fill: #9aa0ab;
+  --color-offline-soft: #eef0f3;
+
+  --color-break: #3b6fb6;
+  --color-break-fill: #6f9bd6;
+  --color-break-soft: #e9f0fa;
+
+  --radius-card: 12px;
+  --radius-control: 8px;
+
+  --shadow-card: 0 1px 2px rgba(28, 26, 23, 0.06), 0 1px 3px rgba(28, 26, 23, 0.08);
+}
+
+html, body, #root { height: 100%; }
+body { @apply bg-canvas text-ink font-sans antialiased; }
+.tnum { font-variant-numeric: tabular-nums; }
