@@ -4099,7 +4099,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: `useActions`, `useDerived`, store methods, `reassignCandidates`, `suggestResetStop`, `stopsPastLimit`, `projectedDepartureAt`, `projectedEta`, format, primitives.
 - Produces: `<Modal title onClose>…</Modal>` with Esc-to-close; `<Toast />`.
 
-- [ ] **Step 1: Write `src/ui/Modal.tsx`**
+- [x] **Step 1: Write `src/ui/Modal.tsx`**
 
 ```tsx
 import { X } from '@phosphor-icons/react'
@@ -4128,7 +4128,7 @@ export default function Modal({ title, onClose, children, footer }: { title: str
 }
 ```
 
-- [ ] **Step 2: Write `src/views/route/actions/ReassignDialog.tsx`**
+- [x] **Step 2: Write `src/views/route/actions/ReassignDialog.tsx`**
 
 ```tsx
 import { useEffect, useMemo, useState } from 'react'
@@ -4248,7 +4248,7 @@ function Preview({ title, before, after, good }: { title: string; before: string
 }
 ```
 
-- [ ] **Step 3: Write `src/views/route/actions/ResetDialog.tsx`**
+- [x] **Step 3: Write `src/views/route/actions/ResetDialog.tsx`**
 
 ```tsx
 import { useState } from 'react'
@@ -4316,7 +4316,7 @@ export default function ResetDialog({ driverId, onClose }: { driverId: string; o
 }
 ```
 
-- [ ] **Step 4: Write `src/views/route/actions/NotifyDialog.tsx`**
+- [x] **Step 4: Write `src/views/route/actions/NotifyDialog.tsx`**
 
 ```tsx
 import { useState } from 'react'
@@ -4375,7 +4375,7 @@ export default function NotifyDialog({ driverId, onClose }: { driverId: string; 
 }
 ```
 
-- [ ] **Step 5: Wire `ActionDialogs` and write `src/ui/Toast.tsx`**
+- [x] **Step 5: Wire `ActionDialogs` and write `src/ui/Toast.tsx`**
 
 Replace `src/actions/ActionDialogs.tsx`:
 ```tsx
@@ -4435,7 +4435,7 @@ import Toast from '../ui/Toast'
 <DevPanel />
 ```
 
-- [ ] **Step 6: Verify in the browser**
+- [x] **Step 6: Verify in the browser**
 
 Run: `npx tsc --noEmit && npm run dev`, on `/routes/drv-01`:
 - "Reassign stops" on the won't-finish row opens the dialog with stops 14 and 15 pre-selected (the ones past the limit), Ana L. among the same-region drivers at the top, Ravi absent. Selecting Ana shows Marcus "after: 0:10 vs 0:12" in green and Ana still green. Confirm → toast "Marcus R.'s stops reassigned to Ana L." with Undo; Marcus's won't-finish row disappears within a tick; his approaching row remains; Ana's card gains two stops. Undo restores everything.
@@ -4444,7 +4444,7 @@ Run: `npx tsc --noEmit && npm run dev`, on `/routes/drv-01`:
 - On `/routes/drv-02` (Priya, over): Reassign opens with both stops selected and Ravi correctly missing from candidates; the empty-candidate path appears only if you scrub the clock until nobody has capacity, and its button opens the reset dialog.
 - Esc closes any dialog; clicking the scrim closes it.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add -A

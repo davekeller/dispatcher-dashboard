@@ -3,6 +3,7 @@ import { ActionProvider } from '../actions/ActionContext'
 import ActionDialogs from '../actions/ActionDialogs'
 import { LookoutProvider } from '../lookout/LookoutContext'
 import LookoutSidebar from '../lookout/LookoutSidebar'
+import Toast from '../ui/Toast'
 import DevPanel from './DevPanel'
 import Header from './Header'
 import LeftNav from './LeftNav'
@@ -24,6 +25,7 @@ export default function Layout() {
           <LookoutSidebar />
         </div>
         <ActionDialogs />
+        <Toast />
         <DevPanel />
       </ActionProvider>
     </LookoutProvider>
