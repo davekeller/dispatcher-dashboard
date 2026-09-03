@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router'
 import Layout from './app/Layout'
+import ActiveShiftPage from './views/shift/ActiveShiftPage'
 import EmptyState from './ui/EmptyState'
 
 function Placeholder({ title }: { title: string }) {
@@ -14,7 +15,7 @@ export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<Placeholder title="Active Shift" />} />
+        <Route index element={<ActiveShiftPage />} />
         <Route path="routes/:driverId" element={<Placeholder title="Route file" />} />
         <Route path="drivers" element={<Placeholder title="Drivers" />} />
         <Route path="routes" element={<Placeholder title="Routes" />} />

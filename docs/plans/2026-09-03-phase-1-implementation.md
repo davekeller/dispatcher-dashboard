@@ -3142,7 +3142,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: `useDerived`, `useStore.groupBy`, `FILTERS`/`applyFilters`/`EMPTY_FILTERS`/`isFiltering`, `groupingById`, tones, primitives, `LIMIT_MIN`.
 - Produces: `<RouteCard view card pick />` reused nowhere else but designed to match the rail's card anatomy.
 
-- [ ] **Step 1: Write `src/views/shift/MetricsRow.tsx`**
+- [x] **Step 1: Write `src/views/shift/MetricsRow.tsx`**
 
 ```tsx
 import type { FilterState } from '../../filters'
@@ -3192,7 +3192,7 @@ export default function MetricsRow({ metrics, filters, onPreset }: { metrics: Me
 }
 ```
 
-- [ ] **Step 2: Write `src/views/shift/FilterBar.tsx`**
+- [x] **Step 2: Write `src/views/shift/FilterBar.tsx`**
 
 ```tsx
 import { MagnifyingGlass, X } from '@phosphor-icons/react'
@@ -3236,7 +3236,7 @@ export default function FilterBar({ filters, onChange }: { filters: FilterState;
 }
 ```
 
-- [ ] **Step 3: Write `src/views/shift/RouteCard.tsx`**
+- [x] **Step 3: Write `src/views/shift/RouteCard.tsx`**
 
 ```tsx
 import { Truck } from '@phosphor-icons/react'
@@ -3294,7 +3294,7 @@ function nextLabel(view: DriverView): string {
 }
 ```
 
-- [ ] **Step 4: Write `src/views/shift/Board.tsx`**
+- [x] **Step 4: Write `src/views/shift/Board.tsx`**
 
 ```tsx
 import type { DriverCard } from '../../alerts/types'
@@ -3329,7 +3329,7 @@ export default function Board({ cards, byId, grouping, pickId }: { cards: Driver
 }
 ```
 
-- [ ] **Step 5: Write `src/views/shift/ActiveShiftPage.tsx` and wire the route**
+- [x] **Step 5: Write `src/views/shift/ActiveShiftPage.tsx` and wire the route**
 
 ```tsx
 import { useState } from 'react'
@@ -3373,7 +3373,7 @@ import ActiveShiftPage from './views/shift/ActiveShiftPage'
 <Route index element={<ActiveShiftPage />} />
 ```
 
-- [ ] **Step 6: Verify in the browser**
+- [x] **Step 6: Verify in the browser**
 
 Run: `npx tsc --noEmit && npm run dev`
 Check, at the anchor:
@@ -3382,7 +3382,7 @@ Check, at the anchor:
 - Clicking "Over limit" filters to Priya, Marcus, Dre (the Act now band); clicking it again clears. Group by Status shows five columns.
 - +1h in the dev panel: Marcus's countdown goes negative and his badge changes to "Over limit" within a tick.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add -A
