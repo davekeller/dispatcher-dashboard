@@ -1,0 +1,449 @@
+# ARCHITECTURE — Dispatcher's Dashboard
+
+Source of truth for how the product is built. `BRIEF.md` says what and why, `LAYOUT.md` describes the surfaces, `FLOWS.md` walks the flows. Where those disagree with this file, this file wins (it was written last, on 2026-09-03, after the design was settled).
+
+The co-pilot is named **Lookout**. The dispatcher is **Lena**. The simulated shift is anchored at **12:47 PM**.
+
+---
+
+## 1. Principles the architecture enforces
+
+1. **Exceptions first.** The primary surface ranks by urgency. Fleet-wide state is a metrics row, not the main event.
+2. **Predict, don't react.** Every HOS figure is derived from duty segments against a live clock. Alerts fire before the violation and carry their interventions.
+3. **Stale data is a state.** Every entity has `lastPingAt`. Staleness is derived, visible, and changes precision and copy. Unknown + high-stakes sorts up.
+4. **Insight → action, with a confirm.** Every action confirms, then commits to local state, then the derived layer recomputes. Nothing mutates silently.
+5. **Rules as data.** Alerts, filters, and column grouping are config arrays. Adding one is a one-object edit.
+6. **One clock, one source of truth.** A single `now`. One `alerts` array feeds the board, the route file, and Lookout. If two surfaces disagree, that is the bug to find first.
+7. **Color is attention.** Only things that need attention carry saturated color. Everything else is subdued. Lookout wears coral and nothing else does.
+
+---
+
+## 2. Stack and dependencies
+
+Vite · React 19 · TypeScript · Tailwind v4 (via `@tailwindcss/vite`). Light theme only. No backend. Deployed to Vercel.
+
+| Runtime dependency | Why |
+|---|---|
+| `react`, `react-dom` | UI |
+| `react-router` | Three real routes now, two more in Phase 2; drivers get URLs for the walkthrough |
+| `zustand` | One small store with actions and one-level undo; less ceremony than context + reducer |
+| `@phosphor-icons/react` | Duotone weight rhymes with Toast's duo-tone icon style without copying it; has a truck |
+| `@fontsource-variable/bricolage-grotesque`, `@fontsource-variable/inter` | Display and body faces, bundled, no CDN |
+| Phase 2 only: `leaflet`, `react-leaflet` | Map and phone view; lazy-loaded, never on the critical path |
+
+Dev: `vite`, `typescript`, `vitest`, `oxlint`, `@vitejs/plugin-react`, `@types/*`.
+
+Reviewers read the package.json. Nothing else goes in without a one-line reason in `DECISIONS.md`.
+
+---
+
+## 3. Directory layout
+
+```
+src/
+  main.tsx · App.tsx (routes) · index.css (tokens)
+  app/          Layout.tsx · LeftNav.tsx · DevPanel.tsx
+  data/         types.ts · prng.ts · seed.ts · planted.ts · regions.ts
+  time/         clock.ts · useNow.ts
+  hos/          constants.ts · compute.ts · compute.test.ts
+  alerts/       types.ts · rules.ts · rank.ts · rank.test.ts
+  bands.ts · filters.ts · groupBy.ts
+  store/        store.ts · actions.ts · undo.ts · derive.ts
+  lookout/      LookoutSidebar.tsx · LookoutPortal.tsx · AlertBar.tsx · RecommendationCard.tsx · ActionConfirm.tsx · voice.ts
+  views/
+    shift/      ActiveShiftPage.tsx · MetricsRow.tsx · Board.tsx · RouteCard.tsx · Filters.tsx
+    route/      RouteFilePage.tsx · RouteHeader.tsx · AlertStrip.tsx · DayMetrics.tsx · RouteRibbon.tsx · DutyTimeline.tsx · StopReceipt.tsx
+    route/actions/  ReassignDialog.tsx · ResetDialog.tsx · NotifyDialog.tsx
+    driver/     DriverPhoneView.tsx · PhoneFrame.tsx        (Phase 2)
+    map/        MapView.tsx                                   (Phase 2, lazy)
+  ui/           Chip · Button · Card · Sheet · Countdown · Bar · Avatar · EmptyState
+  lib/          format.ts (clock times, durations, tilde precision)
+```
+
+Files stay small and single-purpose. `rules.ts` imports nothing heavy so HMR is instant during the live change.
+
+---
+
+## 4. Data model
+
+```ts
+type Region = 'North' | 'West' | 'South' | 'Central'   // four, so the board fits beside the open rail
+
+type DutyStatus = 'driving' | 'on_duty' | 'on_break' | 'off_duty'
+
+interface DutySegment {
+  status: DutyStatus
+  startedAt: number            // epoch ms (sim clock)
+  endedAt?: number             // undefined = ongoing
+  planned?: boolean            // true for a scheduled reset the dispatcher added
+}
+
+interface Driver {
+  id: string
+  name: string                 // "Marcus R."
+  initials: string
+  truckId: string
+  routeId: string
+  region: Region
+  shiftStartedAt: number
+  segments: DutySegment[]      // the truth. HOS math reads segmentsKnownAt(lastPingAt), see §6
+  lastPingAt: number           // mirrors the truck's telematics ping; one ping source, two entities show it
+  pingsSuspended?: boolean     // planted stale/offline drivers stop pinging; everyone else pings with the clock
+  contactAttemptedAt?: number  // set by the "call driver" action
+}
+
+interface Truck {
+  id: string
+  plate: string
+  region: Region
+  position: { lat: number; lng: number }   // around one metro; used by map and phone, seeded from day one
+  lastPingAt: number
+}
+
+interface Delivery {                        // the brief's "deliveries with attributes", by name
+  id: string
+  customer: string
+  address: string
+  position: { lat: number; lng: number }
+  window: { start: number; end: number }
+  priority: 'standard' | 'priority'
+  items: string[]                           // "12 cases · dry goods"
+  instructions?: string                     // "Dock B. Call on arrival."
+}
+
+type StopStatus = 'pending' | 'in_progress' | 'done' | 'failed' | 'unassigned'
+
+interface Stop {
+  id: string
+  routeId: string
+  deliveryId: string
+  seq: number
+  driveMinutesFromPrev: number   // the leg into this stop; consumes the 11-hour limit
+  serviceMinutes: number         // time at the stop; on duty, not driving
+  plannedEta: number             // cumulative from route start
+  status: StopStatus
+  arrivedAt?: number
+  departedAt?: number
+  outcome?: 'delivered' | 'partial' | 'failed'
+  signedBy?: string
+  notifiedAt?: number            // customer notified of a delay
+  note?: string                  // "Customer closed, retry after 3pm"
+}
+
+interface Route {
+  id: string
+  driverId: string
+  region: Region
+  plannedStartAt: number
+  windowEnd: number
+  stops: Stop[]                  // ordered by seq; the remaining ones drive reassign
+}
+```
+
+A route belongs to one driver for the day, so a card on the board is a route, a driver, and a truck at once.
+
+### Seed
+
+- `prng.ts`: mulberry32 with a fixed seed. Never `Math.random()`.
+- 50 drivers and trucks spread across the four regions (13 / 13 / 12 / 12). Shift starts vary 04:30–06:30.
+- ~20 stops per route, ~1,000 deliveries. Drive legs 8–35 min, service 6–20 min. Positions cluster by region around one metro (Chicago-shaped, no real addresses).
+- Actual progress is generated by walking each route from its start with a per-driver drift factor, so most are on time, some ahead, a few behind.
+- **Planted drivers** (`planted.ts`) overwrite generated ones after generation, with hand-authored segments and stop progress:
+
+| Driver | Scenario | Proves |
+|---|---|---|
+| Marcus R. | ~12 min to limit, 3 stops left needing ~34 min of driving, ~15 min behind schedule | The hero: approaching + won't-finish; the ribbon lines cross |
+| Priya S. | Over the limit by ~6 min, still driving | Violation state, different card and actions |
+| Dre W. | Offline 25 min; last-known ~40 min to limit; truth: went on break 5 min after the last ping | Unknown + high-stakes sorts up; recovery correction on reconnect |
+| Elena M. | On break, 20 min in, ~2h to limit | Segments understood; countdown paused |
+| Sam K. | 8h05m cumulative driving with no 30-min break | Trips the 30-minute-break rule added live during the panel |
+| Nadia F. | Stale 8 min; ~70 min to limit, driving | The stale tier on its own: tilde, dropped seconds, age label, band unchanged |
+| Tomas B. | 35 min behind schedule, 7 stops left, HOS clear | Behind-schedule rule alone; edge path without HOS |
+| Ana L. | Fresh, same region as Marcus, 4h of drive time left, 5 stops | The obvious reassign candidate |
+| Ravi P. | Fresh, same region as Priya, 55 min of drive time left | The marginal candidate; excluded by the capacity margin |
+
+Everyone else is comfortably clear so the board is not all red.
+
+---
+
+## 5. Time
+
+- `clock.ts`: `SCENARIO_ANCHOR` = today at 12:47:00 local. `now = anchor + (Date.now() − loadedAt) + scrubOffset`. The clock is live (it ticks), deterministic (same scenario every load), and scrubbable.
+- `useNow()`: one hook, ticks every `TICK_MS = 5000`, value rounded to the tick so memo keys are stable. Nothing else reads `Date.now()`.
+- **Simulated telematics.** Drivers without `pingsSuspended` are treated as pinging continuously: their effective `lastPingAt` is `now − jitter(driverId)` with jitter 0–90s. Planted stale/offline drivers keep their stored `lastPingAt`. This is derivation, not mutation, so the fleet does not go offline when the clock is scrubbed or a tab is left open.
+- **Dev panel** (hidden behind `⌘.`, and a small "dev" toggle in the header): +15m, +1h, reset clock; "bring Dre online" (clears `pingsSuspended`); "advance Marcus one stop"; reset data; undo. The panel exists so any alert can be fired on demand during the walkthrough.
+
+---
+
+## 6. Derivation: Lookout's brain
+
+All pure, no React, unit-tested. Memoized in `store/derive.ts` on `(entities, roundedNow)`.
+
+### Constants (`hos/constants.ts`)
+
+```
+LIMIT_MIN = 660      ACT_NOW_MIN = 30     WATCH_MIN = 90
+FRESH_MIN = 3        OFFLINE_MIN = 15     SNOOZE_MIN = 10
+BEHIND_MIN = 15      CAPACITY_MARGIN_MIN = 20     WINDOW_14H_MIN = 840
+```
+
+Boundaries: `≤ 30` is act now, `≤ 90` is watch, `≤ 0` is over. `< 3` fresh, `3–15` stale, `> 15` offline. Bands are monotonic over time so nothing flaps at a boundary.
+
+### `hos/compute.ts`
+
+- `segmentsKnownAt(driver, at)` — segments as they were known at the last ping: those started before `at`, with any ongoing one still open. **HOS math always reads `segmentsKnownAt(driver, lastPingAt)`**, for fresh and stale drivers alike; for fresh drivers that is everything. This is what makes an offline projection honest: it continues the last-known segment and cannot see what happened after the radio died.
+- `drivingMinutes(driver, now)` — sum of `driving` segments, ongoing segment closed at `now`. A driver last seen driving keeps accumulating while offline; a driver last seen on break does not.
+- `minutesUntilLimit(driver, now)` — `LIMIT_MIN − drivingMinutes`. Negative means over.
+- `hosStatus(driver, now)` — `'over' | 'act_now' | 'watch' | 'clear'`.
+- `staleness(entity, now)` — `'fresh' | 'stale' | 'offline'`, and `pingAgeMinutes`.
+- `remainingStops(route)` — pending + in_progress, in seq order. Unassigned stops are excluded (they are someone else's problem now, see §8).
+- `remainingDriveMinutes(route)` — sum of `driveMinutesFromPrev` over remaining stops. This, against `minutesUntilLimit`, is the number that matters.
+- `scheduleDrift(route, now)` — `now − plannedEta(next pending stop)`; positive is behind. Displayed ahead/behind only past ±5 min.
+- `projectedEta(stop, drift)` — `plannedEta + max(0, drift)` for pending stops.
+- `projectedFinishAt(route, now)` — `now + remaining drive + remaining service`, following the leg order.
+- `limitHitAt(driver, route, now)` — walk the remaining legs; the clock time at which cumulative driving reaches the limit. Service time advances the clock but does not consume the limit. This is where the limit mark sits on the ribbon, so the ribbon and the rules agree by construction.
+- `breakDueIn(driver, now)` — minutes of driving since the last ≥30-min interruption, for the live-change rule.
+- `precision(staleness)` — fresh shows `0:18`, stale/offline show `~0:40` and drop seconds. Precision falls with age.
+
+### `DriverView`
+
+`derive.ts` builds one `DriverView` per driver each tick: driver, truck, route, the computed figures above, `remaining`, `unnotifiedLateStops`, `hasUnassignedStops`, `snoozedUntil`. Rules and views read this and never recompute.
+
+### Rules (`alerts/rules.ts`)
+
+```ts
+type Severity = 'critical' | 'act_now' | 'watch' | 'info'
+type ActionId = 'reassign' | 'schedule_reset' | 'notify_customer' | 'call_driver' | 'acknowledge'
+
+interface Rule {
+  id: string
+  label: string
+  severity: Severity
+  when: (v: DriverView) => boolean
+  message: (v: DriverView) => { title: string; body: string }
+  actions: ActionId[]
+}
+export const RULES: Rule[] = [ /* one object per rule */ ]
+```
+
+Fixed severity and a `when` predicate keeps the shape copy-pasteable in front of the panel. Rules that need two severities are two objects.
+
+| id | severity | fires when | actions |
+|---|---|---|---|
+| `over_limit` | critical | `drivingMinutes ≥ 660` | reassign, call_driver |
+| `limit_act_now` | act_now | driving or on_duty, `0 < minutesUntilLimit ≤ 30` | reassign, schedule_reset, notify_customer |
+| `limit_watch` | watch | driving or on_duty, `30 < minutesUntilLimit ≤ 90` | schedule_reset, reassign |
+| `wont_finish` | act_now | stops remain and `remainingDriveMinutes > minutesUntilLimit` and not over | reassign (pre-selects the stops past the limit), schedule_reset |
+| `offline_near_limit` | act_now | offline and last-known `minutesUntilLimit ≤ 90` | call_driver, acknowledge |
+| `offline` | watch | offline and last-known `minutesUntilLimit > 90` | call_driver, acknowledge |
+| `behind_schedule` | watch | `drift ≥ 15` and stops remain and unnotified late stops exist | notify_customer, reassign |
+| `stops_unassigned` | info | the route has unassigned stops | reassign |
+| `break_due` | watch | **added live during the panel**: ≥ 8h driving since last 30-min break | schedule_reset |
+
+Copy is written in `message()` in Lookout's voice (`lookout/voice.ts` holds the name and shared phrases): "Marcus R. hits his limit in 18 min with 3 stops left." "Priya S. is over her limit by 6 min. She needs to stop now." "Dre W. hasn't pinged in 25 min. Last estimate: ~40 min to limit." Stale figures carry the tilde and the age.
+
+### Ranking (`alerts/rank.ts`)
+
+`rankDrivers(views, alerts, now): DriverCard[]` groups alerts by driver into one card with several reasons. Sort key, in order: severity rank (critical, act_now, watch, info), snoozed after unsnoozed at equal severity, minutes-to-violation ascending (offline continuation counts), staleness (offline before stale before fresh), driver id. Stable across ticks so cards never jump. Snooze de-emphasizes; it never removes a critical or act-now card.
+
+`alertBar = ranked.slice(0, 3)`. If the bar ever needs its own logic, something upstream is wrong.
+
+### Bands (`bands.ts`)
+
+`band(card): 'act_now' | 'watch' | 'offline' | 'break' | 'clear'` — top severity critical or act_now → act_now (critical cards label "Over limit" at the top of the band); watch → watch; else offline if staleness is offline; else break if on_break; else clear. Offline inside the watch window therefore lands in Act now with a hollow marker, and the Offline band holds only dark drivers whose last-known state is clear. Stale (3–15 min) never moves a card; it only adds the tilde and the age.
+
+### Filters and grouping (`filters.ts`, `groupBy.ts`)
+
+```ts
+interface Filter { id: string; label: string; kind: 'multi' | 'text'; options?: {value, label}[]; apply: (v: DriverView, value) => boolean }
+export const FILTERS: Filter[] = [ band, freshness, region, search ]
+
+interface Grouping { id: 'region' | 'band'; label: string; columns: string[]; keyOf: (v: DriverView) => string }
+export const GROUPINGS: Grouping[] = [ byRegion, byBand ]
+```
+
+Metrics cards set filter presets. Adding a filter or a grouping is one object.
+
+---
+
+## 7. Store and actions
+
+Zustand, one store: `{ drivers, trucks, routes, deliveries, scrubOffset, snoozes, lastAction, undoSnapshot }`. Views subscribe to the derived layer, not the raw entities.
+
+Every action follows the same protocol: **preview → confirm → commit → recompute → inline result → undo available for 10s.** The rail and the route file call the same functions in `store/actions.ts`; there is no second implementation anywhere.
+
+| Action | What it changes | How the alert resolves |
+|---|---|---|
+| `reassignStops(from, to, stopIds)` | Moves stops to the end of the target route; recomputes their planned ETAs from the target's projected finish | Source's `remainingDriveMinutes` drops; `wont_finish` and `limit_*` downgrade or clear. Target may enter watch; the preview shows both drivers' new figures |
+| `scheduleReset(driverId, afterStopId)` | Inserts a planned `off_duty` segment (10h) starting at that stop's projected departure; stops after it become `unassigned` | Remaining drive counts only stops up to the reset point; `stops_unassigned` fires at info with a reassign action that pre-selects them |
+| `notifyCustomer(stopIds, message)` | Sets `notifiedAt`; pre-filled message with the projected ETA | `behind_schedule` reads unnotified late stops; when all are notified its body says so |
+| `callDriver(driverId)` | Sets `contactAttemptedAt` | Offline card shows "called 12:52", stays until a ping arrives |
+| `acknowledge(alertId)` | Snoozes 10 min | De-emphasized in rank, never hidden for critical/act-now |
+| `markArrived / markDeparted(stopId, outcome)` | Phone and dev panel | Receipts update; drift recomputes |
+| `undo()` | Restores the snapshot taken before the last action | |
+
+**Reassign candidates:** fresh, driving or on duty, band not act-now or over, and `minutesUntilLimit − (remainingDriveMinutes + movedDriveMinutes) ≥ CAPACITY_MARGIN_MIN`. Same region first, then most spare drive time. Partial reassign is selecting receipt cards; default is every remaining stop, or the stops past the limit when opened from `wont_finish`. Empty list: "No one has the capacity. Schedule a reset instead," with the reset button right there.
+
+**Schedule reset** suggests the last stop the driver can finish before the limit, computed from `limitHitAt`.
+
+---
+
+## 8. Shell and routes
+
+Three panes. Left nav (Active Shift selected; Drivers, Routes, Reports as placeholders; collapses to icons). Main outlet. Lookout sidebar mounted once at app level; each page portals its rail content into it, Meridian's pattern. When Lookout is open the app shifts left to make room; collapsed, it becomes a rail with the act-now count as a badge.
+
+| Route | View | Phase |
+|---|---|---|
+| `/` | Active Shift | 1 |
+| `/routes/:driverId` | Route file | 1 |
+| `/driver/:driverId` | Driver phone | 2 |
+| `/map` | Map | 2 |
+
+Header: view title, shift clock (labeled as simulated), group-by control, view toggle (Board now; Map in Phase 2), dev toggle.
+
+---
+
+## 9. Views
+
+### Active Shift
+
+**Metrics row.** Drivers on shift · Approaching limit · Over limit · Offline · Stops done / remaining, and "Need a driver" when any stop is unassigned. Each card is a filter shortcut. Numbers derive from the same views the board uses.
+
+**Board.** Columns are regions by default (group-by can switch to bands). Within a column, cards sort by Lookout's rank, most urgent at the top, so the top row of the board is "the most urgent problem in each region." Each column scrolls independently. Clear cards stay in their column in a quiet tone. Filters sit above the board.
+
+**Route card.** Left marker strip in the band color (hollow/dashed for offline) · duotone truck glyph, colored only when the card has attention · driver name and truck plate · live countdown in tabular figures, tilde when stale · drive-time bar on an 11h scale · route progress `done/total` and next stop · data age chip · badge row, one badge per firing rule · Lookout pick marker on the board's overall top card. Click opens the route file. Nothing drags: a card's position is computed, not assigned.
+
+**Empty states.** Nothing needs attention: "All clear. 46 drivers on shift, next check-in in 5s." A filter that matches nothing: say which filter, offer to clear it. A region with no trucks: the column says so.
+
+### Route file (`/routes/:driverId`)
+
+A page in the main pane; Lookout stays open and focuses on this driver. Breadcrumb back to Active Shift. Sections in reading order:
+
+1. **Header.** Avatar/initials, name, truck, region, band chip, large live countdown, data age, schedule status chip (On time / Behind 14 min / Ahead 5 min). If stale or offline, a banner: "Last ping 25 min ago. Figures are estimates."
+2. **Alert strip.** Only when alerts exist. One `AlertCard` per firing rule, copy and actions from the rule object, confirm inline. New rules render here with no new UI.
+3. **Day metrics.** Driving time · on duty since · break taken or "none yet" · stops done / remaining · remaining drive vs. time to limit, the pair that decides everything.
+4. **Route ribbon.** One time axis from route start to the latest of window end, limit, and the 14-hour mark. Stop ticks at projected ETAs (planned + drift) for pending stops and at actual departure for done ones; filled through the last completed stop. A now-line with the clock. The limit mark at `limitHitAt`. If the last tick sits past the limit mark, the span between is hatched in the act-now color, and `wont_finish` is the rule that fires, on the same math.
+5. **Duty timeline.** Today's segments on the same axis: driving, on duty, break, off, planned reset.
+6. **Stop receipts.** Vertical list, oldest first. Done: arrived, departed, dwell, items, signed by, outcome, any note. Next: highlighted, with ETA and window. Pending: projected ETA, window, priority, and a checkbox for partial reassign. Notified stops show the stamp. Unassigned stops show "needs a driver."
+7. **Actions.** Reassign, schedule reset, notify customer; each opens its dialog, previews, confirms, commits. Position-dependent actions are disabled with a reason when data is stale or offline.
+8. **Driver's phone** button (Phase 2) renders `DriverPhoneView` in a phone frame overlay, so the dispatcher's action and the driver's screen are visible together.
+
+### Lookout rail
+
+Header with the name and a collapse control (avatar later). **Alert bar**: the top three, one line each, band-colored, live countdowns; click opens the route file. **Recommendation cards**: the full ranked list, one card per driver with every reason, 2–3 actions each, same handlers as the route file. On a route file the rail pins that driver's card at the top and lists the rest below. Chat arrives in Phase 2 as matched intents that render these same cards; the no-match reply lists what Lookout can do.
+
+Lookout never has its own data. It reads `ranked` and nothing else.
+
+### Driver phone (`/driver/:driverId`, Phase 2)
+
+Mobile-first. Header collapses to the driver's avatar and their own countdown chip, the same number Lena sees. Full-bleed map with the route to the next stop. A bottom sheet peeks with the next stop's name, ETA, and window; swipe up reveals the work order: items, instructions, contact, and Arrived / Delivered buttons that write to the store. When Lena reassigns a stop, the phone's next stop changes. The architecture commits to this now: the store is shared, `Delivery` carries items and instructions from day one, positions are seeded from day one, and `StopReceipt` and the map component are shared between the route file and the phone.
+
+### Map (`/map`, Phase 2)
+
+react-leaflet, CARTO light basemap with OpenStreetMap attribution, lazy-loaded. The attention rule applies: every truck a small neutral dot at reduced opacity; act-now, watch, and offline markers in their band color with a name-and-countdown pill; offline hollow at the last known position with a "last seen" tooltip. The remaining route polyline draws only for the selected driver. Click opens the route file. If tiles fail, a message and the board are one click away.
+
+---
+
+## 10. Edge paths
+
+Each is designed, not discovered. Where it shows up is as important as what happens.
+
+| Situation | Behavior | Visible in |
+|---|---|---|
+| Stale (3–15 min) | Tilde, seconds dropped, age shown; band unchanged | Card, header, rail |
+| Offline (>15 min) | Hollow marker; projection continues the last-known segment; own band unless inside the watch window, then Act now | Board, rail, route file banner |
+| Ping recovers | Figures jump; "Updated: was ~40 min, now 33 min" shown for one tick rather than silently replaced | Card, route file |
+| Behind schedule | Status chip, ribbon gap, `behind_schedule` at watch, notify action | Route file, card badge |
+| Won't finish before limit | Ribbon hatch past the limit mark, `wont_finish` at act now, reassign pre-selects the stops past the limit | Route file, rail |
+| Already over the limit | Critical card with different copy and actions: stop now, who takes the stops | Rail, route file |
+| On break | Countdown paused; resumes when the break ends; `limit_*` rules skip on_break | Card, duty timeline |
+| Failed stop | Receipt shows the failure and note; remaining stops shift; drift recomputes | Route file |
+| No reassign candidate | Graceful path to schedule a reset | Reassign dialog |
+| Partial reassign | Select receipt cards; default all remaining | Reassign dialog |
+| Two alerts, one driver | One card, two reasons | Rail, card badges |
+| Acknowledge | Snoozed 10 min, de-emphasized, never hidden for critical/act now; snooze expiry restores emphasis | Rail |
+| Reset mid-route | Stops after the reset point become unassigned; `stops_unassigned` fires; metrics show "need a driver" | Route file, metrics, rail |
+| All stops done | "Finished, heading in"; no exposure; card goes quiet | Card, route file |
+| Clock scrubbed far ahead | Everyone accumulates; the dev panel says "the scrubber advances the clock, not the world" | Dev panel |
+| Empty filter, empty region, nothing to flag | Explicit empty states | Board |
+| Undo | Last action reversible for 10s from the result toast, always from the dev panel | Toast, dev panel |
+
+---
+
+## 11. Visual system
+
+Neutral, dense, calm, warm. Ops software used mid-shift. Rhymes with Toast's warmth and Toast IQ's proactive-feed pattern without borrowing the brand.
+
+**Tokens** (Tailwind v4 `@theme`, all in `index.css`; components use tokens only, never raw hex):
+
+| Token | Value | Use |
+|---|---|---|
+| `--color-canvas` | `#f4f3f0` | Page ground |
+| `--color-panel` | `#ffffff` | Cards, rail |
+| `--color-well` | `#ebe9e4` | Inset grounds, column backgrounds |
+| `--color-line` | `#e2dfd8` | Keylines |
+| `--color-ink` | `#1c1a17` | Text, primary buttons |
+| `--color-muted` | `#6b665e` | Secondary text |
+| `--color-label` | `#7a746a` | Micro-labels on panel only |
+| `--color-lookout` / `-strong` / `-soft` | `#cf4620` / `#a83a15` / `#ffe9e2` | Lookout, and only Lookout |
+| `--color-act-now` / `-fill` / `-soft` | `#b3323f` / `#c9414f` / `#fbeaec` | Act now and Over limit |
+| `--color-watch` / `-fill` / `-soft` | `#8f5f0e` / `#d19a2a` / `#fbf3e3` | Watch |
+| `--color-clear` / `-fill` / `-soft` | `#2f7d5a` / `#5aa37f` / `#e8f4ee` | Clear (muted) |
+| `--color-offline` / `-fill` / `-soft` | `#6b7280` / `#9aa0ab` / `#eef0f3` | Offline, dashed/hollow |
+| `--color-break` / `-fill` / `-soft` | `#3b6fb6` / `#6f9bd6` / `#e9f0fa` | On break |
+| `--color-on-accent` | `#ffffff` | Text on saturated grounds |
+
+Text variants must pass AA on panel; fills are for bars and markers. Validate the pairs once during theme setup and note the results in `DECISIONS.md`. Watch's text color is deliberately darker than its fill so it clears AA while staying distinct from Lookout's coral.
+
+**Type.** Bricolage Grotesque Variable for display: page titles, the large countdown, metric numbers. Inter Variable for everything else, `font-variant-numeric: tabular-nums` on every countdown and duration so rows never jitter. Two faces, no serif.
+
+**Shape and rhythm.** 12px radius on cards, 8px on controls, pill chips. Rows ~40px, cards compact, whitespace spent on grouping. Quiet keylines, one soft shadow level. Phosphor duotone icons. Motion: countdown ticks and a subtle band-change transition only. Light only.
+
+**Illustration (Phase 2 polish).** A custom two-tone truck mark can replace the Phosphor glyph without touching layout. "Cards shaped like trucks with a trailer" is an experiment to try once the board works, kept only if it costs no scanability.
+
+---
+
+## 12. Testing
+
+Vitest, `*.test.ts` beside the module. No UI snapshot tests; the panel reads the derivation tests.
+
+- `hos/compute.test.ts`: ongoing segment closes at now; break pauses accumulation; `segmentsKnownAt` hides post-ping segments; thresholds at exactly 30:00, 90:00, 0:00; staleness at 3 and 15; `limitHitAt` skips service time; drift sign.
+- `alerts/rank.test.ts`: one card per driver; severity then time then staleness; stable order across two ticks; snooze demotes but never removes act now.
+- `alerts/rules.test.ts`: each planted driver trips exactly the rules the table in §4 says.
+- `bands.test.ts`: offline inside the watch window is act now; offline and clear is offline.
+- `data/seed.test.ts`: same seed, same fleet; planted drivers present with the planted figures at the anchor.
+- `derive.test.ts`: the one-source-of-truth test: the rail's order equals the board's within-column order for the same driver set.
+
+---
+
+## 13. Phasing and budget
+
+**Phase 1, the submittable product.** Shell, routing, tokens · data, seed, clock, pings · compute, rules, rank, bands, tests · store, actions, undo · Active Shift with metrics, board, cards, filters · Lookout rail · route file with header, alert strip, metrics, ribbon, duty timeline, receipts · the three action dialogs · staleness, copy, empty states · deploy, README, DECISIONS.
+
+| Block | Min |
+|---|---|
+| Shell + routing + tokens | 30 |
+| Data + seed + clock + pings | 50 |
+| Compute + rules + rank + bands + tests | 45 |
+| Store + actions + undo | 30 |
+| Active Shift | 55 |
+| Lookout rail | 35 |
+| Route file | 70 |
+| Action dialogs | 45 |
+| Staleness, copy, empty states | 20 |
+| Deploy + README + DECISIONS | 15 |
+| **Phase 1** | **~6.5h** |
+
+That is over the brief's 2–3 hour guidance. The answer when asked is the honest one: the core was scoped with discipline, and the extras are labeled as extras in `DECISIONS.md` and the README.
+
+If behind at the two-thirds mark: drop the notify dialog to a single confirm, collapse Clear cards to a count, keep the ribbon, the receipts, and the reassign flow.
+
+**Phase 2, only after Phase 1 is deployed.** Driver phone view · map · chat intents · scrubber polish · illustration.
+
+**Build order.** Thin vertical slice first: seed → compute → one rule → one card → route file header → one action. Then widen.
+
+---
+
+## 14. The live change
+
+`rules.ts` is open. Append `break_due`: id, label, `watch`, `when: v => v.breakDueIn >= 480`, a message in Lookout's voice, `['schedule_reset']`. Save. Vite HMR. Sam K.'s card gains a badge on the board and a reason in the rail. Delete it, add it again, under two minutes, narrating. If they ask for a filter instead, `filters.ts` has the same one-object shape and nothing needs planting.

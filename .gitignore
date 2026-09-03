@@ -1,0 +1,17 @@
+# private notes — never committed
+private/
+
+# deps / build
+node_modules/
+dist/
+.vite/
+
+# env
+.env
+.env.*
+
+# os / editor
+.DS_Store
+.idea/
+.vscode/
+*.log
