@@ -2037,7 +2037,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Produces (store): `useStore` with state `{ fleet, scrubOffsetMs, snoozes, corrections, lastAction, undoSnapshot, groupBy, devOpen }` and methods `now()`, `reassignStops`, `scheduleReset`, `notifyCustomer`, `callDriver`, `acknowledge`, `markArrived`, `markDeparted`, `bringOnline`, `undo`, `scrub`, `resetClock`, `resetFleet`, `setGroupBy`, `toggleDev`.
 - Produces (hooks): `useNow(): number`, `useDerived(): Derived`.
 
-- [ ] **Step 1: Write the failing action tests**
+- [x] **Step 1: Write the failing action tests**
 
 `src/store/actions.test.ts`:
 ```ts
@@ -2177,12 +2177,12 @@ describe('store', () => {
 })
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `npx vitest run src/store/actions.test.ts src/store/store.test.ts`
 Expected: FAIL — modules not found.
 
-- [ ] **Step 3: Write `src/store/actions.ts`**
+- [x] **Step 3: Write `src/store/actions.ts`**
 
 ```ts
 import type { Driver, DutySegment, Fleet, Route, Stop, StopOutcome } from '../data/types'
@@ -2339,7 +2339,7 @@ export function stopsPastLimit(view: DriverView): string[] {
 }
 ```
 
-- [ ] **Step 4: Write `src/store/store.ts`**
+- [x] **Step 4: Write `src/store/store.ts`**
 
 ```ts
 import { create } from 'zustand'
@@ -2441,7 +2441,7 @@ export const useStore = create<State>()((set, get) => {
 export type GroupingId = 'region' | 'band'
 ```
 
-- [ ] **Step 5: Write `src/store/hooks.ts`**
+- [x] **Step 5: Write `src/store/hooks.ts`**
 
 ```tsx
 import { useEffect, useMemo, useState } from 'react'
@@ -2469,12 +2469,12 @@ export function useDerived(): Derived {
 }
 ```
 
-- [ ] **Step 6: Run tests and typecheck**
+- [x] **Step 6: Run tests and typecheck**
 
 Run: `npm test && npx tsc --noEmit`
 Expected: all green. `store.test.ts` runs in the node environment; Zustand works without a DOM.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add -A
