@@ -1449,7 +1449,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 
 Import direction, so nothing is circular at runtime: `types.ts` and `bands.ts` import only types. `rules.ts` imports `types`, constants, format. `rank.ts` imports `rules` and `bands`. `derive.ts` imports `view` and `rank`.
 
-- [ ] **Step 1: Write `src/store/view.ts`**
+- [x] **Step 1: Write `src/store/view.ts`**
 
 ```ts
 import type { Driver, DutyStatus, Fleet, Route, Stop, Truck } from '../data/types'
@@ -1534,7 +1534,7 @@ export function buildViews(fleet: Fleet, now: number): DriverView[] {
 }
 ```
 
-- [ ] **Step 2: Write `src/alerts/types.ts` and `src/bands.ts`**
+- [x] **Step 2: Write `src/alerts/types.ts` and `src/bands.ts`**
 
 `src/alerts/types.ts`:
 ```ts
@@ -1606,7 +1606,7 @@ export function bandOf(v: DriverView, top: Severity | 'none'): Band {
 }
 ```
 
-- [ ] **Step 3: Write the failing tests for rules, rank, bands, derive**
+- [x] **Step 3: Write the failing tests for rules, rank, bands, derive**
 
 `src/alerts/rules.test.ts`:
 ```ts
@@ -1774,12 +1774,12 @@ describe('derive', () => {
 })
 ```
 
-- [ ] **Step 4: Run tests to verify they fail**
+- [x] **Step 4: Run tests to verify they fail**
 
 Run: `npx vitest run src/alerts src/bands.test.ts src/store`
 Expected: FAIL — modules not found.
 
-- [ ] **Step 5: Write `src/alerts/rules.ts`**
+- [x] **Step 5: Write `src/alerts/rules.ts`**
 
 ```ts
 import { ACT_NOW_MIN, BEHIND_MIN, WATCH_MIN } from '../hos/constants'
@@ -1889,7 +1889,7 @@ export const RULES: Rule[] = [
 ]
 ```
 
-- [ ] **Step 6: Write `src/alerts/rank.ts`**
+- [x] **Step 6: Write `src/alerts/rank.ts`**
 
 ```ts
 import { bandOf } from '../bands'
@@ -1946,7 +1946,7 @@ export function rankDrivers(views: DriverView[], alerts: Alert[], snoozes: Recor
 }
 ```
 
-- [ ] **Step 7: Write `src/store/derive.ts`**
+- [x] **Step 7: Write `src/store/derive.ts`**
 
 ```ts
 import { evaluateRules, rankDrivers } from '../alerts/rank'
@@ -2009,12 +2009,12 @@ export function derive(fleet: Fleet, now: number, snoozes: Record<string, number
 }
 ```
 
-- [ ] **Step 8: Run tests and typecheck**
+- [x] **Step 8: Run tests and typecheck**
 
 Run: `npm test && npx tsc --noEmit`
 Expected: all green. If the rank test's top three differ, print `ranked.slice(0, 5)` with severity and `minutesUntilLimit`; the usual cause is a planted block sum off by a minute in Task 4.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add -A
