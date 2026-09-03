@@ -23,8 +23,8 @@ describe('rules shape', () => {
 })
 
 describe('planted drivers trip exactly the rules the spec says', () => {
-  it("Marcus: approaching (act now), won't finish, behind schedule", () => {
-    expect(idsFor('drv-01')).toEqual(['behind_schedule', 'limit_act_now', 'wont_finish'])
+  it("Marcus: approaching (act now) and won't finish; 15 min behind does not yet cost a window", () => {
+    expect(idsFor('drv-01')).toEqual(['limit_act_now', 'wont_finish'])
   })
   it('Priya: over the limit', () => {
     expect(idsFor('drv-02')).toEqual(['over_limit'])
@@ -36,10 +36,16 @@ describe('planted drivers trip exactly the rules the spec says', () => {
     expect(idsFor('drv-04')).toEqual([])
     expect(idsFor('drv-05')).toEqual([])
   })
-  it('Nadia, Ravi, Omar: watch', () => {
-    expect(idsFor('drv-06')).toEqual(['limit_watch'])
+  it('Ravi and Omar: watch; Nadia is stale but clear; Lucia is done for the day', () => {
     expect(idsFor('drv-09')).toEqual(['limit_watch'])
     expect(idsFor('drv-10')).toEqual(['limit_watch'])
+    expect(idsFor('drv-06')).toEqual([])
+    expect(idsFor('drv-11')).toEqual([])
+  })
+  it('the offline rule owns a dark driver even once his projection is over the limit', () => {
+    const later = anchor + 60 * MIN
+    const ids = evaluateRules(buildViews(makeFleet(anchor), later)).filter((a) => a.driverId === 'drv-03').map((a) => a.ruleId)
+    expect(ids).toEqual(['offline_near_limit'])
   })
   it('Tomas: behind schedule only', () => {
     expect(idsFor('drv-07')).toEqual(['behind_schedule'])
@@ -65,7 +71,7 @@ describe('edge paths change the copy, not just the numbers', () => {
     const marcusStops = remainingStops(fleet.routes.find((r) => r.driverId === 'drv-01')!).map((s) => s.id)
     const next = scheduleReset(fleet, 'drv-01', marcusStops[0], anchor)
     const ids = evaluateRules(buildViews(next, anchor)).filter((a) => a.driverId === 'drv-01').map((a) => a.ruleId).sort()
-    expect(ids).toEqual(['behind_schedule', 'limit_act_now', 'stops_unassigned'])
+    expect(ids).toEqual(['limit_act_now', 'stops_unassigned'])
   })
   it('after notifying, the schedule rule says so', () => {
     const tomasStops = remainingStops(fleet.routes.find((r) => r.driverId === 'drv-07')!).map((s) => s.id)

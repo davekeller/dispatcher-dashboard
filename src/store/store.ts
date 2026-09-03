@@ -66,7 +66,7 @@ export const useStore = create<State>()((set, get) => {
     notifyCustomer: (stopIds) => commit(`${stopIds.length} customer${stopIds.length === 1 ? '' : 's'} notified`, (f, now) => A.notifyCustomer(f, stopIds, now)),
     callDriver: (driverId) => commit(`Call to ${name(driverId)} logged`, (f, now) => A.callDriver(f, driverId, now)),
     acknowledge: (alertId) =>
-      set((s) => ({ snoozes: { ...s.snoozes, [alertId]: s.now() + SNOOZE_MIN * MIN }, lastAction: { label: 'Snoozed for 10 min', at: Date.now(), undoable: false } })),
+      set((s) => ({ snoozes: { ...s.snoozes, [alertId]: s.now() + SNOOZE_MIN * MIN }, undoSnapshot: undefined, lastAction: { label: 'Snoozed for 10 min', at: Date.now(), undoable: false } })),
     markArrived: (stopId) => commit('Arrived', (f, now) => A.markArrived(f, stopId, now)),
     markDeparted: (stopId, outcome) => commit('Stop completed', (f, now) => A.markDeparted(f, stopId, outcome, now)),
     bringOnline: (driverId) => {
@@ -76,7 +76,7 @@ export const useStore = create<State>()((set, get) => {
       const was = minutesUntilLimit(before, now)
       const fleet = A.bringOnline(get().fleet, driverId, now)
       const after = fleet.drivers.find((d) => d.id === driverId)!
-      set({ fleet, corrections: { ...get().corrections, [driverId]: { was, now: minutesUntilLimit(after, now), at: Date.now() } } })
+      set({ fleet, corrections: { ...get().corrections, [driverId]: { was, now: minutesUntilLimit(after, now), at: Date.now() } }, lastAction: { label: `${name(driverId)} is back online`, at: Date.now(), undoable: false } })
     },
     undo: () => {
       const snap = get().undoSnapshot

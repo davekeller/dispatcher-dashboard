@@ -64,15 +64,31 @@ describe('planted drivers at the anchor', () => {
     expect(drivingSinceBreak(driver, anchor)).toBeGreaterThanOrEqual(480)
     expect(minutesUntilLimit(driver, anchor)).toBeGreaterThan(90)
   })
-  it('Nadia F. is stale and inside the watch window', () => {
+  it('Nadia F. is stale with a clear HOS', () => {
     const { driver } = byId(f, 'drv-06')
     expect(staleness(driver, anchor)).toBe('stale')
-    expect(minutesUntilLimit(driver, anchor)).toBeCloseTo(70, 0)
+    expect(minutesUntilLimit(driver, anchor)).toBeCloseTo(130, 0)
   })
   it('Tomas B. is far behind schedule with a clear HOS', () => {
     const { driver, route } = byId(f, 'drv-07')
-    expect(scheduleDrift(route, anchor)).toBeGreaterThanOrEqual(34)
+    expect(scheduleDrift(route, anchor)).toBeGreaterThanOrEqual(49)
     expect(minutesUntilLimit(driver, anchor)).toBeGreaterThan(90)
+  })
+  it('Lucia B. has finished her route and is heading in', () => {
+    const { driver, route } = byId(f, 'drv-11')
+    expect(route.stops.every((s) => s.status === 'done')).toBe(true)
+    expect(currentStatus(driver, anchor)).toBe('driving')
+    expect(minutesUntilLimit(driver, anchor)).toBeGreaterThan(90)
+  })
+  it('a planted day is one day: every done stop sits inside an on_duty segment and every leg is a driving segment', () => {
+    for (const id of ['drv-01', 'drv-02', 'drv-03', 'drv-04', 'drv-07', 'drv-11']) {
+      const { driver, route } = byId(f, id)
+      for (const s of route.stops.filter((x) => x.status === 'done')) {
+        expect(driver.segments.some((g) => g.status === 'on_duty' && g.startedAt === s.arrivedAt && g.endedAt === s.departedAt)).toBe(true)
+        expect(driver.segments.some((g) => g.status === 'driving' && g.endedAt === s.arrivedAt && g.startedAt === s.arrivedAt! - s.driveMinutesFromPrev * MIN)).toBe(true)
+      }
+      expect(driver.shiftStartedAt).toBeLessThanOrEqual(route.plannedStartAt)
+    }
   })
   it("Ana L. has the capacity to take Marcus's stops; Ravi P. does not have capacity for Priya's", () => {
     const ana = byId(f, 'drv-08')

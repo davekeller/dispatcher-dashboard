@@ -1,10 +1,10 @@
 import type { Driver, DutyStatus, Fleet, Route, Stop, Truck } from '../data/types'
 import {
   currentStatus, drivingSinceBreak, effectiveLastPingAt, hosStatusOf, knownSegments, limitHitAt, minutesOfStatus,
-  nextStop, pingAgeMinutes, projectedFinishAt, remainingDriveMinutes, remainingStops, scheduleDrift, stalenessOf,
-  unassignedStops, type HosStatus, type Staleness,
+  nextStop, pingAgeMinutes, plannedReset, projectedEta, projectedFinishAt, remainingDriveMinutes, remainingStops,
+  scheduleDrift, stalenessOf, unassignedStops, type HosStatus, type Staleness,
 } from '../hos/compute'
-import { BEHIND_MIN, LIMIT_MIN } from '../hos/constants'
+import { LIMIT_MIN } from '../hos/constants'
 import { MIN } from '../time/clock'
 
 /** Everything a rule or a view needs about one driver at one instant. Built once per
@@ -32,12 +32,14 @@ export interface DriverView {
   projectedFinishAt: number | undefined
   limitHitAt: number
   drivingSinceBreakMin: number
+  /** Pending stops whose projected ETA is past their delivery window. */
   lateStops: Stop[]
   unnotifiedLateStops: Stop[]
   unassigned: Stop[]
+  plannedResetAt: number | undefined
 }
 
-export function buildView(fleet: Fleet, driver: Driver, now: number): DriverView {
+export function buildView(fleet: Fleet, driver: Driver, now: number, windowEnds: Map<string, number> = deliveryWindowEnds(fleet)): DriverView {
   const truck = fleet.trucks.find((t) => t.id === driver.truckId)
   const route = fleet.routes.find((r) => r.id === driver.routeId)
   if (!truck || !route) throw new Error(`fleet is missing truck or route for ${driver.id}`)
@@ -48,7 +50,9 @@ export function buildView(fleet: Fleet, driver: Driver, now: number): DriverView
   const pingAgeMin = pingAgeMinutes(driver, now)
   const remaining = remainingStops(route)
   const driftMin = scheduleDrift(route, now)
-  const lateStops = driftMin >= BEHIND_MIN ? remaining.filter((s) => s.status === 'pending') : []
+  // Late means the customer's window is at risk, not merely behind the plan: the plan slips
+  // all day, and the window is the promise.
+  const lateStops = remaining.filter((s) => s.status === 'pending' && projectedEta(s, driftMin) > (windowEnds.get(s.deliveryId) ?? Infinity))
   return {
     driver, truck, route, now,
     status: currentStatus(driver, now),
@@ -72,9 +76,15 @@ export function buildView(fleet: Fleet, driver: Driver, now: number): DriverView
     lateStops,
     unnotifiedLateStops: lateStops.filter((s) => s.notifiedAt === undefined),
     unassigned: unassignedStops(route),
+    plannedResetAt: plannedReset(driver)?.startedAt,
   }
 }
 
+function deliveryWindowEnds(fleet: Fleet): Map<string, number> {
+  return new Map(fleet.deliveries.map((d) => [d.id, d.window.end]))
+}
+
 export function buildViews(fleet: Fleet, now: number): DriverView[] {
-  return fleet.drivers.map((d) => buildView(fleet, d, now))
+  const windowEnds = deliveryWindowEnds(fleet)
+  return fleet.drivers.map((d) => buildView(fleet, d, now, windowEnds))
 }

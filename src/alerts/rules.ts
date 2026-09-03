@@ -1,4 +1,4 @@
-import { ACT_NOW_MIN, BEHIND_MIN, WATCH_MIN } from '../hos/constants'
+import { ACT_NOW_MIN, WATCH_MIN } from '../hos/constants'
 import { fmtClock, fmtMinutes } from '../lib/format'
 import type { DriverView } from '../store/view'
 import type { Rule } from './types'
@@ -7,8 +7,9 @@ import type { Rule } from './types'
 // imports so HMR is instant when it is edited live. Copy is Lookout's voice: a
 // competent colleague, not a system log.
 
-// The offline rules own dark drivers; the limit rules speak only for drivers we can see.
-const onTheRoad = (v: DriverView) => (v.status === 'driving' || v.status === 'on_duty') && v.staleness !== 'offline'
+// The offline rules own dark drivers: every other rule speaks only for drivers we can see.
+const visible = (v: DriverView) => v.staleness !== 'offline'
+const onTheRoad = (v: DriverView) => visible(v) && (v.status === 'driving' || v.status === 'on_duty')
 const stops = (n: number) => `${n} stop${n === 1 ? '' : 's'}`
 const first = (v: DriverView) => v.driver.name.split(' ')[0]
 const est = (v: DriverView) => (v.staleness === 'fresh' ? '' : '~')
@@ -18,9 +19,9 @@ export const RULES: Rule[] = [
     id: 'over_limit',
     label: 'Over limit',
     severity: 'critical',
-    when: (v) => v.minutesUntilLimit <= 0,
+    when: (v) => visible(v) && v.minutesUntilLimit <= 0,
     message: (v) => ({
-      title: `${v.driver.name} is ${est(v)}over the limit by ${fmtMinutes(-v.minutesUntilLimit)}.`,
+      title: `${v.driver.name} is over the limit by ${est(v)}${fmtMinutes(-v.minutesUntilLimit)}.`,
       body: v.remaining.length > 0 ? `${first(v)} needs to stop now. ${stops(v.remaining.length)} left need another driver.` : `${first(v)} needs to stop now.`,
     }),
     actions: ['reassign', 'call_driver'],
@@ -84,9 +85,9 @@ export const RULES: Rule[] = [
     id: 'behind_schedule',
     label: 'Behind schedule',
     severity: 'watch',
-    when: (v) => v.driftMin >= BEHIND_MIN && v.remaining.length > 0,
+    when: (v) => visible(v) && v.lateStops.length > 0,
     message: (v) => ({
-      title: `${v.driver.name} is ${fmtMinutes(v.driftMin)} behind with ${stops(v.remaining.length)} left.`,
+      title: `${v.driver.name} is ${fmtMinutes(v.driftMin)} behind; ${stops(v.lateStops.length)} will miss ${v.lateStops.length === 1 ? 'its' : 'their'} window.`,
       body: v.unnotifiedLateStops.length > 0 ? `${stops(v.unnotifiedLateStops.length)} haven't been told yet.` : 'Customers have been notified.',
     }),
     actions: ['notify_customer', 'reassign'],
@@ -95,7 +96,7 @@ export const RULES: Rule[] = [
     id: 'stops_unassigned',
     label: 'Needs a driver',
     severity: 'info',
-    when: (v) => v.unassigned.length > 0,
+    when: (v) => visible(v) && v.unassigned.length > 0,
     message: (v) => ({
       title: `${stops(v.unassigned.length)} on ${first(v)}'s route need a driver.`,
       body: 'They fall after the scheduled reset.',

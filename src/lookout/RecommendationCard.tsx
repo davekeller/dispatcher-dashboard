@@ -43,7 +43,7 @@ export default function RecommendationCard({ view, card, pinned = false }: { vie
         <CorrectionChip driverId={view.driver.id} />
       </div>
       <div className="mt-2.5">
-        <AlertActions driverId={view.driver.id} actions={card.alerts.flatMap((a) => a.actions)} alertIds={card.alerts.map((a) => a.id)} positionDependentDisabled={staleReason} />
+        <AlertActions driverId={view.driver.id} actions={card.alerts.flatMap((a) => a.actions)} alertIds={card.alerts.map((a) => a.id)} positionDependentDisabled={staleReason} resetScheduledAt={view.plannedResetAt} />
       </div>
     </article>
   )

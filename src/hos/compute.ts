@@ -89,7 +89,7 @@ export function currentStatus(driver: Driver, now: number): DutyStatus {
 }
 
 export function plannedReset(driver: Driver): DutySegment | undefined {
-  return driver.segments.find((s) => s.planned)
+  return driver.segments.find((s) => s.planned && s.status === 'off_duty')
 }
 
 // ---- Route math -----------------------------------------------------------
@@ -127,8 +127,10 @@ export function scheduleDrift(route: Route, now: number): number {
   let drift = last?.departedAt !== undefined ? (last.departedAt - (last.plannedEta + last.serviceMinutes * MIN)) / MIN : 0
   const next = nextStop(route)
   if (next) {
-    if (next.status === 'in_progress' && next.arrivedAt !== undefined) drift = (next.arrivedAt - next.plannedEta) / MIN
-    else drift = Math.max(drift, (now - next.plannedEta) / MIN)
+    if (next.status === 'in_progress' && next.arrivedAt !== undefined) {
+      // Arrived: the slip is the arrival slip, or the dwell past the planned departure, whichever is worse.
+      drift = Math.max(drift, (next.arrivedAt - next.plannedEta) / MIN, (now - (next.plannedEta + next.serviceMinutes * MIN)) / MIN)
+    } else drift = Math.max(drift, (now - next.plannedEta) / MIN)
   }
   return drift
 }

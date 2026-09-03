@@ -20,7 +20,7 @@ export default function AlertStrip({ view, card }: { view: DriverView; card: Dri
               <p className="text-[13px] font-semibold text-ink">{a.title}</p>
               <p className="text-[12px] text-muted">{a.body}</p>
             </div>
-            <AlertActions driverId={view.driver.id} actions={a.actions} alertIds={[a.id]} positionDependentDisabled={reason} />
+            <AlertActions driverId={view.driver.id} actions={a.actions} alertIds={[a.id]} positionDependentDisabled={reason} resetScheduledAt={view.plannedResetAt} />
           </li>
         )
       })}

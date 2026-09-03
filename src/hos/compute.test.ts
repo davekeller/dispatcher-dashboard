@@ -103,6 +103,11 @@ describe('route math', () => {
     expect(scheduleDrift(r, m(135))).toBeCloseTo(15) // departed stop 1 at 130, planned departure was 115
     expect(scheduleDrift(r, m(160))).toBeCloseTo(35) // should have reached stop 2 at 125
   })
+  it('at the dock, drift keeps growing once the planned departure passes', () => {
+    const docked = route([stop(1, 10, 15, m(100), { status: 'in_progress', arrivedAt: m(118) }), stop(2, 20, 5, m(140))])
+    expect(scheduleDrift(docked, m(120))).toBeCloseTo(18) // arrived 18 late
+    expect(scheduleDrift(docked, m(180))).toBeCloseTo(65) // planned departure was 115; still there at 180
+  })
   it('limitHitAt walks legs and skips service time', () => {
     // 20 min of drive time left. Stop 2: 10 drive + 15 service. Stop 3: 15 drive. Limit lands 10 min into leg 3.
     const d = driver([{ status: 'driving', startedAt: m(0) }], m(640))

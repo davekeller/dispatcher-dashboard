@@ -34,8 +34,8 @@ describe('reassignCandidates', () => {
   const marcus = views.find((v) => v.driver.id === 'drv-01')!
   it('puts same-region drivers first, includes Ana, and excludes anyone who would enter act now', () => {
     const cands = reassignCandidates(views, marcus, marcusStops)
+    expect(cands[0].view.driver.id).toBe('drv-08')
     expect(cands[0].sameRegion).toBe(true)
-    expect(cands.map((c) => c.view.driver.id)).toContain('drv-08')
     const ids = cands.map((c) => c.view.driver.id)
     expect(ids).not.toContain('drv-01')
     expect(ids).not.toContain('drv-02') // over
@@ -60,6 +60,18 @@ describe('scheduleReset', () => {
     expect(remainingDriveMinutes(route)).toBe(10)
     const driver = next.drivers.find((d) => d.id === 'drv-01')!
     expect(plannedReset(driver)?.startedAt).toBeGreaterThan(anchor)
+  })
+  it('the reset lands under the limit: service time is planned as on duty, not charged as driving', () => {
+    const marcus = buildView(fleet, fleet.drivers[0], anchor)
+    const next = scheduleReset(fleet, 'drv-01', suggestResetStop(marcus), anchor)
+    const driver = next.drivers.find((d) => d.id === 'drv-01')!
+    const resetAt = plannedReset(driver)!.startedAt
+    expect(minutesUntilLimit(driver, resetAt)).toBeGreaterThanOrEqual(0)
+    expect(minutesUntilLimit(driver, resetAt + 60 * MIN)).toBeCloseTo(minutesUntilLimit(driver, resetAt), 5) // off duty: nothing accrues
+  })
+  it('a stop that is no longer ahead of the driver is a no-op, not a reset of the whole route', () => {
+    const done = routeOf(fleet, 'drv-01').stops.find((s) => s.status === 'done')!
+    expect(scheduleReset(fleet, 'drv-01', done.id, anchor)).toBe(fleet)
   })
   it('null means reset now: every remaining stop needs a driver', () => {
     const next = scheduleReset(fleet, 'drv-01', null, anchor)

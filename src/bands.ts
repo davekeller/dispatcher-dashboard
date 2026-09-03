@@ -18,8 +18,8 @@ export const BAND_LABEL: Record<Band, string> = {
  *  marker; the Offline band holds only dark drivers whose last-known HOS is clear. */
 export function bandOf(v: DriverView, top: Severity | 'none'): Band {
   if (top === 'critical' || top === 'act_now') return 'act_now'
+  if (v.staleness === 'offline') return 'offline' // before watch: the dark-but-clear driver's own band
   if (top === 'watch') return 'watch'
-  if (v.staleness === 'offline') return 'offline'
   if (v.status === 'on_break') return 'break'
   return 'clear'
 }

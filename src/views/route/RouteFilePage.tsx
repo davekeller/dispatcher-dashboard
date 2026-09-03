@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { useActions } from '../../actions/ActionContext'
+import { fmtClock } from '../../lib/format'
 import { useLookout } from '../../lookout/LookoutContext'
 import { useDerived } from '../../store/hooks'
 import { useStore } from '../../store/store'
@@ -64,7 +65,7 @@ export default function RouteFilePage() {
             <Button size="sm" variant="primary" disabled={selected.length === 0 || stale} title={staleReason} onClick={() => open('reassign', view.driver.id, { stopIds: selected })}>
               Reassign selected{selected.length > 0 ? ` (${selected.length})` : ''}
             </Button>
-            <Button size="sm" disabled={view.remaining.length === 0} onClick={() => open('schedule_reset', view.driver.id)}>Schedule reset</Button>
+            <Button size="sm" disabled={view.remaining.length === 0 || view.plannedResetAt !== undefined} title={view.plannedResetAt !== undefined ? `Reset already scheduled for ${fmtClock(view.plannedResetAt)}` : undefined} onClick={() => open('schedule_reset', view.driver.id)}>Schedule reset</Button>
             <Button size="sm" disabled={stale || view.remaining.length === 0} title={staleReason} onClick={() => open('notify_customer', view.driver.id)}>Notify customers</Button>
           </div>
         </header>

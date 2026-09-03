@@ -25,6 +25,7 @@ export default function RouteHeader({ view, card }: { view: DriverView; card: Dr
           <Chip tone={tone} dashed={offline}>{card.severity === 'critical' ? 'Over limit' : BAND_LABEL[card.band]}</Chip>
           <Chip tone={view.driftMin > 5 ? BAND_TONE.watch : BAND_TONE.clear}>{fmtDrift(view.driftMin)}</Chip>
           <CorrectionChip driverId={view.driver.id} />
+          {view.plannedResetAt !== undefined && <Chip tone={BAND_TONE.break}>reset at {fmtClock(view.plannedResetAt)}</Chip>}
         </div>
         <p className="mt-1 text-[12px] text-muted">
           {view.truck.plate} · {view.driver.region} · on duty since {fmtClock(view.driver.shiftStartedAt)} · {STATUS_LABEL[view.status]}

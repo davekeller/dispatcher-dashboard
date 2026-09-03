@@ -4697,3 +4697,16 @@ Rehearse the live change once against the deployed dev server: add `break_due`, 
 **Type consistency.** `DriverView` fields used by rules (`minutesUntilLimit`, `remaining`, `remainingDriveMin`, `driftMin`, `unnotifiedLateStops`, `unassigned`, `staleness`, `pingAgeMin`, `status`, `projectedFinishAt`, `limitHitAt`, `drivingSinceBreakMin`) are all defined in Task 5 Step 1. `DriverCard.band` is set in `rankDrivers`. `useActions().open(action, driverId, { stopIds })` matches its callers in Tasks 10, 11, 12. `AlertActions` props (`driverId`, `actions`, `alertIds`, `positionDependentDisabled`) match Tasks 10 and 11. `ribbonAxis` is exported from `RouteRibbon.tsx` and consumed by `DutyTimeline.tsx`. `scheduleReset(afterStopId: string | null)` is the same in actions, store, and the dialog.
 
 **Known judgment calls an executor may hit.** (1) Tailwind v4 may not emit `fill-*` utilities for custom colors in some versions; if `.fill-well` is missing from the built CSS, replace SVG `className` fills with `style={{ fill: 'var(--color-well)' }}`. (2) `scheduleDrift` for a driver whose next stop is `in_progress` reads the arrival slip; that is intended. (3) The seed's generated (non-planted) drivers may include one or two in Watch naturally; the tests assert planted figures only.
+
+---
+
+## Post-review amendments (applied after the foundation review)
+
+An independent review of Tasks 1–7 found six issues that were verified and fixed before Task 14. The task bodies above are left as written; the code in the repo is the reference.
+
+1. **`scheduleReset` landed the driver over the limit.** The planned off-duty block capped the live driving segment at the stop's departure, so service time was charged as driving. Fix: `scheduleReset` writes the legs and service up to the reset point as planned `driving` / `on_duty` segments before the planned `off_duty`; `closeLive` drops planned segments the truth overtakes; a stop no longer ahead of the driver is a no-op. Test: `minutesUntilLimit(driver, resetAt) ≥ 0`.
+2. **The Offline band was unreachable.** `bandOf` returned on watch before checking staleness. Fix: staleness check first. Test: Nadia twelve minutes in.
+3. **Drift froze at the dock.** The in-progress branch replaced drift instead of taking the worse of arrival slip and dwell. Fixed, with a test.
+4. **Dark drivers collected three cards.** Every rule but the offline pair now requires `visible`. Test: Dre at +60 minutes fires only `offline_near_limit`.
+5. **Behind-schedule swamped the board as the clock ran.** Late now means a projected ETA past the delivery window. Tomas is planted 50 minutes behind so every remaining stop misses its window; Marcus's 15 minutes no longer count. Test: rule counts hold across an hour.
+6. **Planted segments and receipts disagreed.** `planted.ts` builds each day in one backward walk from the anchor; delivery windows and drift ramp follow the re-timed plan. Test: every done stop sits inside an on-duty segment and every leg is a driving segment. Nadia became stale-and-clear, Lucia B. was added with her route complete, and stop events now count as pings.

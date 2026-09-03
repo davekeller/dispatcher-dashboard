@@ -1,5 +1,5 @@
 import type { Driver, DutySegment, Fleet, Route, Stop, StopOutcome } from '../data/types'
-import { projectedDepartureAt, projectedFinishAt, remainingStops } from '../hos/compute'
+import { currentStatus, projectedFinishAt, remainingStops } from '../hos/compute'
 import { CAPACITY_MARGIN_MIN, RESET_MIN } from '../hos/constants'
 import { MIN } from '../time/clock'
 import type { DriverView } from './view'
@@ -35,9 +35,12 @@ function withDriver(fleet: Fleet, driver: Driver): Fleet {
 
 const reseq = (stops: Stop[]): Stop[] => stops.map((s, i) => ({ ...s, seq: i + 1 }))
 
-/** Close whatever live segment the driver has (never a planned one) at `at`. */
+/** Close whatever live segment the driver has at `at`, and drop planned legs and service the
+ *  truth has now overtaken. The planned reset itself stays. */
 function closeLive(segments: DutySegment[], at: number): DutySegment[] {
-  return segments.map((s) => (s.endedAt === undefined && !s.planned ? { ...s, endedAt: at } : s))
+  return segments
+    .filter((s) => !(s.planned && s.status !== 'off_duty' && s.startedAt <= at))
+    .map((s) => (s.endedAt === undefined && !s.planned ? { ...s, endedAt: at } : s))
 }
 
 export function reassignStops(fleet: Fleet, fromDriverId: string, toDriverId: string, stopIds: string[], now: number): Fleet {
@@ -48,6 +51,7 @@ export function reassignStops(fleet: Fleet, fromDriverId: string, toDriverId: st
   const keep = from.stops.filter((s) => !moving.includes(s))
   // The target's tail starts when the target is projected to finish. The moved stops keep
   // their leg estimate; it was measured from a different previous stop, so it is an estimate.
+  // The same caveat applies to the source: a stop after a gap keeps its old leg.
   let t = projectedFinishAt(to, now) ?? now
   const tail: Stop[] = moving.map((s) => {
     const plannedEta = t + s.driveMinutesFromPrev * MIN
@@ -62,18 +66,33 @@ export function reassignStops(fleet: Fleet, fromDriverId: string, toDriverId: st
 }
 
 /** Plan a 10-hour reset after `afterStopId` (null = right now). Stops past that point
- *  become unassigned: they are somebody else's problem now, and the info rule says so. */
+ *  become unassigned: they are somebody else's problem now, and the info rule says so.
+ *  The legs and service up to the reset point are written as planned segments, so the
+ *  projection stops charging service time as driving and the reset lands where the math
+ *  said it would. A planned segment caps the live one (see segmentEnd in compute.ts). */
 export function scheduleReset(fleet: Fleet, driverId: string, afterStopId: string | null, now: number): Fleet {
   const driver = driverOf(fleet, driverId)
   const route = routeOf(fleet, driverId)
   const remaining = remainingStops(route)
   const cutoff = afterStopId === null ? -1 : remaining.findIndex((s) => s.id === afterStopId)
+  if (afterStopId !== null && cutoff === -1) return fleet // that stop is no longer ahead of the driver; nothing to plan
+  const kept = remaining.slice(0, cutoff + 1)
   const orphaned = new Set(remaining.slice(cutoff + 1).filter((s) => s.status === 'pending').map((s) => s.id))
-  const resetAt = afterStopId === null ? now : projectedDepartureAt(route, afterStopId, now)
-  const segments: DutySegment[] = [
-    ...driver.segments.filter((s) => !s.planned),
-    { status: 'off_duty', startedAt: resetAt, endedAt: resetAt + RESET_MIN * MIN, planned: true },
-  ]
+  const drivingNow = currentStatus(driver, now) === 'driving'
+  const planned: DutySegment[] = []
+  let t = now
+  kept.forEach((s, i) => {
+    if (s.status !== 'in_progress') {
+      const arriveAt = t + s.driveMinutesFromPrev * MIN
+      // The live driving segment already covers the leg the driver is on; every later leg is planned.
+      if (i > 0 || !drivingNow) planned.push({ status: 'driving', startedAt: t, endedAt: arriveAt, planned: true })
+      t = arriveAt
+    }
+    planned.push({ status: 'on_duty', startedAt: t, endedAt: t + s.serviceMinutes * MIN, planned: true })
+    t += s.serviceMinutes * MIN
+  })
+  planned.push({ status: 'off_duty', startedAt: t, endedAt: t + RESET_MIN * MIN, planned: true })
+  const segments: DutySegment[] = [...driver.segments.filter((s) => !s.planned), ...planned]
   const stops = route.stops.map((s) => (orphaned.has(s.id) ? { ...s, status: 'unassigned' as const } : s))
   return withRoutes(withDriver(fleet, { ...driver, segments }), { ...route, stops })
 }
@@ -91,7 +110,8 @@ export function markArrived(fleet: Fleet, stopId: string, now: number): Fleet {
   const driver = driverOf(fleet, route.driverId)
   const stops = route.stops.map((s) => (s.id === stopId ? { ...s, status: 'in_progress' as const, arrivedAt: now } : s))
   const segments: DutySegment[] = [...closeLive(driver.segments, now), { status: 'on_duty', startedAt: now }]
-  return withRoutes(withDriver(fleet, { ...driver, segments }), { ...route, stops })
+  // A stop event is a ping.
+  return withRoutes(withDriver(fleet, { ...driver, segments, lastPingAt: now }), { ...route, stops })
 }
 
 export function markDeparted(fleet: Fleet, stopId: string, outcome: StopOutcome, now: number): Fleet {
@@ -104,7 +124,7 @@ export function markDeparted(fleet: Fleet, stopId: string, outcome: StopOutcome,
   const segments: DutySegment[] = [...closeLive(driver.segments, now), { status: moreToDo ? 'driving' : 'on_duty', startedAt: now }]
   const delivery = fleet.deliveries.find((d) => d.id === route.stops.find((s) => s.id === stopId)!.deliveryId)
   const trucks = delivery ? fleet.trucks.map((t) => (t.id === driver.truckId ? { ...t, position: delivery.position } : t)) : fleet.trucks
-  return { ...withRoutes(withDriver(fleet, { ...driver, segments }), { ...route, stops }), trucks }
+  return { ...withRoutes(withDriver(fleet, { ...driver, segments, lastPingAt: now }), { ...route, stops }), trucks }
 }
 
 export function bringOnline(fleet: Fleet, driverId: string, now: number): Fleet {

@@ -45,7 +45,7 @@ function generateDriver(i: number, rng: Rng, anchor: number): Generated {
   const routeId = `rt-${n}`
   const first = FIRST_NAMES[i]
   const lastInitial = LAST_INITIALS[rng.int(0, LAST_INITIALS.length - 1)]
-  const shiftStartedAt = anchor - rng.int(6 * 60 + 17, 8 * 60 + 17) * MIN // 04:30–06:30
+  const shiftStartedAt = anchor - rng.int(6 * 60 + 17, 8 * 60 + 17) * MIN // 06:30–08:30 for the generated fleet
   const plannedStartAt = shiftStartedAt + rng.int(20, 30) * MIN // pre-trip inspection
   const [legMin, legMax] = REGION_LEG_MINUTES[region]
   // Most drivers run within a few minutes of plan; roughly one in twelve runs genuinely late.

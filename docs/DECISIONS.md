@@ -28,3 +28,8 @@ One line per meaningful choice or cut. Newest at the bottom.
 | 22 | Generated drivers mostly run within a few minutes of plan; about one in twelve runs late | The first generator crowded the Watch band with a dozen behind-schedule drivers and diluted "exceptions first" |
 | 23 | TICK_MS = 5000 with minute-precision countdowns | No false precision; seconds would jitter and mean nothing at a 5-second ping |
 | 24 | All 18 text/ground token pairs pass AA (`node scripts/contrast.mjs`) | Watch text is darker than its fill on purpose so it clears AA and stays distinct from Lookout's coral |
+| 25 | Planted days are built in one walk so segments and receipts agree | A reviewer found Marcus delivering five stops inside an unbroken driving segment |
+| 26 | `scheduleReset` writes the planned legs and service as planned segments | With only an off-duty block, service time was charged as driving and the reset landed 11 min over |
+| 27 | Every rule but the offline pair is gated on visibility | A dark driver was collecting three cards' worth of reasons |
+| 28 | Late means a projected ETA past the delivery window, not past the plan | With the world frozen, plan drift made 40 of 50 drivers "behind" within an hour of demo time |
+| 29 | Drive time left is a quantity; the limit's clock time is a projection. The header shows one, the ribbon the other | They are different questions, and labeling them as such is more honest than forcing one number |
