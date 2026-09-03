@@ -6,7 +6,7 @@ Read `docs/ARCHITECTURE.md` before substantial work; it is the source of truth f
 
 The primary **"Active Shift" dashboard** for a fleet dispatcher (Lena) managing ~50 heavy-duty trucks and 1,000+ deliveries a day, with **one exception flow: Hours of Service (HOS)** — drivers have a legal 11-hour driving limit and must take a mandatory reset. Surface who's approaching it, and the drill-in from that alert.
 
-Three-pane shell: **left nav** · **main view** (metrics row + region-column board, and the route file page) · **Lookout**, the co-pilot rail (alert bar + recommendation cards). The simulated shift is anchored at 12:47 PM and ticks live.
+Three-pane shell: **left nav** · **main view** (metrics row + region-column board, and the route file page) · **Lookout**, the co-pilot rail (alert bar + recommendation cards). The simulated shift is anchored at 2:47 PM and ticks live.
 
 ## Hard constraints (from the brief)
 

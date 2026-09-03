@@ -1,4 +1,4 @@
-> **2026-09-03 —** `ARCHITECTURE.md` supersedes this file where they differ: the route file is a full page, the main view is a region-column board ranked by urgency (the list view is dropped), the co-pilot is **Lookout**, the clock is simulated at 12:47 PM with simulated pings, and the visual system moved to warm neutrals with Bricolage Grotesque + Inter.
+> **2026-09-03 —** `ARCHITECTURE.md` supersedes this file where they differ: the route file is a full page, the main view is a region-column board ranked by urgency (the list view is dropped), the co-pilot is **Lookout**, the clock is simulated at 2:47 PM with simulated pings, and the visual system moved to warm neutrals with Bricolage Grotesque + Inter.
 
 # LAYOUT — Shell, views, co-pilot, persona
 
@@ -6,7 +6,7 @@
 
 ## 1. The user
 
-**Lena Vasquez** — dispatcher, regional carrier, day shift (05:00–15:00). 41. Drove for six years before moving to the desk; still thinks like a driver. Runs ~50 trucks with one other dispatcher on shift. Two monitors, a headset, a phone that never stops. Interrupted every few minutes.
+**Lena Vasquez** — dispatcher, regional carrier, day shift (06:00–16:00). 41. Drove for six years before moving to the desk; still thinks like a driver. Runs ~50 trucks with one other dispatcher on shift. Two monitors, a headset, a phone that never stops. Interrupted every few minutes.
 
 What she's accountable for: every stop delivered inside its window, no driver over the legal limit on her watch. An HOS violation is a fine for the company and a mark on the driver's record — she takes both personally.
 

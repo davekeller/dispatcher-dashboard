@@ -14,7 +14,7 @@
 
 - Runtime dependencies are exactly: `react`, `react-dom`, `react-router`, `zustand`, `@phosphor-icons/react`, `@fontsource-variable/bricolage-grotesque`, `@fontsource-variable/inter`, `tailwindcss`, `@tailwindcss/vite`. Nothing else without a one-line reason in `docs/DECISIONS.md`. No Leaflet in Phase 1.
 - Pure modules (`src/hos/*`, `src/alerts/*`, `src/bands.ts`, `src/filters.ts`, `src/groupBy.ts`, `src/store/derive.ts`, `src/store/actions.ts`, `src/data/*`, `src/time/clock.ts`, `src/lib/*`) import no React and are unit-tested with Vitest, tests beside the module as `*.test.ts`.
-- One clock: `useNow()` is the only hook that reads `Date.now()` at runtime. `TICK_MS = 5000`. The scenario anchor is today at **12:47:00 local**.
+- One clock: `useNow()` is the only hook that reads `Date.now()` at runtime. `TICK_MS = 5000`. The scenario anchor is today at **14:47:00 local**.
 - Constants, verbatim from the spec: `LIMIT_MIN = 660`, `ACT_NOW_MIN = 30`, `WATCH_MIN = 90`, `FRESH_MIN = 3`, `OFFLINE_MIN = 15`, `SNOOZE_MIN = 10`, `BEHIND_MIN = 15`, `CAPACITY_MARGIN_MIN = 20`, `WINDOW_14H_MIN = 840`. Boundaries: `≤ 30` act now, `≤ 90` watch, `≤ 0` over; `< 3` fresh, `3–15` stale, `> 15` offline.
 - HOS math always reads `segmentsKnownAt(driver.segments, effectiveLastPingAt(driver, now))`.
 - Rules are `{ id, label, severity, when, message, actions }` objects in `src/alerts/rules.ts`, fixed severity, one object per rule. Filters and groupings are config arrays too.
@@ -512,10 +512,10 @@ import { describe, expect, it } from 'vitest'
 import { MIN, TICK_MS, scenarioAnchor, simNow, toTick } from './clock'
 
 describe('scenarioAnchor', () => {
-  it('is 12:47:00 local on the given day', () => {
+  it('is 14:47:00 local on the given day', () => {
     const d = new Date(2026, 8, 3, 9, 15, 30)
     const a = new Date(scenarioAnchor(d))
-    expect([a.getHours(), a.getMinutes(), a.getSeconds(), a.getMilliseconds()]).toEqual([12, 47, 0, 0])
+    expect([a.getHours(), a.getMinutes(), a.getSeconds(), a.getMilliseconds()]).toEqual([14, 47, 0, 0])
     expect(a.getDate()).toBe(3)
   })
 })
@@ -614,7 +614,7 @@ export const REGION_LEG_MINUTES: Record<Region, [number, number]> = {
 - [x] **Step 6: Write `src/time/clock.ts`**
 
 ```ts
-// The one clock. The scenario is pinned to 12:47 PM so the demo is the same at
+// The one clock. The scenario is pinned to 2:47 PM so the demo is the same at
 // any hour, and it still ticks: now = anchor + real elapsed + scrub offset.
 export const TICK_MS = 5000
 export const MIN = 60_000
@@ -1695,10 +1695,16 @@ describe('rankDrivers', () => {
     const top = rankedAt(anchor).slice(0, 3).map((c) => c.driverId)
     expect(top).toEqual(['drv-02', 'drv-01', 'drv-03']) // Priya (critical), Marcus (12 min), Dre (~40, offline)
   })
-  it('is stable across a tick', () => {
-    const a = rankedAt(anchor).map((c) => c.driverId)
-    const b = rankedAt(anchor + 5000).map((c) => c.driverId)
-    expect(b).toEqual(a)
+  it('is stable across a tick for every driver whose alerts did not change', () => {
+    // A driver can legitimately move when a rule starts or stops firing inside the tick
+    // (drift crossing 15 min, say). Everyone else must hold their relative order.
+    const a = rankedAt(anchor)
+    const b = rankedAt(anchor + 5000)
+    const key = (c: { severity: string; alerts: { id: string }[] }) => `${c.severity}:${c.alerts.map((x) => x.id).join(',')}`
+    const keyA = new Map(a.map((c) => [c.driverId, key(c)]))
+    const unchanged = new Set(b.filter((c) => keyA.get(c.driverId) === key(c)).map((c) => c.driverId))
+    expect(unchanged.size).toBeGreaterThan(40)
+    expect(b.filter((c) => unchanged.has(c.driverId)).map((c) => c.driverId)).toEqual(a.filter((c) => unchanged.has(c.driverId)).map((c) => c.driverId))
   })
   it('snooze demotes within a severity but never removes an act-now card', () => {
     const snoozes = { 'limit_act_now:drv-01': anchor + 10 * MIN, 'wont_finish:drv-01': anchor + 10 * MIN, 'behind_schedule:drv-01': anchor + 10 * MIN }
@@ -3119,7 +3125,7 @@ Task 9 swaps the index element for `ActiveShiftPage`; Task 11 swaps the route-fi
 - [x] **Step 9: Verify in the browser**
 
 Run: `npx tsc --noEmit && npm run dev`
-Check: three panes render; the header clock shows 12:47 PM and advances; `⌘.` opens the dev panel; +15m moves the clock; the left nav collapses; the Lookout stub collapses to a rail. Nothing in the console.
+Check: three panes render; the header clock shows 2:47 PM and advances; `⌘.` opens the dev panel; +15m moves the clock; the left nav collapses; the Lookout stub collapses to a rail. Nothing in the console.
 
 - [x] **Step 10: Commit**
 
@@ -4616,7 +4622,7 @@ npm test         # derivation tests: HOS math, rules, ranking, bands, seed, acti
 npm run build
 ```
 
-Node 20+. No backend, no keys. The shift is simulated: the clock is pinned to 12:47 PM so the demo is the same at any hour, and it ticks in real time. Press `⌘.` for the dev panel (scrub the clock, bring a truck back online, undo).
+Node 20+. No backend, no keys. The shift is simulated: the clock is pinned to 2:47 PM so the demo is the same at any hour, and it ticks in real time. Press `⌘.` for the dev panel (scrub the clock, bring a truck back online, undo).
 
 ## What to look at
 
@@ -4665,7 +4671,7 @@ Two options; either is fine:
 1. Push the repo to GitHub, import it in Vercel with framework preset **Vite**, build command `npm run build`, output `dist`. `vercel.json` already rewrites deep links.
 2. `npx vercel --prod` from the repo root, accept the detected Vite settings.
 
-Verify on the deployed URL: the board loads at 12:47 PM, `/routes/drv-01` deep-links straight to Marcus, the dev panel opens with `⌘.`, and the console is clean. Paste the URL into `README.md`.
+Verify on the deployed URL: the board loads at 2:47 PM, `/routes/drv-01` deep-links straight to Marcus, the dev panel opens with `⌘.`, and the console is clean. Paste the URL into `README.md`.
 
 - [ ] **Step 5: Final verification and commit**
 

@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { MIN, TICK_MS, scenarioAnchor, simNow, toTick } from './clock'
 
 describe('scenarioAnchor', () => {
-  it('is 12:47:00 local on the given day', () => {
+  it('is 14:47:00 local on the given day', () => {
     const d = new Date(2026, 8, 3, 9, 15, 30)
     const a = new Date(scenarioAnchor(d))
-    expect([a.getHours(), a.getMinutes(), a.getSeconds(), a.getMilliseconds()]).toEqual([12, 47, 0, 0])
+    expect([a.getHours(), a.getMinutes(), a.getSeconds(), a.getMilliseconds()]).toEqual([14, 47, 0, 0])
     expect(a.getDate()).toBe(3)
   })
 })

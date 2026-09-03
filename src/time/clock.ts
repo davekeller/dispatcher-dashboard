@@ -1,8 +1,9 @@
-// The one clock. The scenario is pinned to 12:47 PM so the demo is the same at
+// The one clock. The scenario is pinned to 2:47 PM (a driver near the 11-hour limit
+// by then started around 2:40 AM, which is ordinary freight) so the demo is the same at
 // any hour, and it still ticks: now = anchor + real elapsed + scrub offset.
 export const TICK_MS = 5000
 export const MIN = 60_000
-export const ANCHOR_HOUR = 12
+export const ANCHOR_HOUR = 14
 export const ANCHOR_MINUTE = 47
 
 export function scenarioAnchor(from: Date = new Date()): number {

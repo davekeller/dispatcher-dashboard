@@ -2,7 +2,7 @@
 
 Source of truth for how the product is built. `BRIEF.md` says what and why, `LAYOUT.md` describes the surfaces, `FLOWS.md` walks the flows. Where those disagree with this file, this file wins (it was written last, on 2026-09-03, after the design was settled).
 
-The co-pilot is named **Lookout**. The dispatcher is **Lena**. The simulated shift is anchored at **12:47 PM**.
+The co-pilot is named **Lookout**. The dispatcher is **Lena**. The simulated shift is anchored at **2:47 PM**.
 
 ---
 
@@ -168,7 +168,7 @@ Everyone else is comfortably clear so the board is not all red.
 
 ## 5. Time
 
-- `clock.ts`: `SCENARIO_ANCHOR` = today at 12:47:00 local. `now = anchor + (Date.now() − loadedAt) + scrubOffset`. The clock is live (it ticks), deterministic (same scenario every load), and scrubbable.
+- `clock.ts`: `SCENARIO_ANCHOR` = today at 14:47:00 local. `now = anchor + (Date.now() − loadedAt) + scrubOffset`. The clock is live (it ticks), deterministic (same scenario every load), and scrubbable.
 - `useNow()`: one hook, ticks every `TICK_MS = 5000`, value rounded to the tick so memo keys are stable. Nothing else reads `Date.now()`.
 - **Simulated telematics.** Drivers without `pingsSuspended` are treated as pinging continuously: their effective `lastPingAt` is `now − jitter(driverId)` with jitter 0–90s. Planted stale/offline drivers keep their stored `lastPingAt`. This is derivation, not mutation, so the fleet does not go offline when the clock is scrubbed or a tab is left open.
 - **Dev panel** (hidden behind `⌘.`, and a small "dev" toggle in the header): +15m, +1h, reset clock; "bring Dre online" (clears `pingsSuspended`); "advance Marcus one stop"; reset data; undo. The panel exists so any alert can be fired on demand during the walkthrough.

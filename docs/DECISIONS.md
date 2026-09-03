@@ -11,7 +11,7 @@ One line per meaningful choice or cut. Newest at the bottom.
 | 5 | Co-pilot reads the same alerts array as the main view | One source of truth; two presentations |
 | 6 | Every action confirms before it commits | Consequential actions should feel consequential |
 | 7 | Board and map are Phase 2, behind a toggle, never on the critical path | Scope discipline; the list is the product |
-| 8 | Simulated shift clock anchored at 12:47 PM, ticking live, with simulated pings for online drivers | Deterministic demo at any hour; scrubbing never blacks out the fleet |
+| 8 | Simulated shift clock anchored at 2:47 PM, ticking live, with simulated pings for online drivers | Deterministic demo at any hour; scrubbing never blacks out the fleet |
 | 9 | Route file is a full page, not a side sheet | Receipts and the ribbon need the room; Lookout stays open beside it |
 | 10 | Main view is a region-column board ranked by urgency within columns; the list view is dropped | Top row = the worst problem in each region, which is how a dispatcher thinks about a fix |
 | 11 | Offline inside the watch window fires at act-now severity | Making contact can't wait; every minute blind is lead time lost |

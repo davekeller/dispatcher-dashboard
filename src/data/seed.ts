@@ -48,7 +48,8 @@ function generateDriver(i: number, rng: Rng, anchor: number): Generated {
   const shiftStartedAt = anchor - rng.int(6 * 60 + 17, 8 * 60 + 17) * MIN // 04:30–06:30
   const plannedStartAt = shiftStartedAt + rng.int(20, 30) * MIN // pre-trip inspection
   const [legMin, legMax] = REGION_LEG_MINUTES[region]
-  const driftRate = rng.pick([-0.08, -0.04, 0, 0, 0, 0.04, 0.08, 0.15]) // fraction of each leg, per driver
+  // Most drivers run within a few minutes of plan; roughly one in twelve runs genuinely late.
+  const driftRate = rng.chance(0.08) ? 0.12 : rng.pick([-0.06, -0.03, 0, 0, 0, 0.03, 0.06])
 
   const segments: DutySegment[] = [{ status: 'on_duty', startedAt: shiftStartedAt, endedAt: plannedStartAt }]
   const stops: Stop[] = []
