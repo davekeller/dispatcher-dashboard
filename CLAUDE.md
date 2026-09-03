@@ -50,4 +50,4 @@ Ship a thin vertical slice first (seed → compute → one rule → one card →
 
 ## Not for this repo
 
-Toast's logo, name as a product, exact brand palette, or product names. Rhyme with good patterns; don't copy an identity. Lookout is this product's own feature.
+Any third party's logo, product names, or exact brand palette. Rhyme with good patterns; don't copy an identity. Lookout is this product's own feature.

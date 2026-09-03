@@ -27,7 +27,7 @@ Vite · React 19 · TypeScript · Tailwind v4 (via `@tailwindcss/vite`). Light t
 | `react`, `react-dom` | UI |
 | `react-router` | Three real routes now, two more in Phase 2; drivers get URLs for the walkthrough |
 | `zustand` | One small store with actions and one-level undo; less ceremony than context + reducer |
-| `@phosphor-icons/react` | Duotone weight rhymes with Toast's duo-tone icon style without copying it; has a truck |
+| `@phosphor-icons/react` | The duotone weight gives the friendly two-tone icon feel common in hospitality software without copying anyone's set; has a truck |
 | `@fontsource-variable/bricolage-grotesque`, `@fontsource-variable/inter` | Display and body faces, bundled, no CDN |
 | Phase 2 only: `leaflet`, `react-leaflet` | Map and phone view; lazy-loaded, never on the critical path |
 
@@ -374,7 +374,7 @@ Each is designed, not discovered. Where it shows up is as important as what happ
 
 ## 11. Visual system
 
-Neutral, dense, calm, warm. Ops software used mid-shift. Rhymes with Toast's warmth and Toast IQ's proactive-feed pattern without borrowing the brand.
+Neutral, dense, calm, warm. Ops software used mid-shift. Rhymes with the warmth of modern hospitality software and the proactive-feed pattern of an in-product assistant, without borrowing anyone's brand.
 
 **Tokens** (Tailwind v4 `@theme`, all in `index.css`; components use tokens only, never raw hex):
 
