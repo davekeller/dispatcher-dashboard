@@ -2782,7 +2782,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: store, hooks, format, primitives.
 - Produces: `useLookout(): { collapsed, setCollapsed, focusDriverId, setFocus }`; `LOOKOUT` voice constants; `useActions(): { request, open, close }` where `open(action: DialogAction, driverId: string, opts?: { stopIds?: string[] })` and `DialogAction = 'reassign' | 'schedule_reset' | 'notify_customer'`; `<ActionDialogs />` (renders nothing until Task 12). Routes: `/`, `/routes/:driverId`, `/drivers`, `/routes`, `/reports`.
 
-- [ ] **Step 1: Write `src/lookout/voice.ts`**
+- [x] **Step 1: Write `src/lookout/voice.ts`**
 
 ```ts
 // Lookout's name and shared phrases. The co-pilot is a feature of this product with its
@@ -2797,7 +2797,7 @@ export const LOOKOUT = {
 } as const
 ```
 
-- [ ] **Step 2: Write `src/lookout/LookoutContext.tsx`**
+- [x] **Step 2: Write `src/lookout/LookoutContext.tsx`**
 
 ```tsx
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
@@ -2825,7 +2825,7 @@ export function useLookout(): LookoutState {
 }
 ```
 
-- [ ] **Step 3: Write `src/actions/ActionContext.tsx`**
+- [x] **Step 3: Write `src/actions/ActionContext.tsx`**
 
 The three consequential actions open a dialog. Anything can request one; Task 12 renders them. Inline actions (acknowledge, call driver) never come through here.
 
@@ -2871,7 +2871,7 @@ export default function ActionDialogs() {
 }
 ```
 
-- [ ] **Step 4: Write `src/app/LeftNav.tsx`**
+- [x] **Step 4: Write `src/app/LeftNav.tsx`**
 
 ```tsx
 import { ChartBar, Path, SquaresFour, Users, CaretLeft, CaretRight } from '@phosphor-icons/react'
@@ -2918,7 +2918,7 @@ export default function LeftNav() {
 }
 ```
 
-- [ ] **Step 5: Write `src/app/Header.tsx`**
+- [x] **Step 5: Write `src/app/Header.tsx`**
 
 ```tsx
 import { Wrench } from '@phosphor-icons/react'
@@ -2977,7 +2977,7 @@ export default function Header() {
 }
 ```
 
-- [ ] **Step 6: Write `src/app/DevPanel.tsx`**
+- [x] **Step 6: Write `src/app/DevPanel.tsx`**
 
 ```tsx
 import { useEffect } from 'react'
@@ -3029,7 +3029,7 @@ export default function DevPanel() {
 }
 ```
 
-- [ ] **Step 7: Write the Lookout sidebar stub and the Layout**
+- [x] **Step 7: Write the Lookout sidebar stub and the Layout**
 
 `src/lookout/LookoutSidebar.tsx` (stub; Task 10 replaces it entirely):
 ```tsx
@@ -3083,7 +3083,7 @@ export default function Layout() {
 }
 ```
 
-- [ ] **Step 8: Write `src/App.tsx` with the routes and placeholder pages**
+- [x] **Step 8: Write `src/App.tsx` with the routes and placeholder pages**
 
 ```tsx
 import { Route, Routes } from 'react-router'
@@ -3116,12 +3116,12 @@ export default function App() {
 
 Task 9 swaps the index element for `ActiveShiftPage`; Task 11 swaps the route-file element for `RouteFilePage`.
 
-- [ ] **Step 9: Verify in the browser**
+- [x] **Step 9: Verify in the browser**
 
 Run: `npx tsc --noEmit && npm run dev`
 Check: three panes render; the header clock shows 12:47 PM and advances; `⌘.` opens the dev panel; +15m moves the clock; the left nav collapses; the Lookout stub collapses to a rail. Nothing in the console.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add -A
