@@ -3403,7 +3403,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: `useDerived`, `useLookout`, `useActions`, store methods, tones, primitives, `LOOKOUT`.
 - Produces: `<AlertActions driverId actions disabledReason? />` — the single component that renders action buttons for any alert, used by both the rail and the route file's alert strip (Task 11). `<ActionConfirm label confirmLabel onConfirm />` — the two-step inline confirm.
 
-- [ ] **Step 1: Write `src/lookout/ActionConfirm.tsx`**
+- [x] **Step 1: Write `src/lookout/ActionConfirm.tsx`**
 
 ```tsx
 import { useEffect, useState } from 'react'
@@ -3434,7 +3434,7 @@ export default function ActionConfirm({ label, confirmLabel = 'Confirm', doneLab
 }
 ```
 
-- [ ] **Step 2: Write `src/lookout/AlertActions.tsx`**
+- [x] **Step 2: Write `src/lookout/AlertActions.tsx`**
 
 ```tsx
 import { useActions } from '../actions/ActionContext'
@@ -3476,7 +3476,7 @@ export default function AlertActions({ driverId, actions, alertIds, positionDepe
 }
 ```
 
-- [ ] **Step 3: Write `src/lookout/RecommendationCard.tsx`**
+- [x] **Step 3: Write `src/lookout/RecommendationCard.tsx`**
 
 ```tsx
 import { Link } from 'react-router'
@@ -3529,7 +3529,7 @@ export default function RecommendationCard({ view, card, pinned = false }: { vie
 }
 ```
 
-- [ ] **Step 4: Write `src/lookout/AlertBar.tsx`**
+- [x] **Step 4: Write `src/lookout/AlertBar.tsx`**
 
 ```tsx
 import { Link } from 'react-router'
@@ -3562,7 +3562,7 @@ export default function AlertBar({ cards, byId }: { cards: DriverCard[]; byId: M
 }
 ```
 
-- [ ] **Step 5: Replace `src/lookout/LookoutSidebar.tsx`**
+- [x] **Step 5: Replace `src/lookout/LookoutSidebar.tsx`**
 
 ```tsx
 import { CaretDoubleRight, CaretDoubleLeft } from '@phosphor-icons/react'
@@ -3622,7 +3622,7 @@ export default function LookoutSidebar() {
 }
 ```
 
-- [ ] **Step 6: Verify in the browser**
+- [x] **Step 6: Verify in the browser**
 
 Run: `npx tsc --noEmit && npm run dev`
 Check:
@@ -3632,7 +3632,7 @@ Check:
 - Collapsing shows a rail with a red "3".
 - Clicking "Reassign stops" on Marcus does nothing visible yet (dialogs arrive in Task 12); it must not throw.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add -A
