@@ -51,7 +51,7 @@ export const RULES: Rule[] = [
     id: 'wont_finish',
     label: "Won't finish",
     severity: 'act_now',
-    when: (v) => v.minutesUntilLimit > 0 && v.remaining.length > 0 && v.remainingDriveMin > v.minutesUntilLimit,
+    when: (v) => onTheRoad(v) && v.minutesUntilLimit > 0 && v.remaining.length > 0 && v.remainingDriveMin > v.minutesUntilLimit,
     message: (v) => ({
       title: `${v.driver.name} can't finish the route before the limit.`,
       body: `Last stop projected ${fmtClock(v.projectedFinishAt ?? v.now)}; the limit hits at ${est(v)}${fmtClock(v.limitHitAt)}.`,

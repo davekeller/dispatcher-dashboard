@@ -226,14 +226,14 @@ interface Rule {
 export const RULES: Rule[] = [ /* one object per rule */ ]
 ```
 
-Fixed severity and a `when` predicate keeps the shape copy-pasteable in front of the panel. Rules that need two severities are two objects.
+Fixed severity and a `when` predicate keeps the shape copy-pasteable in front of the panel. Rules that need two severities are two objects. The limit rules (`limit_*`, `wont_finish`) speak only for drivers who are driving or on duty and not offline: the offline rules own dark drivers with one card, and a break pauses the clock so the alert resumes with the driver.
 
 | id | severity | fires when | actions |
 |---|---|---|---|
 | `over_limit` | critical | `drivingMinutes ≥ 660` | reassign, call_driver |
 | `limit_act_now` | act_now | driving or on_duty, `0 < minutesUntilLimit ≤ 30` | reassign, schedule_reset, notify_customer |
 | `limit_watch` | watch | driving or on_duty, `30 < minutesUntilLimit ≤ 90` | schedule_reset, reassign |
-| `wont_finish` | act_now | stops remain and `remainingDriveMinutes > minutesUntilLimit` and not over | reassign (pre-selects the stops past the limit), schedule_reset |
+| `wont_finish` | act_now | on the road and visible, stops remain, `remainingDriveMinutes > minutesUntilLimit`, not over | reassign (pre-selects the stops past the limit), schedule_reset |
 | `offline_near_limit` | act_now | offline and last-known `minutesUntilLimit ≤ 90` | call_driver, acknowledge |
 | `offline` | watch | offline and last-known `minutesUntilLimit > 90` | call_driver, acknowledge |
 | `behind_schedule` | watch | `drift ≥ 15` and stops remain and unnotified late stops exist | notify_customer, reassign |
