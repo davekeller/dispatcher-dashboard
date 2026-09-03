@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { makeFleet } from '../data/seed'
+import { materialize } from '../data/simulate'
 import type { Fleet, StopOutcome } from '../data/types'
 import type { GroupingId } from '../groupBy'
 import { minutesUntilLimit } from '../hos/compute'
@@ -43,6 +44,8 @@ export interface State {
   resetFleet: () => void
   setGroupBy: (id: GroupingId) => void
   toggleDev: () => void
+  /** Apply the clock to the simulated day. Cheap: returns early when no stop crossed `now`. */
+  advanceWorld: () => void
 }
 
 export const useStore = create<State>()((set, get) => {
@@ -82,8 +85,18 @@ export const useStore = create<State>()((set, get) => {
       const snap = get().undoSnapshot
       if (snap) set({ fleet: snap, undoSnapshot: undefined, lastAction: { label: 'Undone', at: Date.now(), undoable: false } })
     },
-    scrub: (ms) => set((s) => ({ scrubOffsetMs: s.scrubOffsetMs + ms })),
-    resetClock: () => set({ scrubOffsetMs: 0 }),
+    scrub: (ms) => {
+      set((s) => ({ scrubOffsetMs: s.scrubOffsetMs + ms }))
+      get().advanceWorld()
+    },
+    resetClock: () => {
+      set({ scrubOffsetMs: 0 })
+      get().advanceWorld()
+    },
+    advanceWorld: () => {
+      const next = materialize(get().fleet, get().now())
+      if (next !== get().fleet) set({ fleet: next })
+    },
     resetFleet: () => set({ fleet: makeFleet(ANCHOR), snoozes: {}, corrections: {}, undoSnapshot: undefined, lastAction: undefined, scrubOffsetMs: 0 }),
     setGroupBy: (groupBy) => set({ groupBy }),
     toggleDev: () => set((s) => ({ devOpen: !s.devOpen })),

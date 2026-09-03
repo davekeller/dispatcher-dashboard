@@ -5,7 +5,7 @@ import { useStore } from '../store/store'
 import Button from '../ui/Button'
 
 /** Hidden behind ⌘. and the wrench. Exists so any alert can be fired on demand during a
- *  walkthrough. The scrubber advances the clock, not the world: stops don't complete themselves. */
+ *  walkthrough. The generated fleet keeps moving with the clock; the planted scenarios hold still. */
 export default function DevPanel() {
   const open = useStore((s) => s.devOpen)
   const toggle = useStore((s) => s.toggleDev)
@@ -44,7 +44,7 @@ export default function DevPanel() {
       <span className="h-5 w-px bg-line" />
       <Button size="sm" onClick={undo}>Undo</Button>
       <Button size="sm" variant="ghost" onClick={resetFleet}>Reset data</Button>
-      <span className="ml-1 text-[11px] text-muted">The scrubber advances the clock, not the world.</span>
+      <span className="ml-1 text-[11px] text-muted">The fleet keeps moving; the planted scenarios hold still.</span>
     </aside>
   )
 }

@@ -56,7 +56,8 @@ export function reassignStops(fleet: Fleet, fromDriverId: string, toDriverId: st
   const tail: Stop[] = moving.map((s) => {
     const plannedEta = t + s.driveMinutesFromPrev * MIN
     t = plannedEta + s.serviceMinutes * MIN
-    return { ...s, routeId: to.id, status: 'pending', plannedEta }
+    // It leaves its old simulated schedule behind: on the new route it is pending until someone gets there.
+    return { ...s, routeId: to.id, status: 'pending', plannedEta, arrivedAt: undefined, departedAt: undefined }
   })
   return withRoutes(
     fleet,

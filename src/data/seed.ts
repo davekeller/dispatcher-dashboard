@@ -1,5 +1,6 @@
 import { MIN } from '../time/clock'
 import { applyPlanted } from './planted'
+import { materialize } from './simulate'
 import { makeRng, type Rng } from './prng'
 import { REGIONS, REGION_CENTER, REGION_LEG_MINUTES } from './regions'
 import type { Delivery, Driver, DutySegment, Fleet, LatLng, Region, Route, Stop, Truck } from './types'
@@ -59,9 +60,11 @@ function generateDriver(i: number, rng: Rng, anchor: number): Generated {
   let actualT = plannedStartAt
   let drivingSinceBreak = 0
   let breakTaken = false
-  let nowPlaced = false // has the "where the driver is right now" segment been written
   let position = jitterAround(REGION_CENTER[region], rng, 0.04)
 
+  // The whole day is simulated up front: every stop carries the time the driver will reach
+  // it and leave it, and the segments run to the end of the shift. materialize() turns the
+  // clock into stop statuses, so the generated fleet keeps moving while the demo runs.
   for (let k = 0; k < STOPS_PER_ROUTE; k++) {
     const drive = rng.int(legMin, legMax)
     const service = rng.int(6, 20)
@@ -81,45 +84,36 @@ function generateDriver(i: number, rng: Rng, anchor: number): Generated {
       instructions: rng.chance(0.3) ? INSTRUCTIONS[rng.int(0, INSTRUCTIONS.length - 1)] : undefined,
     })
 
-    const stop: Stop = { id: `stp-${n}-${String(k + 1).padStart(2, '0')}`, routeId, deliveryId, seq: k + 1, driveMinutesFromPrev: drive, serviceMinutes: service, plannedEta, status: 'pending' }
-
-    if (nowPlaced) { stops.push(stop); continue }
-
     // A 30-minute break after ~4.5h of driving, before starting the next leg.
     if (!breakTaken && drivingSinceBreak >= 270) {
       segments.push({ status: 'on_break', startedAt: actualT, endedAt: actualT + 30 * MIN })
       actualT += 30 * MIN
       breakTaken = true
       drivingSinceBreak = 0
-      if (actualT > anchor) { nowPlaced = true; stops.push(stop); continue } // on break right now
     }
 
     const departPrev = actualT
     const actualDrive = Math.max(4, Math.round(drive * (1 + driftRate) + rng.int(-2, 2)))
     const arrivedAt = departPrev + actualDrive * MIN
     const departedAt = arrivedAt + service * MIN
-
-    if (departedAt <= anchor) {
-      const failed = rng.chance(0.03)
-      segments.push({ status: 'driving', startedAt: departPrev, endedAt: arrivedAt })
-      segments.push({ status: 'on_duty', startedAt: arrivedAt, endedAt: departedAt })
-      stops.push({ ...stop, status: failed ? 'failed' : 'done', arrivedAt, departedAt, outcome: failed ? 'failed' : rng.chance(0.06) ? 'partial' : 'delivered', signedBy: failed ? undefined : SIGNERS[rng.int(0, SIGNERS.length - 1)], note: failed ? 'Customer closed. Retry after 3 PM.' : undefined })
-      drivingSinceBreak += actualDrive
-      actualT = departedAt
-      position = stopPosition
-    } else if (arrivedAt <= anchor) {
-      segments.push({ status: 'driving', startedAt: departPrev, endedAt: arrivedAt })
-      segments.push({ status: 'on_duty', startedAt: arrivedAt }) // at the dock right now
-      stops.push({ ...stop, status: 'in_progress', arrivedAt })
-      position = stopPosition
-      nowPlaced = true
-    } else {
-      segments.push({ status: 'driving', startedAt: departPrev }) // on the road right now
-      stops.push(stop)
-      position = jitterAround({ lat: (position.lat + stopPosition.lat) / 2, lng: (position.lng + stopPosition.lng) / 2 }, rng, 0.01)
-      nowPlaced = true
-    }
+    const failed = rng.chance(0.03)
+    segments.push({ status: 'driving', startedAt: departPrev, endedAt: arrivedAt })
+    segments.push({ status: 'on_duty', startedAt: arrivedAt, endedAt: departedAt })
+    stops.push({
+      id: `stp-${n}-${String(k + 1).padStart(2, '0')}`, routeId, deliveryId, seq: k + 1, driveMinutesFromPrev: drive, serviceMinutes: service, plannedEta,
+      status: 'pending', // materialize() sets done / in_progress / pending from the clock
+      arrivedAt, departedAt,
+      outcome: failed ? 'failed' : rng.chance(0.06) ? 'partial' : 'delivered',
+      signedBy: failed ? undefined : SIGNERS[rng.int(0, SIGNERS.length - 1)],
+      note: failed ? 'Customer closed. Retry after 3 PM.' : undefined,
+    })
+    drivingSinceBreak += actualDrive
+    actualT = departedAt
+    if (arrivedAt <= anchor) position = stopPosition
   }
+  // Back to the yard, then off duty for the night.
+  segments.push({ status: 'driving', startedAt: actualT, endedAt: actualT + 20 * MIN })
+  segments.push({ status: 'off_duty', startedAt: actualT + 20 * MIN })
 
   const driver: Driver = { id, name: `${first} ${lastInitial}.`, initials: `${first[0]}${lastInitial}`, truckId, routeId, region, shiftStartedAt, segments, lastPingAt: anchor - 30_000 }
   const truck: Truck = { id: truckId, plate: `IL ${rng.int(100, 999)} ${LAST_INITIALS[rng.int(0, 18)]}${LAST_INITIALS[rng.int(0, 18)]}${LAST_INITIALS[rng.int(0, 18)]}`, region, position, lastPingAt: driver.lastPingAt }
@@ -140,7 +134,8 @@ export function generateFleet(anchor: number, seed: number = SEED): Fleet {
   return fleet
 }
 
-/** The fleet the app boots with: generated, then the planted scenarios overwrite ten drivers. */
+/** The fleet the app boots with: generated, the planted scenarios overwrite eleven drivers,
+ *  and the clock is applied once so every stop has the status it should have at the anchor. */
 export function makeFleet(anchor: number): Fleet {
-  return applyPlanted(generateFleet(anchor), anchor)
+  return materialize(applyPlanted(generateFleet(anchor), anchor), anchor)
 }

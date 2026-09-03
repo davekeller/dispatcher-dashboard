@@ -8,7 +8,10 @@ export function useNow(): number {
   const scrub = useStore((s) => s.scrubOffsetMs)
   const [wall, setWall] = useState(() => Date.now())
   useEffect(() => {
-    const id = setInterval(() => setWall(Date.now()), TICK_MS)
+    const id = setInterval(() => {
+      setWall(Date.now())
+      useStore.getState().advanceWorld()
+    }, TICK_MS)
     return () => clearInterval(id)
   }, [])
   return toTick(simNow(scrub, wall))

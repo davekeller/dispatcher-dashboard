@@ -172,6 +172,7 @@ Everyone else is comfortably clear so the board is not all red. Each planted day
 - `clock.ts`: `SCENARIO_ANCHOR` = today at 14:47:00 local. `now = anchor + (Date.now() − loadedAt) + scrubOffset`. The clock is live (it ticks), deterministic (same scenario every load), and scrubbable.
 - `useNow()`: one hook, ticks every `TICK_MS = 5000`, value rounded to the tick so memo keys are stable. Nothing else reads `Date.now()`.
 - **Simulated telematics.** Drivers without `pingsSuspended` are treated as pinging continuously: their effective `lastPingAt` is `now − jitter(driverId)` with jitter 0–90s. Planted stale/offline drivers keep their stored `lastPingAt`. This is derivation, not mutation, so the fleet does not go offline when the clock is scrubbed or a tab is left open.
+- **The world moves.** The generated fleet is a whole simulated day: every generated stop carries the time the driver will reach it and leave it, and `materialize(fleet, now)` (`src/data/simulate.ts`) sets stop statuses from the clock on every tick and every scrub. The planted scenarios carry no future times, so they hold still for the demo. Scrub an hour and the fleet has completed its next stops; leave a tab open through a panel and the board does not slowly fill with drivers who fell behind a frozen plan.
 - **Dev panel** (hidden behind `⌘.`, and a small "dev" toggle in the header): +15m, +1h, reset clock; "bring Dre online" (clears `pingsSuspended`); "advance Marcus one stop"; reset data; undo. The panel exists so any alert can be fired on demand during the walkthrough.
 
 ---
