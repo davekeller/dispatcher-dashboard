@@ -2,7 +2,7 @@
 
 A fleet dispatcher runs ~50 heavy-duty trucks and 1,000+ deliveries a day. Her job is not monitoring; it is intervening in time. This is the view she lives in, built around one exception: the 11-hour Hours of Service driving limit.
 
-**Live:** <deployed URL> · **Source:** this repo
+**Live:** _the Vercel link goes here after `npx vercel --prod`_ · **Source:** this repo
 
 ## Run it
 
@@ -29,7 +29,7 @@ Node 20+. No backend, no keys. The shift is simulated: the clock is pinned to 2:
 
 ## Scope, honestly
 
-The brief suggests 2–3 hours. This took roughly <hours> hours of directing and reviewing, counting the design conversation, and it produced more than the brief asks for: the board, the route file with receipts and a schedule ribbon, and the Lookout rail. The core was scoped with discipline; the extras are labeled as extras in `docs/DECISIONS.md`. Not built: the driver's phone view, the map, chat, routing, auth, dark mode, mobile layouts.
+The brief suggests 2–3 hours. This took roughly 3 hours of directing and reviewing, counting the design conversation, and it produced more than the brief asks for: the board, the route file with receipts and a schedule ribbon, and the Lookout rail. The core was scoped with discipline; the extras are labeled as extras in `docs/DECISIONS.md`. Not built: the driver's phone view, the map, chat, routing, auth, dark mode, mobile layouts.
 
 ## The live change
 
