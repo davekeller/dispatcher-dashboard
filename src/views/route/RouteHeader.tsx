@@ -6,6 +6,7 @@ import type { DriverView } from '../../store/view'
 import Avatar from '../../ui/Avatar'
 import Card from '../../ui/Card'
 import Chip from '../../ui/Chip'
+import CorrectionChip from '../../ui/CorrectionChip'
 import Countdown from '../../ui/Countdown'
 import { BAND_TONE, STALENESS_TONE } from '../../ui/tones'
 
@@ -23,6 +24,7 @@ export default function RouteHeader({ view, card }: { view: DriverView; card: Dr
           <h2 className="font-display text-2xl font-semibold tracking-tight">{view.driver.name}</h2>
           <Chip tone={tone} dashed={offline}>{card.severity === 'critical' ? 'Over limit' : BAND_LABEL[card.band]}</Chip>
           <Chip tone={view.driftMin > 5 ? BAND_TONE.watch : BAND_TONE.clear}>{fmtDrift(view.driftMin)}</Chip>
+          <CorrectionChip driverId={view.driver.id} />
         </div>
         <p className="mt-1 text-[12px] text-muted">
           {view.truck.plate} · {view.driver.region} · on duty since {fmtClock(view.driver.shiftStartedAt)} · {STATUS_LABEL[view.status]}

@@ -5,6 +5,7 @@ import { useStore } from '../store/store'
 import type { DriverView } from '../store/view'
 import Avatar from '../ui/Avatar'
 import Chip from '../ui/Chip'
+import CorrectionChip from '../ui/CorrectionChip'
 import Countdown from '../ui/Countdown'
 import { BAND_TONE, STALENESS_TONE, severityTone } from '../ui/tones'
 import AlertActions from './AlertActions'
@@ -39,6 +40,7 @@ export default function RecommendationCard({ view, card, pinned = false }: { vie
         <Chip tone={STALENESS_TONE[view.staleness]} dashed={offline}>{fmtAge(view.pingAgeMin)}</Chip>
         {view.driver.contactAttemptedAt !== undefined && <span>{LOOKOUT.called(fmtClock(view.driver.contactAttemptedAt))}</span>}
         {snoozedUntil !== undefined && <span>{LOOKOUT.snoozed(fmtClock(snoozedUntil))}</span>}
+        <CorrectionChip driverId={view.driver.id} />
       </div>
       <div className="mt-2.5">
         <AlertActions driverId={view.driver.id} actions={card.alerts.flatMap((a) => a.actions)} alertIds={card.alerts.map((a) => a.id)} positionDependentDisabled={staleReason} />

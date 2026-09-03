@@ -159,7 +159,7 @@ A route belongs to one driver for the day, so a card on the board is a route, a 
 | Sam K. | 8h05m cumulative driving with no 30-min break | Trips the 30-minute-break rule added live during the panel |
 | Nadia F. | Stale 8 min; ~70 min to limit, driving | The stale tier on its own: tilde, dropped seconds, age label, band unchanged |
 | Tomas B. | 35 min behind schedule, 7 stops left, HOS clear | Behind-schedule rule alone; edge path without HOS |
-| Ana L. | Fresh, same region as Marcus, 4h of drive time left, 5 stops | The obvious reassign candidate |
+| Ana L. | Fresh, same region as Marcus, 7h of drive time left, 5 short stops | The obvious reassign candidate; tops the picker |
 | Ravi P. | Fresh, same region as Priya, 55 min of drive time left | The marginal candidate; excluded by the capacity margin |
 
 Everyone else is comfortably clear so the board is not all red.

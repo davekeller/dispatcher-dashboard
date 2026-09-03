@@ -1346,7 +1346,7 @@ export const PLANTS: Plant[] = [
   // 35 minutes behind with seven stops left and a clear HOS. The schedule rule on its own.
   { id: 'drv-07', name: 'Tomas B.', region: 'South', blocks: [['on_duty', 25], ['driving', 180], ['on_duty', 14], ['driving', 120], ['on_break', 30], ['driving', 120]], stopsDone: 9, legsLeft: [20, 22, 18, 25, 20, 24, 19], driftMin: 35 },
   // The obvious reassign candidate for Marcus: same region, four hours of drive time, five stops.
-  { id: 'drv-08', name: 'Ana L.', region: 'North', blocks: [['on_duty', 25], ['driving', 180], ['on_duty', 12], ['driving', 120], ['on_break', 30], ['driving', 120]], stopsDone: 11, legsLeft: [10, 12, 9, 11, 10], driftMin: -3 },
+  { id: 'drv-08', name: 'Ana L.', region: 'North', blocks: [['on_duty', 25], ['driving', 120], ['on_duty', 12], ['driving', 70], ['on_break', 30], ['driving', 50]], stopsDone: 11, legsLeft: [10, 12, 9, 11, 10], driftMin: -3 },
   // The marginal candidate near Priya: 55 minutes left, 32 of driving still to do. Excluded by the capacity margin.
   { id: 'drv-09', name: 'Ravi P.', region: 'West', blocks: [['on_duty', 25], ['driving', 250], ['on_duty', 12], ['driving', 200], ['on_break', 30], ['driving', 155]], stopsDone: 13, legsLeft: [10, 12, 10], driftMin: 2 },
   // Watch, fresh, finishes fine. Fills the Watch band with a boring case.

@@ -3,9 +3,11 @@ import { Link } from 'react-router'
 import type { DriverCard } from '../../alerts/types'
 import { LIMIT_MIN } from '../../hos/constants'
 import { fmtAge } from '../../lib/format'
+import { useStore } from '../../store/store'
 import type { DriverView } from '../../store/view'
 import Bar from '../../ui/Bar'
 import Chip from '../../ui/Chip'
+import CorrectionChip from '../../ui/CorrectionChip'
 import Countdown from '../../ui/Countdown'
 import { BAND_TONE, LOOKOUT_TONE, STALENESS_TONE, severityTone } from '../../ui/tones'
 
@@ -18,6 +20,7 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
   const offline = view.staleness === 'offline'
   const surface = quiet ? 'border-line/70 bg-panel/80 opacity-80 hover:opacity-100' : 'border-line bg-panel shadow-card'
   const dim = card.snoozed ? 'opacity-60' : ''
+  const hasCorrection = useStore((s) => Boolean(s.corrections[view.driver.id]))
   return (
     <Link to={`/routes/${view.driver.id}`} className={`group flex overflow-hidden rounded-card border transition hover:border-ink/30 hover:shadow-md ${surface} ${dim}`}>
       <div className={`w-1.5 shrink-0 transition-colors duration-300 ${offline ? `border-l-[6px] border-dashed ${tone.border} bg-transparent` : tone.fill}`} aria-hidden="true" />
@@ -34,9 +37,10 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
           <span className="truncate">{view.next ? `next · ${nextLabel(view)}` : view.unassigned.length ? `${view.unassigned.length} need a driver` : 'route complete'}</span>
           <Chip tone={STALENESS_TONE[view.staleness]} dashed={offline} className="ml-auto" title="Age of the last telematics ping">{fmtAge(view.pingAgeMin)}</Chip>
         </div>
-        {(card.alerts.length > 0 || pick) && (
+        {(card.alerts.length > 0 || pick || hasCorrection) && (
           <div className="flex flex-wrap gap-1">
             {pick && <Chip tone={LOOKOUT_TONE} title="Lookout's top pick across the fleet">✦ Lookout's pick</Chip>}
+            <CorrectionChip driverId={view.driver.id} />
             {card.alerts.map((a) => (
               <Chip key={a.id} tone={severityTone(a.severity)} title={a.title}>{a.label}</Chip>
             ))}
