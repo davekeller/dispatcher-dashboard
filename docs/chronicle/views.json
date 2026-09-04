@@ -1,0 +1,23 @@
+{
+  "baseUrl": "http://localhost:5173",
+  "viewport": { "width": 1440, "height": 900 },
+  "settleMs": 1200,
+  "views": [
+    {
+      "name": "shift-board",
+      "path": "/",
+      "note": "The Active Shift board — metrics strip, filters, route columns, Lookout rail."
+    },
+    {
+      "name": "route-file",
+      "path": "/routes/drv-01",
+      "note": "The HOS drill-in. drv-01 is planted closest to the 11-hour limit; if the seed changes, point this at whichever driver the Approaching-limit alert names."
+    },
+    {
+      "name": "lookout-timeline",
+      "path": "/",
+      "steps": [{ "click": "timeline" }],
+      "note": "Lookout's Timeline tab — the shift log."
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-> **2026-09-03 —** `ARCHITECTURE.md` supersedes this file where they differ: the route file is a full page, the main view is a region-column board ranked by urgency (the list view is dropped), the co-pilot is **Lookout**, the clock is simulated at 12:47 PM with simulated pings, and the visual system moved to warm neutrals with Bricolage Grotesque + Inter.
+> **2026-09-03 —** `ARCHITECTURE.md` supersedes this file where they differ: the route file is a full page, the main view is a region-column board ranked by urgency (the list view is dropped), the co-pilot is **Lookout**, the clock is simulated at 2:47 PM with simulated pings, and the visual system moved to warm neutrals with Bricolage Grotesque + Inter.
 
 # LAYOUT — Shell, views, co-pilot, persona
 
@@ -6,7 +6,7 @@
 
 ## 1. The user
 
-**Lena Vasquez** — dispatcher, regional carrier, day shift (05:00–15:00). 41. Drove for six years before moving to the desk; still thinks like a driver. Runs ~50 trucks with one other dispatcher on shift. Two monitors, a headset, a phone that never stops. Interrupted every few minutes.
+**Lena Vasquez** — dispatcher, regional carrier, day shift (06:00–16:00). 41. Drove for six years before moving to the desk; still thinks like a driver. Runs ~50 trucks with one other dispatcher on shift. Two monitors, a headset, a phone that never stops. Interrupted every few minutes.
 
 What she's accountable for: every stop delivered inside its window, no driver over the legal limit on her watch. An HOS violation is a fine for the company and a mark on the driver's record — she takes both personally.
 
@@ -56,7 +56,7 @@ Light. Enough to show this is one view inside a product, not the whole product. 
 Named. Has its own identity — not the product's. Collapsible to a rail with a badge count.
 
 - **Alert bar** (pinned top): the three most pressing alerts, one line each, color-banded, live countdowns. Click → drill-in.
-- **Recommendations**: the full ranked alert list as cards. Each card: driver, why, countdown, data age, and 2–3 actions. Actions confirm inline.
+- **Recommendations**: the full ranked alert list as cards using the same flat route-card shell and miniature stop spine as the board. Each card: driver, why, countdown, data age, and 2–3 actions separated by full-width dividers. Actions confirm inline.
 - **Chat** (Phase 2): an input. Matched intents, not a model. Responses render as the same card components.
 
 The co-pilot **never has its own data**. It reads the same `alerts` array the main view reads. If they ever disagree, that's a bug.
@@ -75,7 +75,7 @@ Bands, in order: **Act now** (≤30 min) · **Watch** (30–90 min) · **Offline
 Offline rows show the last known time-to-limit as an estimate with age: `~0:40 est · 25m ago`.
 
 ### Board (Phase 2)
-Columns = bands (same five). Cards = drivers. Card shows name, countdown, mini route progress bar, data age chip. Drag is **not** supported — a driver's band is computed, not assigned. Optional **group by region** switches columns to regions with band as card color, for the "where are my problems" question.
+Columns = bands (same five). Cards = routes. Each card pairs its limit-state badge with the countdown in the header, then uses a narrow full-height stop spine beside the driver identity and a 2×2 Stops / Next / HOS fit / Route risk grid. Drag is **not** supported — a route's band is computed, not assigned. Optional **group by region** switches columns to regions with band as card color, for the "where are my problems" question.
 
 Adapt existing board components from prior work; restyle, don't rebuild.
 
@@ -115,10 +115,12 @@ Written like a competent colleague, not a system log.
 
 ## 6. Visual system
 
-Neutral, dense, calm. This is ops software used mid-shift.
+Warm, dense, and calm. This is ops software used mid-shift. See `VISUAL_LANGUAGE.md` for the complete system.
 
-- **Type**: one sans, tight scale. Countdowns in tabular/monospace figures so they don't jitter.
-- **Color**: near-monochrome base. Bands carry the only saturated color: act-now (red), watch (amber), clear (green, muted), offline (slate, hollow/dashed), break (blue, muted). Color is always paired with a label or icon.
+- **Type**: Inter for the interface and Bricolage Grotesque for selected display figures. Countdowns use tabular figures so they do not jitter.
+- **Foundation**: paper-like warm neutrals, white cards, near-black type, quiet borders, and modest radii.
+- **Status color**: act-now red, watch amber, clear green, offline slate, and break blue. Color is always paired with a label, icon, or shape.
+- **AI signature**: accessible orange plus a subtle peach-to-rose-to-periwinkle spectrum, reserved for Lookout and top-level AI entry points rather than operational severity.
 - **Density**: rows ~40px. Cards compact. Whitespace goes to grouping, not decoration.
 - **Motion**: none beyond countdown ticks and a subtle band-change transition.
 - **Dark mode**: not built. Light only.

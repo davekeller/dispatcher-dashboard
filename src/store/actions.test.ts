@@ -1,0 +1,131 @@
+import { describe, expect, it } from 'vitest'
+import { makeFleet } from '../data/seed'
+import { minutesUntilLimit, plannedReset, remainingDriveMinutes, remainingStops, unassignedStops } from '../hos/compute'
+import { MIN } from '../time/clock'
+import { bringOnline, cancelStop, markArrived, markDeparted, notifyCustomer, reassignCandidates, reassignStops, scheduleReset, stopsPastLimit, suggestResetStop, updateStopNote } from './actions'
+import { buildView, buildViews } from './view'
+
+const anchor = new Date(2026, 8, 3, 12, 47, 0, 0).getTime()
+const fleet = makeFleet(anchor)
+const routeOf = (f: typeof fleet, driverId: string) => f.routes.find((r) => r.driverId === driverId)!
+const marcusStops = remainingStops(routeOf(fleet, 'drv-01')).map((s) => s.id)
+
+describe('reassignStops', () => {
+  it('moves stops to the end of the target route and re-times them after the target finishes', () => {
+    const next = reassignStops(fleet, 'drv-01', 'drv-08', marcusStops, anchor)
+    expect(remainingDriveMinutes(routeOf(next, 'drv-01'))).toBe(0)
+    const ana = routeOf(next, 'drv-08')
+    const moved = ana.stops.filter((s) => marcusStops.includes(s.id))
+    expect(moved).toHaveLength(3)
+    expect(moved.map((s) => s.routeId)).toEqual(['rt-08', 'rt-08', 'rt-08'])
+    expect(ana.stops.map((s) => s.seq)).toEqual(ana.stops.map((_, i) => i + 1))
+    const anaOwnLast = ana.stops[ana.stops.length - 4]
+    expect(moved[0].plannedEta).toBeGreaterThan(anaOwnLast.plannedEta)
+    expect(next).not.toBe(fleet) // immutable
+  })
+  it('a partial reassign leaves the rest with the driver', () => {
+    const next = reassignStops(fleet, 'drv-01', 'drv-08', marcusStops.slice(1), anchor)
+    expect(remainingStops(routeOf(next, 'drv-01'))).toHaveLength(1)
+  })
+})
+
+describe('reassignCandidates', () => {
+  const views = buildViews(fleet, anchor)
+  const marcus = views.find((v) => v.driver.id === 'drv-01')!
+  it('puts same-region drivers first, includes Ana, and excludes anyone who would enter act now', () => {
+    const cands = reassignCandidates(views, marcus, marcusStops)
+    expect(cands[0].view.driver.id).toBe('drv-08')
+    expect(cands[0].sameRegion).toBe(true)
+    const ids = cands.map((c) => c.view.driver.id)
+    expect(ids).not.toContain('drv-01')
+    expect(ids).not.toContain('drv-02') // over
+    expect(ids).not.toContain('drv-03') // offline
+    expect(ids).not.toContain('drv-09') // marginal: 55 left, 32 to drive, plus 34 moved
+  })
+  it('the marginal candidate is excluded for Priya too', () => {
+    const priya = views.find((v) => v.driver.id === 'drv-02')!
+    const ids = reassignCandidates(views, priya, remainingStops(priya.route).map((s) => s.id)).map((c) => c.view.driver.id)
+    expect(ids).not.toContain('drv-09')
+  })
+})
+
+describe('scheduleReset', () => {
+  it('suggests the last stop finishable before the limit and orphans the rest', () => {
+    const marcus = buildView(fleet, fleet.drivers[0], anchor)
+    const after = suggestResetStop(marcus)
+    expect(after).toBe(marcusStops[0]) // 10 min leg fits in 12; 10 + 14 does not
+    const next = scheduleReset(fleet, 'drv-01', after, anchor)
+    const route = routeOf(next, 'drv-01')
+    expect(unassignedStops(route).map((s) => s.id)).toEqual(marcusStops.slice(1))
+    expect(remainingDriveMinutes(route)).toBe(10)
+    const driver = next.drivers.find((d) => d.id === 'drv-01')!
+    expect(plannedReset(driver)?.startedAt).toBeGreaterThan(anchor)
+  })
+  it('the reset lands under the limit: service time is planned as on duty, not charged as driving', () => {
+    const marcus = buildView(fleet, fleet.drivers[0], anchor)
+    const next = scheduleReset(fleet, 'drv-01', suggestResetStop(marcus), anchor)
+    const driver = next.drivers.find((d) => d.id === 'drv-01')!
+    const resetAt = plannedReset(driver)!.startedAt
+    expect(minutesUntilLimit(driver, resetAt)).toBeGreaterThanOrEqual(0)
+    expect(minutesUntilLimit(driver, resetAt + 60 * MIN)).toBeCloseTo(minutesUntilLimit(driver, resetAt), 5) // off duty: nothing accrues
+  })
+  it('a stop that is no longer ahead of the driver is a no-op, not a reset of the whole route', () => {
+    const done = routeOf(fleet, 'drv-01').stops.find((s) => s.status === 'done')!
+    expect(scheduleReset(fleet, 'drv-01', done.id, anchor)).toBe(fleet)
+  })
+  it('null means reset now: every remaining stop needs a driver', () => {
+    const next = scheduleReset(fleet, 'drv-01', null, anchor)
+    expect(unassignedStops(routeOf(next, 'drv-01'))).toHaveLength(3)
+    expect(plannedReset(next.drivers.find((d) => d.id === 'drv-01')!)?.startedAt).toBe(anchor)
+  })
+  it('stopsPastLimit names the stops the driver cannot reach', () => {
+    const marcus = buildView(fleet, fleet.drivers[0], anchor)
+    expect(stopsPastLimit(marcus)).toEqual(marcusStops.slice(1))
+  })
+})
+
+describe('notify, call, arrive, depart, reconnect', () => {
+  it('notifyCustomer stamps the stops', () => {
+    const next = notifyCustomer(fleet, marcusStops, anchor)
+    for (const s of remainingStops(routeOf(next, 'drv-01'))) expect(s.notifiedAt).toBe(anchor)
+  })
+  it('markArrived then markDeparted advances the route and the segments', () => {
+    const arrived = markArrived(fleet, marcusStops[0], anchor)
+    expect(routeOf(arrived, 'drv-01').stops.find((s) => s.id === marcusStops[0])!.status).toBe('in_progress')
+    const departed = markDeparted(arrived, marcusStops[0], 'delivered', anchor + 10 * MIN)
+    const stop = routeOf(departed, 'drv-01').stops.find((s) => s.id === marcusStops[0])!
+    expect(stop.status).toBe('done')
+    expect(stop.departedAt).toBe(anchor + 10 * MIN)
+    const driver = departed.drivers.find((d) => d.id === 'drv-01')!
+    expect(driver.segments[driver.segments.length - 1]).toMatchObject({ status: 'driving', startedAt: anchor + 10 * MIN })
+  })
+  it('bringOnline reveals the truth and the countdown corrects upward for Dre', () => {
+    const dre = fleet.drivers.find((d) => d.id === 'drv-03')!
+    const before = minutesUntilLimit(dre, anchor)
+    const next = bringOnline(fleet, 'drv-03', anchor)
+    const after = next.drivers.find((d) => d.id === 'drv-03')!
+    expect(after.pingsSuspended).toBe(false)
+    expect(minutesUntilLimit(after, anchor)).toBeGreaterThan(before)
+  })
+})
+
+describe('stop maintenance', () => {
+  it('adds, replaces, and clears a stop note immutably', () => {
+    const stopId = marcusStops[0]
+    const noted = updateStopNote(fleet, stopId, 'Call receiving before arrival.')
+    expect(noted).not.toBe(fleet)
+    expect(routeOf(noted, 'drv-01').stops.find((stop) => stop.id === stopId)?.note).toBe('Call receiving before arrival.')
+    expect(routeOf(fleet, 'drv-01').stops.find((stop) => stop.id === stopId)?.note).toBeUndefined()
+    expect(routeOf(updateStopNote(noted, stopId, '   '), 'drv-01').stops.find((stop) => stop.id === stopId)?.note).toBeUndefined()
+  })
+
+  it('cancels unresolved stops, resequences the route, and leaves completed work intact', () => {
+    const stopId = marcusStops[1]
+    const canceled = cancelStop(fleet, stopId)
+    const route = routeOf(canceled, 'drv-01')
+    expect(route.stops.some((stop) => stop.id === stopId)).toBe(false)
+    expect(route.stops.map((stop) => stop.seq)).toEqual(route.stops.map((_, index) => index + 1))
+    const done = routeOf(fleet, 'drv-01').stops.find((stop) => stop.status === 'done')!
+    expect(cancelStop(fleet, done.id)).toBe(fleet)
+  })
+})

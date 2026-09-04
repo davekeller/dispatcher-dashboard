@@ -1,0 +1,23 @@
+import type { ButtonHTMLAttributes } from 'react'
+
+type Variant = 'primary' | 'secondary' | 'danger' | 'lookout' | 'ghost'
+type Size = 'sm' | 'md'
+
+const VARIANT: Record<Variant, string> = {
+  primary: 'bg-ink text-on-accent hover:bg-ink/90',
+  secondary: 'bg-panel text-ink border border-line hover:bg-well',
+  danger: 'bg-act-now text-on-accent hover:bg-act-now/90',
+  lookout: 'bg-lookout text-on-accent hover:bg-lookout-strong',
+  ghost: 'bg-transparent text-muted hover:bg-well hover:text-ink',
+}
+const SIZE: Record<Size, string> = { sm: 'h-7 px-2.5 text-[12px]', md: 'h-9 px-3.5 text-[13px]' }
+
+export default function Button({ variant = 'secondary', size = 'md', className = '', ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: Size }) {
+  return (
+    <button
+      type="button"
+      className={`inline-flex items-center justify-center gap-1.5 rounded-control font-semibold transition disabled:cursor-not-allowed disabled:opacity-40 ${VARIANT[variant]} ${SIZE[size]} ${className}`}
+      {...props}
+    />
+  )
+}

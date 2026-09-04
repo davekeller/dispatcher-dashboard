@@ -14,7 +14,7 @@
 
 - Runtime dependencies are exactly: `react`, `react-dom`, `react-router`, `zustand`, `@phosphor-icons/react`, `@fontsource-variable/bricolage-grotesque`, `@fontsource-variable/inter`, `tailwindcss`, `@tailwindcss/vite`. Nothing else without a one-line reason in `docs/DECISIONS.md`. No Leaflet in Phase 1.
 - Pure modules (`src/hos/*`, `src/alerts/*`, `src/bands.ts`, `src/filters.ts`, `src/groupBy.ts`, `src/store/derive.ts`, `src/store/actions.ts`, `src/data/*`, `src/time/clock.ts`, `src/lib/*`) import no React and are unit-tested with Vitest, tests beside the module as `*.test.ts`.
-- One clock: `useNow()` is the only hook that reads `Date.now()` at runtime. `TICK_MS = 5000`. The scenario anchor is today at **12:47:00 local**.
+- One clock: `useNow()` is the only hook that reads `Date.now()` at runtime. `TICK_MS = 5000`. The scenario anchor is today at **14:47:00 local**.
 - Constants, verbatim from the spec: `LIMIT_MIN = 660`, `ACT_NOW_MIN = 30`, `WATCH_MIN = 90`, `FRESH_MIN = 3`, `OFFLINE_MIN = 15`, `SNOOZE_MIN = 10`, `BEHIND_MIN = 15`, `CAPACITY_MARGIN_MIN = 20`, `WINDOW_14H_MIN = 840`. Boundaries: `≤ 30` act now, `≤ 90` watch, `≤ 0` over; `< 3` fresh, `3–15` stale, `> 15` offline.
 - HOS math always reads `segmentsKnownAt(driver.segments, effectiveLastPingAt(driver, now))`.
 - Rules are `{ id, label, severity, when, message, actions }` objects in `src/alerts/rules.ts`, fixed severity, one object per rule. Filters and groupings are config arrays too.
@@ -74,12 +74,12 @@ Deviation from the spec's §3, recorded here so nobody hunts for it: Lookout is 
 **Interfaces:**
 - Produces: `fmtClock(t: number): string`, `fmtHm(minutes: number): string`, `fmtCountdown(minutes: number, stale: boolean): string`, `fmtMinutes(minutes: number): string`, `fmtAge(minutes: number): string`, `fmtDrift(minutes: number): string`. Every later task formats time through these.
 
-- [ ] **Step 1: Preflight**
+- [x] **Step 1: Preflight**
 
 Run: `node -v && npm -v && git status --short`
 Expected: Node 20 or newer; a clean tree containing only `.gitignore`, `CLAUDE.md`, `docs/`.
 
-- [ ] **Step 2: Write `package.json`**
+- [x] **Step 2: Write `package.json`**
 
 ```json
 {
@@ -98,7 +98,7 @@ Expected: Node 20 or newer; a clean tree containing only `.gitignore`, `CLAUDE.m
 }
 ```
 
-- [ ] **Step 3: Install dependencies**
+- [x] **Step 3: Install dependencies**
 
 Run:
 ```bash
@@ -107,7 +107,7 @@ npm i -D vite @vitejs/plugin-react typescript vitest oxlint @types/react @types/
 ```
 Expected: `package-lock.json` created; no peer warnings that mention React 18.
 
-- [ ] **Step 4: Write `tsconfig.json`**
+- [x] **Step 4: Write `tsconfig.json`**
 
 ```json
 {
@@ -131,7 +131,7 @@ Expected: `package-lock.json` created; no peer warnings that mention React 18.
 }
 ```
 
-- [ ] **Step 5: Write `vite.config.ts`**
+- [x] **Step 5: Write `vite.config.ts`**
 
 ```ts
 import { defineConfig } from 'vitest/config'
@@ -147,7 +147,7 @@ export default defineConfig({
 })
 ```
 
-- [ ] **Step 6: Write `index.html`, `vercel.json`, `src/main.tsx`, `src/App.tsx`**
+- [x] **Step 6: Write `index.html`, `vercel.json`, `src/main.tsx`, `src/App.tsx`**
 
 `index.html`:
 ```html
@@ -194,7 +194,7 @@ export default function App() {
 }
 ```
 
-- [ ] **Step 7: Write `src/index.css` with every token from the spec §11**
+- [x] **Step 7: Write `src/index.css` with every token from the spec §11**
 
 ```css
 @import "tailwindcss";
@@ -229,15 +229,15 @@ export default function App() {
   --color-watch-fill: #d19a2a;
   --color-watch-soft: #fbf3e3;
 
-  --color-clear: #2f7d5a;
+  --color-clear: #266b4c;
   --color-clear-fill: #5aa37f;
   --color-clear-soft: #e8f4ee;
 
-  --color-offline: #6b7280;
+  --color-offline: #5b6370;
   --color-offline-fill: #9aa0ab;
   --color-offline-soft: #eef0f3;
 
-  --color-break: #3b6fb6;
+  --color-break: #3262a8;
   --color-break-fill: #6f9bd6;
   --color-break-soft: #e9f0fa;
 
@@ -252,7 +252,7 @@ body { @apply bg-canvas text-ink font-sans antialiased; }
 .tnum { font-variant-numeric: tabular-nums; }
 ```
 
-- [ ] **Step 8: Write the failing format tests**
+- [x] **Step 8: Write the failing format tests**
 
 `src/lib/format.test.ts`:
 ```ts
@@ -302,12 +302,12 @@ describe('fmtDrift', () => {
 })
 ```
 
-- [ ] **Step 9: Run the test to verify it fails**
+- [x] **Step 9: Run the test to verify it fails**
 
 Run: `npx vitest run src/lib/format.test.ts`
 Expected: FAIL — cannot resolve `./format`.
 
-- [ ] **Step 10: Write `src/lib/format.ts`**
+- [x] **Step 10: Write `src/lib/format.ts`**
 
 ```ts
 // All time formatting lives here so precision rules (tilde for estimates, no
@@ -347,12 +347,12 @@ export function fmtDrift(minutes: number): string {
 }
 ```
 
-- [ ] **Step 11: Run tests, typecheck, and build**
+- [x] **Step 11: Run tests, typecheck, and build**
 
 Run: `npm test && npm run build`
 Expected: 1 test file, 7 tests passing; `tsc` clean; `dist/` produced. Then `npm run dev` and open `http://localhost:5173`: "Active Shift" renders in Bricolage on the warm canvas.
 
-- [ ] **Step 12: Commit**
+- [x] **Step 12: Commit**
 
 ```bash
 git add -A
@@ -372,7 +372,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 **Interfaces:**
 - Produces: every entity type in `types.ts` (copied from the spec §4, plus `Fleet` and `LatLng`); `mulberry32(seed)`, `makeRng(seed): Rng`, `hashString(s)`; `REGIONS`, `REGION_CENTER`, `REGION_LEG_MINUTES`; `TICK_MS`, `MIN`, `ANCHOR`, `LOADED_AT`, `scenarioAnchor(from?)`, `simNow(scrubOffsetMs, wall?, loadedAt?, anchor?)`, `toTick(t)`.
 
-- [ ] **Step 1: Write `src/data/types.ts`**
+- [x] **Step 1: Write `src/data/types.ts`**
 
 ```ts
 export type Region = 'North' | 'West' | 'South' | 'Central'
@@ -461,7 +461,7 @@ export interface Fleet {
 }
 ```
 
-- [ ] **Step 2: Write the failing PRNG and clock tests**
+- [x] **Step 2: Write the failing PRNG and clock tests**
 
 `src/data/prng.test.ts`:
 ```ts
@@ -512,10 +512,10 @@ import { describe, expect, it } from 'vitest'
 import { MIN, TICK_MS, scenarioAnchor, simNow, toTick } from './clock'
 
 describe('scenarioAnchor', () => {
-  it('is 12:47:00 local on the given day', () => {
+  it('is 14:47:00 local on the given day', () => {
     const d = new Date(2026, 8, 3, 9, 15, 30)
     const a = new Date(scenarioAnchor(d))
-    expect([a.getHours(), a.getMinutes(), a.getSeconds(), a.getMilliseconds()]).toEqual([12, 47, 0, 0])
+    expect([a.getHours(), a.getMinutes(), a.getSeconds(), a.getMilliseconds()]).toEqual([14, 47, 0, 0])
     expect(a.getDate()).toBe(3)
   })
 })
@@ -537,12 +537,12 @@ describe('toTick', () => {
 })
 ```
 
-- [ ] **Step 3: Run tests to verify they fail**
+- [x] **Step 3: Run tests to verify they fail**
 
 Run: `npx vitest run src/data src/time`
 Expected: FAIL — modules not found.
 
-- [ ] **Step 4: Write `src/data/prng.ts`**
+- [x] **Step 4: Write `src/data/prng.ts`**
 
 ```ts
 // mulberry32: tiny, seedable, deterministic. Same seed → same fleet in every
@@ -586,7 +586,7 @@ export function hashString(s: string): number {
 }
 ```
 
-- [ ] **Step 5: Write `src/data/regions.ts`**
+- [x] **Step 5: Write `src/data/regions.ts`**
 
 ```ts
 import type { LatLng, Region } from './types'
@@ -611,10 +611,10 @@ export const REGION_LEG_MINUTES: Record<Region, [number, number]> = {
 }
 ```
 
-- [ ] **Step 6: Write `src/time/clock.ts`**
+- [x] **Step 6: Write `src/time/clock.ts`**
 
 ```ts
-// The one clock. The scenario is pinned to 12:47 PM so the demo is the same at
+// The one clock. The scenario is pinned to 2:47 PM so the demo is the same at
 // any hour, and it still ticks: now = anchor + real elapsed + scrub offset.
 export const TICK_MS = 5000
 export const MIN = 60_000
@@ -644,12 +644,12 @@ export function minutesBetween(from: number, to: number): number {
 }
 ```
 
-- [ ] **Step 7: Run tests and typecheck**
+- [x] **Step 7: Run tests and typecheck**
 
 Run: `npm test && npx tsc --noEmit`
 Expected: all green.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add -A
@@ -669,7 +669,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: `Driver`, `DutySegment`, `DutyStatus`, `Route`, `Stop` from `src/data/types.ts`; `hashString` from `src/data/prng.ts`; `MIN` from `src/time/clock.ts`.
 - Produces: `HosStatus = 'over' | 'act_now' | 'watch' | 'clear'`, `Staleness = 'fresh' | 'stale' | 'offline'`, and the functions listed in Step 3. Later tasks call `effectiveLastPingAt`, `knownSegments`, `drivingMinutes`, `minutesUntilLimit`, `hosStatusOf`, `hosStatus`, `pingAgeMinutes`, `stalenessOf`, `staleness`, `currentStatus`, `remainingStops`, `doneStops`, `unassignedStops`, `nextStop`, `remainingDriveMinutes`, `remainingServiceMinutes`, `scheduleDrift`, `projectedEta`, `projectedFinishAt`, `projectedDepartureAt`, `limitHitAt`, `drivingSinceBreak`, `plannedReset`.
 
-- [ ] **Step 1: Write `src/hos/constants.ts`**
+- [x] **Step 1: Write `src/hos/constants.ts`**
 
 ```ts
 // Thresholds. Every one of these is a guess a real deployment would tune; the
@@ -689,7 +689,7 @@ export const RESET_MIN = 600 // 10 consecutive hours off duty
 export const PING_JITTER_MS = 90_000
 ```
 
-- [ ] **Step 2: Write the failing compute tests**
+- [x] **Step 2: Write the failing compute tests**
 
 `src/hos/compute.test.ts`:
 ```ts
@@ -830,12 +830,12 @@ describe('drivingSinceBreak', () => {
 })
 ```
 
-- [ ] **Step 3: Run tests to verify they fail**
+- [x] **Step 3: Run tests to verify they fail**
 
 Run: `npx vitest run src/hos`
 Expected: FAIL — `./compute` not found.
 
-- [ ] **Step 4: Write `src/hos/compute.ts`**
+- [x] **Step 4: Write `src/hos/compute.ts`**
 
 ```ts
 import type { Driver, DutySegment, DutyStatus, Route, Stop } from '../data/types'
@@ -1030,12 +1030,12 @@ export function drivingSinceBreak(driver: Driver, now: number): number {
 }
 ```
 
-- [ ] **Step 5: Run tests and typecheck**
+- [x] **Step 5: Run tests and typecheck**
 
 Run: `npx vitest run src/hos && npx tsc --noEmit`
 Expected: all compute tests pass. If `scheduleDrift` at `m(135)` fails, check that `last.serviceMinutes * MIN` is added to the planned ETA before subtracting.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add -A
@@ -1056,7 +1056,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: types, `makeRng`, regions, `MIN`, compute functions for the tests.
 - Produces: `SEED`, `DRIVER_COUNT`, `STOPS_PER_ROUTE`, `generateFleet(anchor, seed?) : Fleet` (raw), `makeFleet(anchor) : Fleet` (generated + planted), `applyPlanted(fleet, anchor): Fleet`, and the planted driver ids: `drv-01` Marcus R., `drv-02` Priya S., `drv-03` Dre W., `drv-04` Elena M., `drv-05` Sam K., `drv-06` Nadia F., `drv-07` Tomas B., `drv-08` Ana L., `drv-09` Ravi P., `drv-10` Omar H.
 
-- [ ] **Step 1: Write the failing seed tests**
+- [x] **Step 1: Write the failing seed tests**
 
 `src/data/seed.test.ts`:
 ```ts
@@ -1151,12 +1151,12 @@ describe('planted drivers at the anchor', () => {
 })
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `npx vitest run src/data/seed.test.ts`
 Expected: FAIL — `./seed` not found.
 
-- [ ] **Step 3: Write `src/data/seed.ts`**
+- [x] **Step 3: Write `src/data/seed.ts`**
 
 ```ts
 import { MIN } from '../time/clock'
@@ -1306,7 +1306,7 @@ export function makeFleet(anchor: number): Fleet {
 }
 ```
 
-- [ ] **Step 4: Write `src/data/planted.ts`**
+- [x] **Step 4: Write `src/data/planted.ts`**
 
 Each planted driver is described as duty blocks ending at the anchor (the last block is ongoing) plus a re-timed route. The generated route's deliveries are kept; only timing and status change.
 
@@ -1346,7 +1346,7 @@ export const PLANTS: Plant[] = [
   // 35 minutes behind with seven stops left and a clear HOS. The schedule rule on its own.
   { id: 'drv-07', name: 'Tomas B.', region: 'South', blocks: [['on_duty', 25], ['driving', 180], ['on_duty', 14], ['driving', 120], ['on_break', 30], ['driving', 120]], stopsDone: 9, legsLeft: [20, 22, 18, 25, 20, 24, 19], driftMin: 35 },
   // The obvious reassign candidate for Marcus: same region, four hours of drive time, five stops.
-  { id: 'drv-08', name: 'Ana L.', region: 'North', blocks: [['on_duty', 25], ['driving', 180], ['on_duty', 12], ['driving', 120], ['on_break', 30], ['driving', 120]], stopsDone: 11, legsLeft: [10, 12, 9, 11, 10], driftMin: -3 },
+  { id: 'drv-08', name: 'Ana L.', region: 'North', blocks: [['on_duty', 25], ['driving', 120], ['on_duty', 12], ['driving', 70], ['on_break', 30], ['driving', 50]], stopsDone: 11, legsLeft: [10, 12, 9, 11, 10], driftMin: -3 },
   // The marginal candidate near Priya: 55 minutes left, 32 of driving still to do. Excluded by the capacity margin.
   { id: 'drv-09', name: 'Ravi P.', region: 'West', blocks: [['on_duty', 25], ['driving', 250], ['on_duty', 12], ['driving', 200], ['on_break', 30], ['driving', 155]], stopsDone: 13, legsLeft: [10, 12, 10], driftMin: 2 },
   // Watch, fresh, finishes fine. Fills the Watch band with a boring case.
@@ -1422,12 +1422,12 @@ export function applyPlanted(fleet: Fleet, anchor: number): Fleet {
 }
 ```
 
-- [ ] **Step 5: Run tests and typecheck**
+- [x] **Step 5: Run tests and typecheck**
 
 Run: `npx vitest run src/data && npx tsc --noEmit`
 Expected: all pass. If Marcus's countdown is off by a minute, check that `segmentsFromBlocks` leaves the last block open (no `endedAt`) so it closes at `now`. If Dre reconnects to fewer than 50 minutes, check that `truthAfterPing` closed his driving block at `lastPingAt + 5 min`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add -A
@@ -1449,7 +1449,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 
 Import direction, so nothing is circular at runtime: `types.ts` and `bands.ts` import only types. `rules.ts` imports `types`, constants, format. `rank.ts` imports `rules` and `bands`. `derive.ts` imports `view` and `rank`.
 
-- [ ] **Step 1: Write `src/store/view.ts`**
+- [x] **Step 1: Write `src/store/view.ts`**
 
 ```ts
 import type { Driver, DutyStatus, Fleet, Route, Stop, Truck } from '../data/types'
@@ -1534,7 +1534,7 @@ export function buildViews(fleet: Fleet, now: number): DriverView[] {
 }
 ```
 
-- [ ] **Step 2: Write `src/alerts/types.ts` and `src/bands.ts`**
+- [x] **Step 2: Write `src/alerts/types.ts` and `src/bands.ts`**
 
 `src/alerts/types.ts`:
 ```ts
@@ -1606,7 +1606,7 @@ export function bandOf(v: DriverView, top: Severity | 'none'): Band {
 }
 ```
 
-- [ ] **Step 3: Write the failing tests for rules, rank, bands, derive**
+- [x] **Step 3: Write the failing tests for rules, rank, bands, derive**
 
 `src/alerts/rules.test.ts`:
 ```ts
@@ -1695,10 +1695,16 @@ describe('rankDrivers', () => {
     const top = rankedAt(anchor).slice(0, 3).map((c) => c.driverId)
     expect(top).toEqual(['drv-02', 'drv-01', 'drv-03']) // Priya (critical), Marcus (12 min), Dre (~40, offline)
   })
-  it('is stable across a tick', () => {
-    const a = rankedAt(anchor).map((c) => c.driverId)
-    const b = rankedAt(anchor + 5000).map((c) => c.driverId)
-    expect(b).toEqual(a)
+  it('is deterministic, and the alerted order holds across a tick', () => {
+    const a = rankedAt(anchor)
+    expect(rankedAt(anchor).map((c) => c.driverId)).toEqual(a.map((c) => c.driverId))
+    const alerted = (cards: ReturnType<typeof rankedAt>) => cards.filter((c) => c.alerts.length > 0).map((c) => c.driverId)
+    const before = alerted(a)
+    const after = alerted(rankedAt(anchor + 5000))
+    // Same drivers in the same order five seconds later. A driver may only move when a
+    // rule starts or stops firing inside the tick, which none do at the anchor.
+    expect(after).toEqual(before)
+    expect(before.slice(0, 3)).toEqual(['drv-02', 'drv-01', 'drv-03'])
   })
   it('snooze demotes within a severity but never removes an act-now card', () => {
     const snoozes = { 'limit_act_now:drv-01': anchor + 10 * MIN, 'wont_finish:drv-01': anchor + 10 * MIN, 'behind_schedule:drv-01': anchor + 10 * MIN }
@@ -1774,12 +1780,12 @@ describe('derive', () => {
 })
 ```
 
-- [ ] **Step 4: Run tests to verify they fail**
+- [x] **Step 4: Run tests to verify they fail**
 
 Run: `npx vitest run src/alerts src/bands.test.ts src/store`
 Expected: FAIL — modules not found.
 
-- [ ] **Step 5: Write `src/alerts/rules.ts`**
+- [x] **Step 5: Write `src/alerts/rules.ts`**
 
 ```ts
 import { ACT_NOW_MIN, BEHIND_MIN, WATCH_MIN } from '../hos/constants'
@@ -1835,7 +1841,7 @@ export const RULES: Rule[] = [
     id: 'wont_finish',
     label: "Won't finish",
     severity: 'act_now',
-    when: (v) => v.minutesUntilLimit > 0 && v.remaining.length > 0 && v.remainingDriveMin > v.minutesUntilLimit,
+    when: (v) => onTheRoad(v) && v.minutesUntilLimit > 0 && v.remaining.length > 0 && v.remainingDriveMin > v.minutesUntilLimit,
     message: (v) => ({
       title: `${v.driver.name} can't finish the route before the limit.`,
       body: `Last stop projected ${fmtClock(v.projectedFinishAt ?? v.now)}; the limit hits at ${est(v)}${fmtClock(v.limitHitAt)}.`,
@@ -1889,7 +1895,7 @@ export const RULES: Rule[] = [
 ]
 ```
 
-- [ ] **Step 6: Write `src/alerts/rank.ts`**
+- [x] **Step 6: Write `src/alerts/rank.ts`**
 
 ```ts
 import { bandOf } from '../bands'
@@ -1937,7 +1943,7 @@ export function rankDrivers(views: DriverView[], alerts: Alert[], snoozes: Recor
     return (
       SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity] ||
       Number(a.snoozed) - Number(b.snoozed) ||
-      va.minutesUntilLimit - vb.minutesUntilLimit ||
+      Math.floor(va.minutesUntilLimit) - Math.floor(vb.minutesUntilLimit) || // whole minutes: sub-minute drift never jostles cards
       STALE_RANK[va.staleness] - STALE_RANK[vb.staleness] ||
       a.driverId.localeCompare(b.driverId)
     )
@@ -1946,7 +1952,7 @@ export function rankDrivers(views: DriverView[], alerts: Alert[], snoozes: Recor
 }
 ```
 
-- [ ] **Step 7: Write `src/store/derive.ts`**
+- [x] **Step 7: Write `src/store/derive.ts`**
 
 ```ts
 import { evaluateRules, rankDrivers } from '../alerts/rank'
@@ -2009,12 +2015,12 @@ export function derive(fleet: Fleet, now: number, snoozes: Record<string, number
 }
 ```
 
-- [ ] **Step 8: Run tests and typecheck**
+- [x] **Step 8: Run tests and typecheck**
 
 Run: `npm test && npx tsc --noEmit`
 Expected: all green. If the rank test's top three differ, print `ranked.slice(0, 5)` with severity and `minutesUntilLimit`; the usual cause is a planted block sum off by a minute in Task 4.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add -A
@@ -2037,7 +2043,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Produces (store): `useStore` with state `{ fleet, scrubOffsetMs, snoozes, corrections, lastAction, undoSnapshot, groupBy, devOpen }` and methods `now()`, `reassignStops`, `scheduleReset`, `notifyCustomer`, `callDriver`, `acknowledge`, `markArrived`, `markDeparted`, `bringOnline`, `undo`, `scrub`, `resetClock`, `resetFleet`, `setGroupBy`, `toggleDev`.
 - Produces (hooks): `useNow(): number`, `useDerived(): Derived`.
 
-- [ ] **Step 1: Write the failing action tests**
+- [x] **Step 1: Write the failing action tests**
 
 `src/store/actions.test.ts`:
 ```ts
@@ -2177,12 +2183,12 @@ describe('store', () => {
 })
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `npx vitest run src/store/actions.test.ts src/store/store.test.ts`
 Expected: FAIL — modules not found.
 
-- [ ] **Step 3: Write `src/store/actions.ts`**
+- [x] **Step 3: Write `src/store/actions.ts`**
 
 ```ts
 import type { Driver, DutySegment, Fleet, Route, Stop, StopOutcome } from '../data/types'
@@ -2339,7 +2345,7 @@ export function stopsPastLimit(view: DriverView): string[] {
 }
 ```
 
-- [ ] **Step 4: Write `src/store/store.ts`**
+- [x] **Step 4: Write `src/store/store.ts`**
 
 ```ts
 import { create } from 'zustand'
@@ -2441,7 +2447,7 @@ export const useStore = create<State>()((set, get) => {
 export type GroupingId = 'region' | 'band'
 ```
 
-- [ ] **Step 5: Write `src/store/hooks.ts`**
+- [x] **Step 5: Write `src/store/hooks.ts`**
 
 ```tsx
 import { useEffect, useMemo, useState } from 'react'
@@ -2469,12 +2475,12 @@ export function useDerived(): Derived {
 }
 ```
 
-- [ ] **Step 6: Run tests and typecheck**
+- [x] **Step 6: Run tests and typecheck**
 
 Run: `npm test && npx tsc --noEmit`
 Expected: all green. `store.test.ts` runs in the node environment; Zustand works without a DOM.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add -A
@@ -2495,7 +2501,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 **Interfaces:**
 - Produces: `FilterDef`, `FilterState`, `FILTERS`, `EMPTY_FILTERS`, `applyFilters(cards, byId, state)`, `isFiltering(state)`; `Grouping`, `GROUPINGS`, `groupingById(id)`; `Tone`, `BAND_TONE`, `INFO_TONE`, `STALENESS_TONE`, `severityTone(sev)`; components `Chip`, `Button`, `Card`, `Countdown`, `Bar`, `Avatar`, `EmptyState`.
 
-- [ ] **Step 1: Write the failing filter test**
+- [x] **Step 1: Write the failing filter test**
 
 `src/filters.test.ts`:
 ```ts
@@ -2525,12 +2531,12 @@ describe('applyFilters', () => {
 })
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `npx vitest run src/filters.test.ts`
 Expected: FAIL — `./filters` not found.
 
-- [ ] **Step 3: Write `src/filters.ts` and finish `src/groupBy.ts`**
+- [x] **Step 3: Write `src/filters.ts` and finish `src/groupBy.ts`**
 
 `src/filters.ts`:
 ```ts
@@ -2602,7 +2608,7 @@ export function groupingById(id: GroupingId): Grouping {
 }
 ```
 
-- [ ] **Step 4: Write `src/ui/tones.ts`**
+- [x] **Step 4: Write `src/ui/tones.ts`**
 
 Class names live here as literal strings so Tailwind's scanner sees them and so no component invents its own color.
 
@@ -2639,7 +2645,7 @@ export function severityTone(severity: Severity | 'none'): Tone {
 }
 ```
 
-- [ ] **Step 5: Write the primitives**
+- [x] **Step 5: Write the primitives**
 
 `src/ui/Chip.tsx`:
 ```tsx
@@ -2757,12 +2763,12 @@ export default function EmptyState({ title, body, action }: { title: string; bod
 }
 ```
 
-- [ ] **Step 6: Run tests, typecheck, and a Tailwind sanity check**
+- [x] **Step 6: Run tests, typecheck, and a Tailwind sanity check**
 
 Run: `npm test && npx tsc --noEmit && npm run build`
 Expected: green. Open `dist/assets/*.css` and confirm `.bg-act-now-fill` and `.text-lookout-strong` exist; if not, the token names in `index.css` and `tones.ts` disagree.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add -A
@@ -2782,7 +2788,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: store, hooks, format, primitives.
 - Produces: `useLookout(): { collapsed, setCollapsed, focusDriverId, setFocus }`; `LOOKOUT` voice constants; `useActions(): { request, open, close }` where `open(action: DialogAction, driverId: string, opts?: { stopIds?: string[] })` and `DialogAction = 'reassign' | 'schedule_reset' | 'notify_customer'`; `<ActionDialogs />` (renders nothing until Task 12). Routes: `/`, `/routes/:driverId`, `/drivers`, `/routes`, `/reports`.
 
-- [ ] **Step 1: Write `src/lookout/voice.ts`**
+- [x] **Step 1: Write `src/lookout/voice.ts`**
 
 ```ts
 // Lookout's name and shared phrases. The co-pilot is a feature of this product with its
@@ -2797,7 +2803,7 @@ export const LOOKOUT = {
 } as const
 ```
 
-- [ ] **Step 2: Write `src/lookout/LookoutContext.tsx`**
+- [x] **Step 2: Write `src/lookout/LookoutContext.tsx`**
 
 ```tsx
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
@@ -2825,7 +2831,7 @@ export function useLookout(): LookoutState {
 }
 ```
 
-- [ ] **Step 3: Write `src/actions/ActionContext.tsx`**
+- [x] **Step 3: Write `src/actions/ActionContext.tsx`**
 
 The three consequential actions open a dialog. Anything can request one; Task 12 renders them. Inline actions (acknowledge, call driver) never come through here.
 
@@ -2871,7 +2877,7 @@ export default function ActionDialogs() {
 }
 ```
 
-- [ ] **Step 4: Write `src/app/LeftNav.tsx`**
+- [x] **Step 4: Write `src/app/LeftNav.tsx`**
 
 ```tsx
 import { ChartBar, Path, SquaresFour, Users, CaretLeft, CaretRight } from '@phosphor-icons/react'
@@ -2918,7 +2924,7 @@ export default function LeftNav() {
 }
 ```
 
-- [ ] **Step 5: Write `src/app/Header.tsx`**
+- [x] **Step 5: Write `src/app/Header.tsx`**
 
 ```tsx
 import { Wrench } from '@phosphor-icons/react'
@@ -2977,7 +2983,7 @@ export default function Header() {
 }
 ```
 
-- [ ] **Step 6: Write `src/app/DevPanel.tsx`**
+- [x] **Step 6: Write `src/app/DevPanel.tsx`**
 
 ```tsx
 import { useEffect } from 'react'
@@ -3029,7 +3035,7 @@ export default function DevPanel() {
 }
 ```
 
-- [ ] **Step 7: Write the Lookout sidebar stub and the Layout**
+- [x] **Step 7: Write the Lookout sidebar stub and the Layout**
 
 `src/lookout/LookoutSidebar.tsx` (stub; Task 10 replaces it entirely):
 ```tsx
@@ -3083,7 +3089,7 @@ export default function Layout() {
 }
 ```
 
-- [ ] **Step 8: Write `src/App.tsx` with the routes and placeholder pages**
+- [x] **Step 8: Write `src/App.tsx` with the routes and placeholder pages**
 
 ```tsx
 import { Route, Routes } from 'react-router'
@@ -3116,12 +3122,12 @@ export default function App() {
 
 Task 9 swaps the index element for `ActiveShiftPage`; Task 11 swaps the route-file element for `RouteFilePage`.
 
-- [ ] **Step 9: Verify in the browser**
+- [x] **Step 9: Verify in the browser**
 
 Run: `npx tsc --noEmit && npm run dev`
-Check: three panes render; the header clock shows 12:47 PM and advances; `⌘.` opens the dev panel; +15m moves the clock; the left nav collapses; the Lookout stub collapses to a rail. Nothing in the console.
+Check: three panes render; the header clock shows 2:47 PM and advances; `⌘.` opens the dev panel; +15m moves the clock; the left nav collapses; the Lookout stub collapses to a rail. Nothing in the console.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add -A
@@ -3142,7 +3148,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: `useDerived`, `useStore.groupBy`, `FILTERS`/`applyFilters`/`EMPTY_FILTERS`/`isFiltering`, `groupingById`, tones, primitives, `LIMIT_MIN`.
 - Produces: `<RouteCard view card pick />` reused nowhere else but designed to match the rail's card anatomy.
 
-- [ ] **Step 1: Write `src/views/shift/MetricsRow.tsx`**
+- [x] **Step 1: Write `src/views/shift/MetricsRow.tsx`**
 
 ```tsx
 import type { FilterState } from '../../filters'
@@ -3192,7 +3198,7 @@ export default function MetricsRow({ metrics, filters, onPreset }: { metrics: Me
 }
 ```
 
-- [ ] **Step 2: Write `src/views/shift/FilterBar.tsx`**
+- [x] **Step 2: Write `src/views/shift/FilterBar.tsx`**
 
 ```tsx
 import { MagnifyingGlass, X } from '@phosphor-icons/react'
@@ -3236,7 +3242,7 @@ export default function FilterBar({ filters, onChange }: { filters: FilterState;
 }
 ```
 
-- [ ] **Step 3: Write `src/views/shift/RouteCard.tsx`**
+- [x] **Step 3: Write `src/views/shift/RouteCard.tsx`**
 
 ```tsx
 import { Truck } from '@phosphor-icons/react'
@@ -3294,7 +3300,7 @@ function nextLabel(view: DriverView): string {
 }
 ```
 
-- [ ] **Step 4: Write `src/views/shift/Board.tsx`**
+- [x] **Step 4: Write `src/views/shift/Board.tsx`**
 
 ```tsx
 import type { DriverCard } from '../../alerts/types'
@@ -3329,7 +3335,7 @@ export default function Board({ cards, byId, grouping, pickId }: { cards: Driver
 }
 ```
 
-- [ ] **Step 5: Write `src/views/shift/ActiveShiftPage.tsx` and wire the route**
+- [x] **Step 5: Write `src/views/shift/ActiveShiftPage.tsx` and wire the route**
 
 ```tsx
 import { useState } from 'react'
@@ -3373,7 +3379,7 @@ import ActiveShiftPage from './views/shift/ActiveShiftPage'
 <Route index element={<ActiveShiftPage />} />
 ```
 
-- [ ] **Step 6: Verify in the browser**
+- [x] **Step 6: Verify in the browser**
 
 Run: `npx tsc --noEmit && npm run dev`
 Check, at the anchor:
@@ -3382,7 +3388,7 @@ Check, at the anchor:
 - Clicking "Over limit" filters to Priya, Marcus, Dre (the Act now band); clicking it again clears. Group by Status shows five columns.
 - +1h in the dev panel: Marcus's countdown goes negative and his badge changes to "Over limit" within a tick.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add -A
@@ -3403,7 +3409,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: `useDerived`, `useLookout`, `useActions`, store methods, tones, primitives, `LOOKOUT`.
 - Produces: `<AlertActions driverId actions disabledReason? />` — the single component that renders action buttons for any alert, used by both the rail and the route file's alert strip (Task 11). `<ActionConfirm label confirmLabel onConfirm />` — the two-step inline confirm.
 
-- [ ] **Step 1: Write `src/lookout/ActionConfirm.tsx`**
+- [x] **Step 1: Write `src/lookout/ActionConfirm.tsx`**
 
 ```tsx
 import { useEffect, useState } from 'react'
@@ -3434,7 +3440,7 @@ export default function ActionConfirm({ label, confirmLabel = 'Confirm', doneLab
 }
 ```
 
-- [ ] **Step 2: Write `src/lookout/AlertActions.tsx`**
+- [x] **Step 2: Write `src/lookout/AlertActions.tsx`**
 
 ```tsx
 import { useActions } from '../actions/ActionContext'
@@ -3476,7 +3482,7 @@ export default function AlertActions({ driverId, actions, alertIds, positionDepe
 }
 ```
 
-- [ ] **Step 3: Write `src/lookout/RecommendationCard.tsx`**
+- [x] **Step 3: Write `src/lookout/RecommendationCard.tsx`**
 
 ```tsx
 import { Link } from 'react-router'
@@ -3529,7 +3535,7 @@ export default function RecommendationCard({ view, card, pinned = false }: { vie
 }
 ```
 
-- [ ] **Step 4: Write `src/lookout/AlertBar.tsx`**
+- [x] **Step 4: Write `src/lookout/AlertBar.tsx`**
 
 ```tsx
 import { Link } from 'react-router'
@@ -3562,7 +3568,7 @@ export default function AlertBar({ cards, byId }: { cards: DriverCard[]; byId: M
 }
 ```
 
-- [ ] **Step 5: Replace `src/lookout/LookoutSidebar.tsx`**
+- [x] **Step 5: Replace `src/lookout/LookoutSidebar.tsx`**
 
 ```tsx
 import { CaretDoubleRight, CaretDoubleLeft } from '@phosphor-icons/react'
@@ -3622,7 +3628,7 @@ export default function LookoutSidebar() {
 }
 ```
 
-- [ ] **Step 6: Verify in the browser**
+- [x] **Step 6: Verify in the browser**
 
 Run: `npx tsc --noEmit && npm run dev`
 Check:
@@ -3632,7 +3638,7 @@ Check:
 - Collapsing shows a rail with a red "3".
 - Clicking "Reassign stops" on Marcus does nothing visible yet (dialogs arrive in Task 12); it must not throw.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add -A
@@ -3652,7 +3658,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: `useDerived`, `useStore.fleet.deliveries`, `useLookout().setFocus`, `useActions().open`, `AlertActions`, compute helpers (`projectedEta`, `knownSegments`), `WINDOW_14H_MIN`, format, tones, primitives.
 - Produces: `ribbonAxis(view): { start: number; end: number; pct(t: number): number }` exported from `RouteRibbon.tsx` and shared with `DutyTimeline`, so both draw on one axis.
 
-- [ ] **Step 1: Write `src/views/route/RouteHeader.tsx`**
+- [x] **Step 1: Write `src/views/route/RouteHeader.tsx`**
 
 ```tsx
 import type { DriverCard } from '../../alerts/types'
@@ -3697,7 +3703,7 @@ export default function RouteHeader({ view, card }: { view: DriverView; card: Dr
 }
 ```
 
-- [ ] **Step 2: Write `src/views/route/StaleBanner.tsx` and `src/views/route/AlertStrip.tsx`**
+- [x] **Step 2: Write `src/views/route/StaleBanner.tsx` and `src/views/route/AlertStrip.tsx`**
 
 `StaleBanner.tsx`:
 ```tsx
@@ -3754,7 +3760,7 @@ export default function AlertStrip({ view, card }: { view: DriverView; card: Dri
 }
 ```
 
-- [ ] **Step 3: Write `src/views/route/DayMetrics.tsx`**
+- [x] **Step 3: Write `src/views/route/DayMetrics.tsx`**
 
 ```tsx
 import { fmtClock, fmtCountdown, fmtHm } from '../../lib/format'
@@ -3785,7 +3791,7 @@ export default function DayMetrics({ view }: { view: DriverView }) {
 }
 ```
 
-- [ ] **Step 4: Write `src/views/route/RouteRibbon.tsx`**
+- [x] **Step 4: Write `src/views/route/RouteRibbon.tsx`**
 
 ```tsx
 import type { ReactNode } from 'react'
@@ -3868,7 +3874,7 @@ export default function RouteRibbon({ view }: { view: DriverView }) {
 }
 ```
 
-- [ ] **Step 5: Write `src/views/route/DutyTimeline.tsx`**
+- [x] **Step 5: Write `src/views/route/DutyTimeline.tsx`**
 
 ```tsx
 import type { DutyStatus } from '../../data/types'
@@ -3904,7 +3910,7 @@ export default function DutyTimeline({ view, className = '' }: { view: DriverVie
 }
 ```
 
-- [ ] **Step 6: Write `src/views/route/StopReceipt.tsx`**
+- [x] **Step 6: Write `src/views/route/StopReceipt.tsx`**
 
 ```tsx
 import type { Delivery, Stop } from '../../data/types'
@@ -3969,7 +3975,7 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle }
 }
 ```
 
-- [ ] **Step 7: Write `src/views/route/RouteFilePage.tsx` and wire the route**
+- [x] **Step 7: Write `src/views/route/RouteFilePage.tsx` and wire the route**
 
 ```tsx
 import { useEffect, useMemo, useState } from 'react'
@@ -4060,7 +4066,7 @@ import RouteFilePage from './views/route/RouteFilePage'
 <Route path="routes/:driverId" element={<RouteFilePage />} />
 ```
 
-- [ ] **Step 8: Verify in the browser**
+- [x] **Step 8: Verify in the browser**
 
 Run: `npx tsc --noEmit && npm run dev`, then open `/routes/drv-01` (Marcus):
 - Header: big red `0:12`, "Act now" chip, "Behind 15 min" chip. Lookout pins Marcus's card at the top of the rail.
@@ -4072,7 +4078,7 @@ Run: `npx tsc --noEmit && npm run dev`, then open `/routes/drv-01` (Marcus):
 - `/routes/drv-04` (Elena): "on break", no alerts, no alert strip, a blue break block on the duty timeline ending at the now-line.
 - `/routes/nope`: the not-found empty state.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add -A
@@ -4093,7 +4099,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: `useActions`, `useDerived`, store methods, `reassignCandidates`, `suggestResetStop`, `stopsPastLimit`, `projectedDepartureAt`, `projectedEta`, format, primitives.
 - Produces: `<Modal title onClose>…</Modal>` with Esc-to-close; `<Toast />`.
 
-- [ ] **Step 1: Write `src/ui/Modal.tsx`**
+- [x] **Step 1: Write `src/ui/Modal.tsx`**
 
 ```tsx
 import { X } from '@phosphor-icons/react'
@@ -4122,7 +4128,7 @@ export default function Modal({ title, onClose, children, footer }: { title: str
 }
 ```
 
-- [ ] **Step 2: Write `src/views/route/actions/ReassignDialog.tsx`**
+- [x] **Step 2: Write `src/views/route/actions/ReassignDialog.tsx`**
 
 ```tsx
 import { useEffect, useMemo, useState } from 'react'
@@ -4242,7 +4248,7 @@ function Preview({ title, before, after, good }: { title: string; before: string
 }
 ```
 
-- [ ] **Step 3: Write `src/views/route/actions/ResetDialog.tsx`**
+- [x] **Step 3: Write `src/views/route/actions/ResetDialog.tsx`**
 
 ```tsx
 import { useState } from 'react'
@@ -4310,7 +4316,7 @@ export default function ResetDialog({ driverId, onClose }: { driverId: string; o
 }
 ```
 
-- [ ] **Step 4: Write `src/views/route/actions/NotifyDialog.tsx`**
+- [x] **Step 4: Write `src/views/route/actions/NotifyDialog.tsx`**
 
 ```tsx
 import { useState } from 'react'
@@ -4369,7 +4375,7 @@ export default function NotifyDialog({ driverId, onClose }: { driverId: string; 
 }
 ```
 
-- [ ] **Step 5: Wire `ActionDialogs` and write `src/ui/Toast.tsx`**
+- [x] **Step 5: Wire `ActionDialogs` and write `src/ui/Toast.tsx`**
 
 Replace `src/actions/ActionDialogs.tsx`:
 ```tsx
@@ -4429,7 +4435,7 @@ import Toast from '../ui/Toast'
 <DevPanel />
 ```
 
-- [ ] **Step 6: Verify in the browser**
+- [x] **Step 6: Verify in the browser**
 
 Run: `npx tsc --noEmit && npm run dev`, on `/routes/drv-01`:
 - "Reassign stops" on the won't-finish row opens the dialog with stops 14 and 15 pre-selected (the ones past the limit), Ana L. among the same-region drivers at the top, Ravi absent. Selecting Ana shows Marcus "after: 0:10 vs 0:12" in green and Ana still green. Confirm → toast "Marcus R.'s stops reassigned to Ana L." with Undo; Marcus's won't-finish row disappears within a tick; his approaching row remains; Ana's card gains two stops. Undo restores everything.
@@ -4438,7 +4444,7 @@ Run: `npx tsc --noEmit && npm run dev`, on `/routes/drv-01`:
 - On `/routes/drv-02` (Priya, over): Reassign opens with both stops selected and Ravi correctly missing from candidates; the empty-candidate path appears only if you scrub the clock until nobody has capacity, and its button opens the reset dialog.
 - Esc closes any dialog; clicking the scrim closes it.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add -A
@@ -4459,7 +4465,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: `useStore.corrections`.
 - Produces: `<CorrectionChip driverId />` in `src/ui/CorrectionChip.tsx`.
 
-- [ ] **Step 1: Write `src/ui/CorrectionChip.tsx` and place it**
+- [x] **Step 1: Write `src/ui/CorrectionChip.tsx` and place it**
 
 ```tsx
 import { fmtHm } from '../lib/format'
@@ -4484,7 +4490,7 @@ export default function CorrectionChip({ driverId }: { driverId: string }) {
 
 Place it: in `RouteHeader.tsx` after the drift chip; in `RouteCard.tsx` inside the badge row (render the row when a correction exists too: change the condition to `card.alerts.length > 0 || pick || hasCorrection`, reading `hasCorrection` with `useStore((s) => Boolean(s.corrections[view.driver.id]))`); in `RecommendationCard.tsx` in the footer line.
 
-- [ ] **Step 2: Extend the rules test with the edge paths that are copy-driven**
+- [x] **Step 2: Extend the rules test with the edge paths that are copy-driven**
 
 Add the three imports below to the top of `src/alerts/rules.test.ts`, then append the `describe` block:
 ```ts
@@ -4520,7 +4526,7 @@ describe('edge paths change the copy, not just the numbers', () => {
 Run: `npx vitest run src/alerts/rules.test.ts`
 Expected: PASS. If `limit_act_now` also fires for Marcus an hour later, its `when` is missing `v.minutesUntilLimit > 0`.
 
-- [ ] **Step 3: Walk every edge path in the browser and fix what's off**
+- [x] **Step 3: Walk every edge path in the browser and fix what's off**
 
 Using the dev panel and the planted drivers, confirm each row of `docs/ARCHITECTURE.md` §10:
 
@@ -4544,11 +4550,11 @@ Using the dev panel and the planted drivers, confirm each row of `docs/ARCHITECT
 
 Fix anything that fails in the component that owns it. Keep fixes to the file responsible; do not add logic to views that belongs in `compute.ts` or `rules.ts`.
 
-- [ ] **Step 4: Copy pass**
+- [x] **Step 4: Copy pass**
 
 Read every string in `rules.ts`, `voice.ts`, the dialogs, and the empty states aloud. Each must read like a competent colleague talking to Lena. No "Error", no "Invalid", no "N/A", no system-log tone. Every figure that comes from stale data carries a tilde. Fix inline.
 
-- [ ] **Step 5: Run everything and commit**
+- [x] **Step 5: Run everything and commit**
 
 Run: `npm test && npm run lint && npm run build`
 Expected: green.
@@ -4577,7 +4583,7 @@ const tokens = {
   panel: '#ffffff', canvas: '#f4f3f0', well: '#ebe9e4',
   ink: '#1c1a17', muted: '#6b665e', label: '#7a746a',
   'lookout-strong': '#a83a15', lookout: '#cf4620',
-  'act-now': '#b3323f', watch: '#8f5f0e', clear: '#2f7d5a', offline: '#6b7280', break: '#3b6fb6',
+  'act-now': '#b3323f', watch: '#8f5f0e', clear: '#266b4c', offline: '#5b6370', break: '#3262a8',
   'act-now-soft': '#fbeaec', 'watch-soft': '#fbf3e3', 'clear-soft': '#e8f4ee', 'offline-soft': '#eef0f3', 'break-soft': '#e9f0fa', 'lookout-soft': '#ffe9e2',
 }
 const lum = (hex) => {
@@ -4616,7 +4622,7 @@ npm test         # derivation tests: HOS math, rules, ranking, bands, seed, acti
 npm run build
 ```
 
-Node 20+. No backend, no keys. The shift is simulated: the clock is pinned to 12:47 PM so the demo is the same at any hour, and it ticks in real time. Press `⌘.` for the dev panel (scrub the clock, bring a truck back online, undo).
+Node 20+. No backend, no keys. The shift is simulated: the clock is pinned to 2:47 PM so the demo is the same at any hour, and it ticks in real time. Press `⌘.` for the dev panel (scrub the clock, bring a truck back online, undo).
 
 ## What to look at
 
@@ -4665,7 +4671,7 @@ Two options; either is fine:
 1. Push the repo to GitHub, import it in Vercel with framework preset **Vite**, build command `npm run build`, output `dist`. `vercel.json` already rewrites deep links.
 2. `npx vercel --prod` from the repo root, accept the detected Vite settings.
 
-Verify on the deployed URL: the board loads at 12:47 PM, `/routes/drv-01` deep-links straight to Marcus, the dev panel opens with `⌘.`, and the console is clean. Paste the URL into `README.md`.
+Verify on the deployed URL: the board loads at 2:47 PM, `/routes/drv-01` deep-links straight to Marcus, the dev panel opens with `⌘.`, and the console is clean. Paste the URL into `README.md`.
 
 - [ ] **Step 5: Final verification and commit**
 
@@ -4691,3 +4697,20 @@ Rehearse the live change once against the deployed dev server: add `break_due`, 
 **Type consistency.** `DriverView` fields used by rules (`minutesUntilLimit`, `remaining`, `remainingDriveMin`, `driftMin`, `unnotifiedLateStops`, `unassigned`, `staleness`, `pingAgeMin`, `status`, `projectedFinishAt`, `limitHitAt`, `drivingSinceBreakMin`) are all defined in Task 5 Step 1. `DriverCard.band` is set in `rankDrivers`. `useActions().open(action, driverId, { stopIds })` matches its callers in Tasks 10, 11, 12. `AlertActions` props (`driverId`, `actions`, `alertIds`, `positionDependentDisabled`) match Tasks 10 and 11. `ribbonAxis` is exported from `RouteRibbon.tsx` and consumed by `DutyTimeline.tsx`. `scheduleReset(afterStopId: string | null)` is the same in actions, store, and the dialog.
 
 **Known judgment calls an executor may hit.** (1) Tailwind v4 may not emit `fill-*` utilities for custom colors in some versions; if `.fill-well` is missing from the built CSS, replace SVG `className` fills with `style={{ fill: 'var(--color-well)' }}`. (2) `scheduleDrift` for a driver whose next stop is `in_progress` reads the arrival slip; that is intended. (3) The seed's generated (non-planted) drivers may include one or two in Watch naturally; the tests assert planted figures only.
+
+---
+
+## Post-review amendments (applied after the foundation review)
+
+An independent review of Tasks 1–7 found six issues that were verified and fixed before Task 14. The task bodies above are left as written; the code in the repo is the reference.
+
+1. **`scheduleReset` landed the driver over the limit.** The planned off-duty block capped the live driving segment at the stop's departure, so service time was charged as driving. Fix: `scheduleReset` writes the legs and service up to the reset point as planned `driving` / `on_duty` segments before the planned `off_duty`; `closeLive` drops planned segments the truth overtakes; a stop no longer ahead of the driver is a no-op. Test: `minutesUntilLimit(driver, resetAt) ≥ 0`.
+2. **The Offline band was unreachable.** `bandOf` returned on watch before checking staleness. Fix: staleness check first. Test: Nadia twelve minutes in.
+3. **Drift froze at the dock.** The in-progress branch replaced drift instead of taking the worse of arrival slip and dwell. Fixed, with a test.
+4. **Dark drivers collected three cards.** Every rule but the offline pair now requires `visible`. Test: Dre at +60 minutes fires only `offline_near_limit`.
+5. **Behind-schedule swamped the board as the clock ran.** Late now means a projected ETA past the delivery window. Tomas is planted 50 minutes behind so every remaining stop misses its window; Marcus's 15 minutes no longer count. Test: rule counts hold across an hour.
+6. **Planted segments and receipts disagreed.** `planted.ts` builds each day in one backward walk from the anchor; delivery windows and drift ramp follow the re-timed plan. Test: every done stop sits inside an on-duty segment and every leg is a driving segment. Nadia became stale-and-clear, Lucia B. was added with her route complete, and stop events now count as pings.
+
+## Evening tweaks (2026-09-03) and the route rail (2026-09-04)
+
+After Phase 1 shipped to the PR, Dave asked for four changes, then refined the fourth: the left nav is gone and the product bar reads Dispatch; the board groups by status by default; the filters are one row of dropdowns with search at the right; and the route file became one driver card, the alerts, and the stop receipts, with a **route rail** down the left in the Meridian case-file pattern: a vertical, proportional duty timeline (driving, on duty, break; a dashed projection after now) carrying every stop as a node at its actual or projected time, the now marker, the limit mark with the axis red past it, an active node that follows scroll, click-to-jump, and a collapsed state that is just the bar and the dots. `RouteRail.tsx` owns it; `DutyBar.tsx` and the in-list spine were removed.

@@ -1,0 +1,289 @@
+import { ArrowLeft, CaretDown, Check, SidebarSimple } from '@phosphor-icons/react'
+import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
+import { Link } from 'react-router'
+import type { Delivery, Stop } from '../../data/types'
+import { projectedEta } from '../../hos/compute'
+import { fmtAge, fmtClock } from '../../lib/format'
+import { routeHosSignal, routeScheduleSignal, type RouteSignalTone } from '../../lib/routeProgress'
+import { completedStopLightWeight } from '../../lib/routeTimeline'
+import type { DriverView } from '../../store/view'
+
+interface Node {
+  stop: Stop
+  t: number
+  customer: string
+  late: boolean
+}
+
+const DOT: Record<RouteSignalTone, string> = {
+  clear: 'bg-clear-fill',
+  watch: 'bg-watch-fill',
+  act_now: 'bg-act-now-fill',
+  offline: 'bg-offline-fill',
+}
+
+const SIGNAL_TEXT: Record<RouteSignalTone, string> = {
+  clear: 'text-clear',
+  watch: 'text-watch',
+  act_now: 'text-act-now',
+  offline: 'text-offline',
+}
+
+const TIMELINE_COLUMNS = { gridTemplateColumns: '1.25rem minmax(0, 1fr)' }
+
+function stopTone(node: Node, pastLimitIds: Set<string>): string {
+  const { stop } = node
+  if (stop.status === 'failed') return 'bg-act-now-fill text-on-accent'
+  if (stop.status === 'done') return 'route-history-node text-on-accent'
+  if (stop.status === 'unassigned') return 'border-2 border-dashed border-offline bg-panel text-offline'
+  if (pastLimitIds.has(stop.id) || node.late) return 'border-2 border-act-now bg-panel text-act-now'
+  return 'border-2 border-muted/70 bg-panel text-muted'
+}
+
+function detailNodeSize(index: number, firstRemainingIndex: number, status: Stop['status']): string {
+  if (status === 'done') return 'h-3 w-3'
+  if (index === firstRemainingIndex) return 'h-4 w-4'
+  if (index === firstRemainingIndex + 1) return 'h-[15px] w-[15px]'
+  return 'h-3.5 w-3.5'
+}
+
+function historyStyle(index: number, lastCompleteIndex: number): CSSProperties {
+  return { '--route-history-light': `${completedStopLightWeight(index, lastCompleteIndex)}%` } as CSSProperties
+}
+
+function rowTone(node: Node, pastLimitIds: Set<string>): string {
+  if (pastLimitIds.has(node.stop.id) || node.late) return 'bg-act-now-soft/65 hover:bg-act-now-soft'
+  return 'hover:bg-canvas'
+}
+
+function stopState(node: Node, nextId: string | undefined, pastLimitIds: Set<string>): string {
+  const { stop } = node
+  if (stop.status === 'failed') return 'failed'
+  if (stop.status === 'done') return 'delivered'
+  if (stop.status === 'unassigned') return 'unassigned'
+  if (pastLimitIds.has(stop.id)) return 'past HOS'
+  if (node.late) return 'past due'
+  if (stop.id === nextId || stop.status === 'in_progress') return 'current stop'
+  return 'undelivered'
+}
+
+/** A route-first progress rail. The summary answers "where are we?" and "does it fit?"
+ * before the stop sequence supplies detail. Stop spacing follows route order rather than
+ * elapsed time so completed, current, upcoming, and post-limit work remain scannable. */
+export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed, onCollapsedChange }: { view: DriverView; deliveryById: Map<string, Delivery>; pastLimitIds: Set<string>; collapsed: boolean; onCollapsedChange: (c: boolean) => void }) {
+  const { route, now } = view
+  const schedule = routeScheduleSignal(view)
+  const hos = routeHosSignal(view)
+  const nextId = view.next?.id
+  const progress = view.total === 0 ? 1 : view.done / view.total
+  const [active, setActive] = useState<string | null>(route.stops[0]?.id ?? null)
+  const [summaryOpen, setSummaryOpen] = useState(true)
+  const [timelineOpen, setTimelineOpen] = useState(true)
+  const timelineRef = useRef<HTMLDivElement>(null)
+  const nodeRefs = useRef(new Map<string, HTMLButtonElement>())
+
+  const nodes = useMemo<Node[]>(() => route.stops.map((stop) => {
+    const t = stop.status === 'done' || stop.status === 'failed'
+      ? (stop.departedAt ?? stop.plannedEta)
+      : stop.status === 'in_progress'
+        ? (stop.arrivedAt ?? now)
+        : projectedEta(stop, view.driftMin)
+    const windowEnd = deliveryById.get(stop.deliveryId)?.window.end
+    return {
+      stop,
+      t,
+      customer: deliveryById.get(stop.deliveryId)?.customer ?? stop.deliveryId,
+      late: stop.status === 'pending' && windowEnd !== undefined && t > windowEnd,
+    }
+  }), [deliveryById, now, route.stops, view.driftMin])
+
+  const firstPastLimitId = nodes.find((node) => pastLimitIds.has(node.stop.id))?.stop.id
+  const firstRemainingIndex = nodes.findIndex((node) => node.stop.status !== 'done' && node.stop.status !== 'failed')
+  const lastCompleteIndex = nodes.reduce((last, node, index) => node.stop.status === 'done' || node.stop.status === 'failed' ? index : last, -1)
+
+  useEffect(() => {
+    setActive(route.stops[0]?.id ?? null)
+  }, [route.id, route.stops])
+
+  useEffect(() => {
+    setSummaryOpen(true)
+    setTimelineOpen(true)
+  }, [route.id])
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      const container = timelineRef.current
+      const node = active ? nodeRefs.current.get(active) : undefined
+      if (!container || !node) return
+      const top = node.offsetTop
+      const bottom = top + node.offsetHeight
+      if (top < container.scrollTop || bottom > container.scrollTop + container.clientHeight) {
+        container.scrollTop = Math.max(0, top - container.clientHeight * 0.35)
+      }
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [active, collapsed, route.id])
+
+  // The selected timeline node still follows the receipt currently being read.
+  useEffect(() => {
+    const elements = route.stops.map((stop) => document.getElementById(`stop-${stop.id}`)).filter((node): node is HTMLElement => Boolean(node))
+    if (elements.length === 0) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const top = entries.filter((entry) => entry.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0]
+        if (top) setActive(top.target.id.replace('stop-', ''))
+      },
+      { rootMargin: '-15% 0px -65% 0px', threshold: [0, 0.5] },
+    )
+    elements.forEach((element) => observer.observe(element))
+    return () => observer.disconnect()
+  }, [route.stops])
+
+  const jump = (id: string) => {
+    setActive(id)
+    document.getElementById(`stop-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+
+  return (
+    <nav aria-label="Route" className={`sticky top-0 flex h-[calc(100vh-3.5rem-2.5rem)] shrink-0 flex-col overflow-hidden rounded-card border border-line bg-panel shadow-card transition-[width] duration-200 ${collapsed ? 'w-16' : 'w-64'}`}>
+      <div className={`flex shrink-0 items-center border-b border-line px-2 py-2 ${collapsed ? 'flex-col gap-1' : 'gap-2'}`}>
+        <Link to="/" title="Back to the board" aria-label="Back to the board" className="flex h-7 w-7 shrink-0 items-center justify-center rounded-control text-muted transition hover:bg-well hover:text-ink">
+          <ArrowLeft size={16} />
+        </Link>
+        {!collapsed && (
+          <div className="min-w-0 flex-1">
+            <p className="text-[8px] font-semibold uppercase tracking-[0.08em] text-label">Route</p>
+            <p className="truncate font-mono text-[12px] font-semibold text-ink">{route.id.toUpperCase()}</p>
+          </div>
+        )}
+        <button type="button" onClick={() => onCollapsedChange(!collapsed)} aria-expanded={!collapsed} aria-label={collapsed ? 'Expand the route rail' : 'Collapse the route rail'} title={collapsed ? 'Expand' : 'Collapse'} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-control text-muted transition hover:bg-well hover:text-ink">
+          <SidebarSimple size={16} className={collapsed ? '-scale-x-100' : ''} />
+        </button>
+      </div>
+
+      <section aria-label={`Route progress: ${view.done} of ${view.total} stops complete`} className="shrink-0 border-b border-line">
+        {collapsed ? (
+          <div className="px-1.5 py-3">
+            <p className="tnum text-center font-display text-lg font-semibold leading-none text-ink">{Math.round(progress * 100)}%</p>
+            <p className="tnum mt-1 text-center text-[8px] text-muted">{view.done}/{view.total}</p>
+            <div className="mt-2 flex justify-center gap-1.5">
+              <span title={`${schedule.label}: ${schedule.value}`} className={`h-2 w-2 rounded-full ${DOT[schedule.tone]}`} />
+              <span title={`${hos.label}: ${hos.value}`} className={`h-2 w-2 rounded-full ${DOT[hos.tone]}`} />
+            </div>
+          </div>
+        ) : (
+          <>
+            <button type="button" onClick={() => setSummaryOpen((open) => !open)} aria-expanded={summaryOpen} className="flex w-full items-center gap-2 px-3 py-2 text-left transition hover:bg-canvas">
+              <span className="text-[9px] font-semibold uppercase tracking-[0.08em] text-label">Route status</span>
+              <span className="ml-auto text-[9px] text-muted">4 metrics</span>
+              <CaretDown size={12} className={`shrink-0 text-muted transition-transform ${summaryOpen ? '' : '-rotate-90'}`} />
+            </button>
+            {summaryOpen && (
+              <dl className="grid grid-cols-2 border-t border-line bg-canvas/20">
+                <div className="min-w-0 border-b border-r border-line px-3 py-2.5">
+                  <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">Progress</dt>
+                  <dd className="tnum mt-1 font-display text-[1.35rem] font-semibold leading-none tracking-[-0.035em] text-ink">{view.done} <span className="text-[11px] font-medium tracking-normal text-muted">of {view.total}</span></dd>
+                  <dd className="tnum mt-1 text-[9px] text-muted">{Math.round(progress * 100)}% complete</dd>
+                </div>
+                <div className="min-w-0 border-b border-line px-3 py-2.5">
+                  <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">Remaining</dt>
+                  <dd className="tnum mt-1 font-display text-[1.35rem] font-semibold leading-none tracking-[-0.035em] text-ink">{view.remaining.length}</dd>
+                  <dd className="mt-1 truncate text-[9px] text-muted" title={`Updated ${fmtAge(view.pingAgeMin)}`}>updated {fmtAge(view.pingAgeMin)}</dd>
+                </div>
+                {[schedule, hos].map((signal, index) => (
+                  <div key={signal.label} className={`min-w-0 px-3 py-2.5 ${index === 0 ? 'border-r border-line' : ''}`}>
+                    <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">{signal.label}</dt>
+                    <dd className={`mt-1 flex min-w-0 items-center gap-1.5 text-[10px] font-semibold ${SIGNAL_TEXT[signal.tone]}`}>
+                      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${DOT[signal.tone]}`} />
+                      <span className="truncate" title={signal.value}>{signal.value}</span>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+          </>
+        )}
+      </section>
+
+      {!collapsed && (
+        <button type="button" onClick={() => setTimelineOpen((open) => !open)} aria-expanded={timelineOpen} className="flex w-full shrink-0 items-center gap-2 px-3 py-2 text-left transition hover:bg-canvas">
+          <h2 className="text-[9px] font-semibold uppercase tracking-[0.08em] text-label">Route timeline</h2>
+          <span className="ml-auto text-[9px] text-muted">Stop order</span>
+          <CaretDown size={12} className={`shrink-0 text-muted transition-transform ${timelineOpen ? '' : '-rotate-90'}`} />
+        </button>
+      )}
+
+      {(collapsed || timelineOpen) && <div ref={timelineRef} data-collapsed={collapsed} className={`route-timeline-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain ${collapsed ? 'px-1 py-2' : 'px-2 pb-2'}`}>
+        <ol>
+          {nodes.map((node, index) => {
+            const { stop } = node
+            const isActive = active === stop.id
+            const isFirstPast = stop.id === firstPastLimitId
+            const state = stopState(node, nextId, pastLimitIds)
+            const isRed = stop.status === 'failed' || pastLimitIds.has(stop.id) || node.late
+            const timePrefix = view.staleness !== 'fresh' && stop.status === 'pending' ? '~' : ''
+            const completed = stop.status === 'done'
+            const connectorTone = completed ? 'route-history-node' : isRed ? 'bg-act-now-fill/70' : 'bg-line'
+            const rowSize = collapsed ? completed ? 'h-5' : 'h-7' : completed ? 'min-h-8' : 'min-h-10'
+            return (
+              <li key={stop.id}>
+                {isFirstPast && (
+                  <div style={collapsed ? undefined : TIMELINE_COLUMNS} className={`${collapsed ? 'my-1 flex justify-center' : 'grid h-6 items-center'}`} title="The remaining route crosses the driver's 11-hour HOS limit here">
+                    {collapsed ? (
+                      <span className="h-px w-7 bg-act-now-fill" />
+                    ) : (
+                      <>
+                        <span className="relative flex h-6 items-center justify-center"><span className="absolute inset-y-0 w-px bg-act-now-fill" /><span className="relative h-px w-4 bg-act-now-fill" /></span>
+                        <span className="pl-2 text-[8px] font-semibold uppercase tracking-[0.05em] text-act-now">HOS limit</span>
+                      </>
+                    )}
+                  </div>
+                )}
+                <button
+                  ref={(element) => {
+                    if (element) nodeRefs.current.set(stop.id, element)
+                    else nodeRefs.current.delete(stop.id)
+                  }}
+                  type="button"
+                  onClick={() => jump(stop.id)}
+                  aria-current={isActive ? 'location' : undefined}
+                  aria-label={`Stop ${stop.seq}, ${node.customer}, ${fmtClock(node.t)}, ${state}`}
+                  title={`${stop.seq} · ${node.customer} · ${fmtClock(node.t)} · ${state}`}
+                  style={collapsed ? undefined : TIMELINE_COLUMNS}
+                  className={`${collapsed ? `flex ${rowSize} w-full items-center justify-center rounded-control hover:bg-canvas` : `grid ${rowSize} w-full items-stretch rounded-control text-left transition ${rowTone(node, pastLimitIds)}`}`}
+                >
+                  <span className={`relative flex ${collapsed ? rowSize : 'h-full min-h-7'} items-center justify-center`}>
+                    <span className={`absolute left-1/2 top-0 h-1/2 w-px -translate-x-1/2 ${connectorTone}`} style={completed ? historyStyle(index - 0.5, lastCompleteIndex) : undefined} />
+                    <span className={`absolute bottom-0 left-1/2 h-1/2 w-px -translate-x-1/2 ${connectorTone}`} style={completed ? historyStyle(index + 0.5, lastCompleteIndex) : undefined} />
+                    <span className={`relative z-10 flex items-center justify-center rounded-full motion-safe:transition-[width,height] motion-safe:duration-150 ${detailNodeSize(index, firstRemainingIndex, stop.status)} ${stopTone(node, pastLimitIds)} ${isActive ? 'ring-4 ring-ink/10' : ''}`} style={completed ? historyStyle(index, lastCompleteIndex) : undefined}>
+                      {completed && <Check size={8} weight="bold" className="drop-shadow-[0_1px_1px_rgb(0_0_0/0.3)]" />}
+                    </span>
+                  </span>
+                  {!collapsed && (
+                    <span className="min-w-0 py-1 pl-2 pr-2">
+                      <span className={`tnum block text-[8px] ${isRed ? 'font-semibold text-act-now' : 'text-label'}`}>{timePrefix}{fmtClock(node.t)}</span>
+                      <span className="mt-0.5 flex min-w-0 items-baseline gap-1.5">
+                        <span className={`tnum shrink-0 text-[9px] font-semibold ${isRed ? 'text-act-now' : 'text-muted'}`}>{stop.seq}</span>
+                        <span className={`truncate text-[10px] ${isActive ? 'font-semibold text-ink' : isRed ? 'font-semibold text-act-now' : stop.status === 'done' ? 'text-muted' : 'text-ink'}`}>{node.customer}</span>
+                      </span>
+                    </span>
+                  )}
+                </button>
+              </li>
+            )
+          })}
+        </ol>
+      </div>}
+
+      {!collapsed && !timelineOpen && <div className="min-h-0 flex-1 border-t border-line bg-canvas/20" />}
+
+      {!collapsed && timelineOpen && (
+        <div className="flex shrink-0 items-center gap-3 border-t border-line px-3 py-2 text-[8px] text-label">
+          <span className="flex items-center gap-1"><span className="route-history-progress flex h-2.5 w-2.5 items-center justify-center rounded-full text-on-accent"><Check size={7} weight="bold" className="drop-shadow-[0_1px_1px_rgb(0_0_0/0.3)]" /></span> delivered</span>
+          <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full border-2 border-muted/70" /> undelivered</span>
+          <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full border-2 border-act-now" /> late / HOS</span>
+        </div>
+      )}
+    </nav>
+  )
+}

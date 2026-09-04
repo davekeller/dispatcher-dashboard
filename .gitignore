@@ -15,3 +15,11 @@ dist/
 .idea/
 .vscode/
 *.log
+
+# harness config
+.claude/
+
+# chronicle — raw captures stay local; the committed flight log embeds what it needs
+docs/chronicle/progress/
+docs/chronicle/chronicle.json
+.playwright-mcp/
