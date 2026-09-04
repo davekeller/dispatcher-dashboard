@@ -28,18 +28,11 @@
   --color-ai-violet: #8259d6;
   --color-ai-cool: #4f7cdd;
 
-  --color-hero-warm: #68423d;
-  --color-hero-gold: #655033;
-  --color-hero-rose: #603e55;
-  --color-hero-violet: #4c3e67;
-  --color-hero-cool: #344f73;
-  --color-hero-text: #fffaf7;
-  --color-hero-muted: #e5dce3;
-  --color-hero-act: #ffb3c2;
-  --color-hero-watch: #ffd48a;
-  --color-hero-break: #b5ceff;
-  --color-hero-offline: #d8deea;
-  --color-hero-clear: #a2e4c0;
+  --color-hero-warm: #f2d8d0;
+  --color-hero-gold: #eee1bf;
+  --color-hero-rose: #ebd6e4;
+  --color-hero-violet: #ddd7ec;
+  --color-hero-cool: #d3e0ef;
 
   --color-act-now: #9f1f3b;
   --color-act-now-fill: #cb3453;
@@ -80,7 +73,7 @@ body { @apply bg-canvas text-ink font-sans antialiased; }
 
 .iq-metrics-band {
   background:
-    radial-gradient(circle at 6% -50%, color-mix(in srgb, var(--color-hero-text) 11%, transparent), transparent 27rem),
+    radial-gradient(circle at 6% -50%, color-mix(in srgb, white 24%, transparent), transparent 27rem),
     linear-gradient(108deg, var(--color-hero-warm) 0%, var(--color-hero-gold) 24%, var(--color-hero-rose) 50%, var(--color-hero-violet) 74%, var(--color-hero-cool) 100%);
 }
 
@@ -131,7 +124,7 @@ body { @apply bg-canvas text-ink font-sans antialiased; }
   background: linear-gradient(90deg, var(--color-ai-warm), var(--color-ai-rose), var(--color-ai-violet), var(--color-ai-cool));
 }
 
-.iq-metric-active { box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--color-hero-text) 80%, transparent); }
+.iq-metric-active { box-shadow: inset 0 -2px 0 var(--color-lookout); }
 
 .route-history-progress {
   background: linear-gradient(to bottom, var(--color-route-done-start), var(--color-route-done-end));

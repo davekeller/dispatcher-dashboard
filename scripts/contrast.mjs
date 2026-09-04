@@ -6,8 +6,7 @@ const tokens = {
   'lookout-strong': '#a93817', lookout: '#cf4620',
   'act-now': '#9f1f3b', watch: '#755000', clear: '#165d3f', offline: '#424c60', break: '#28549a',
   'act-now-soft': '#fff0f3', 'watch-soft': '#fff6df', 'clear-soft': '#eaf8f0', 'offline-soft': '#eff2f6', 'break-soft': '#edf3ff', 'lookout-soft': '#fff0e9',
-  'hero-warm': '#68423d', 'hero-gold': '#655033', 'hero-rose': '#603e55', 'hero-violet': '#4c3e67', 'hero-cool': '#344f73',
-  'hero-text': '#fffaf7', 'hero-muted': '#e5dce3', 'hero-act': '#ffb3c2', 'hero-watch': '#ffd48a', 'hero-break': '#b5ceff', 'hero-offline': '#d8deea', 'hero-clear': '#a2e4c0',
+  'hero-warm': '#f2d8d0', 'hero-gold': '#eee1bf', 'hero-rose': '#ebd6e4', 'hero-violet': '#ddd7ec', 'hero-cool': '#d3e0ef',
 }
 const lum = (hex) => {
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
@@ -19,8 +18,8 @@ const pairs = [
   ['lookout-strong', 'panel'], ['lookout', 'panel'], ['lookout-strong', 'lookout-soft'],
   ['act-now', 'panel'], ['act-now', 'act-now-soft'], ['watch', 'panel'], ['watch', 'watch-soft'],
   ['clear', 'panel'], ['clear', 'clear-soft'], ['offline', 'panel'], ['offline', 'offline-soft'], ['break', 'panel'], ['break', 'break-soft'],
-  ['hero-text', 'hero-warm'], ['hero-text', 'hero-cool'], ['hero-muted', 'hero-cool'],
-  ['hero-act', 'hero-warm'], ['hero-watch', 'hero-gold'], ['hero-break', 'hero-rose'], ['hero-offline', 'hero-violet'], ['hero-clear', 'hero-cool'],
+  ['ink', 'hero-warm'], ['ink', 'hero-cool'], ['muted', 'hero-cool'],
+  ['act-now', 'hero-warm'], ['watch', 'hero-gold'], ['break', 'hero-rose'], ['offline', 'hero-violet'], ['clear', 'hero-cool'],
 ]
 let fails = 0
 console.log('| text | ground | ratio | AA |\n|---|---|---|---|')
