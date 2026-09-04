@@ -284,7 +284,7 @@ Every action follows the same protocol: **preview → confirm → commit → rec
 | `markArrived / markDeparted(stopId, outcome)` | Phone and dev panel | Receipts update; drift recomputes |
 | `undo()` | Restores the snapshot taken before the last action | |
 
-**Reassign candidates:** fresh, driving or on duty, band not act-now or over, and `minutesUntilLimit − (remainingDriveMinutes + movedDriveMinutes) ≥ CAPACITY_MARGIN_MIN`. Same region first, then most spare drive time. Partial reassign is selecting receipt cards; default is every remaining stop, or the stops past the limit when opened from `wont_finish`. Empty list: "No one has the capacity. Schedule a reset instead," with the reset button right there.
+**Reassign candidates:** fresh, driving or on duty, band not act-now or over, and `minutesUntilLimit − (remainingDriveMinutes + movedDriveMinutes) ≥ CAPACITY_MARGIN_MIN`. Same region first, then most spare drive time. The picker's nav mirrors the board's (`store/candidates.ts`): an order (Lookout's order by default; closest first, by great-circle distance between the two trucks; most drive time left), manual filters (region, same region only), and search by driver name or plate on the right. Orders re-sequence and filters narrow the same capacity-safe set; nothing adds anyone back, and when filters hide everyone the dialog says how many could take the stops and offers to clear. Partial reassign is selecting receipt cards; default is every remaining stop, or the stops past the limit when opened from `wont_finish`. Empty list: "No one has the capacity. Schedule a reset instead," with the reset button right there.
 
 **Schedule reset** suggests the last stop the driver can finish before the limit, computed from `limitHitAt`.
 
@@ -368,6 +368,7 @@ Each is designed, not discovered. Where it shows up is as important as what happ
 | Failed stop | Receipt shows the failure and note; remaining stops shift; drift recomputes | Route file |
 | No reassign candidate | Graceful path to schedule a reset | Reassign dialog |
 | Partial reassign | Select receipt cards; default all remaining | Reassign dialog |
+| Picker filters hide every candidate | Inline note with how many could take the stops, and a clear-filters button | Reassign dialog |
 | Two alerts, one driver | One card, two reasons | Rail, card badges |
 | Acknowledge | Snoozed 10 min, de-emphasized, never hidden for critical/act now; snooze expiry restores emphasis | Rail |
 | Reset mid-route | Stops after the reset point become unassigned; `stops_unassigned` fires; metrics show "need a driver" | Route file, metrics, rail |
