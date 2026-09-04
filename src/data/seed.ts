@@ -38,6 +38,28 @@ function jitterAround(center: LatLng, rng: Rng, spread: number): LatLng {
   return { lat: center.lat + (rng.next() - 0.5) * spread, lng: center.lng + (rng.next() - 0.5) * spread * 1.3 }
 }
 
+// Each stop is a walk from the previous one, the leg's drive minutes setting the distance,
+// so on a map a route reads as a route and the geography agrees with the schedule. Two rng
+// draws per stop, the same as the jitter it replaced, so nothing else in the seed moved.
+const KM_PER_DRIVE_MIN = 0.25 // city truck pace, lights and docks included
+const DEG_PER_KM = 1 / 111
+const REGION_HALF = { lat: 0.045, lng: 0.06 }
+
+function reflect(value: number, center: number, half: number): number {
+  const d = value - center
+  return Math.abs(d) <= half ? value : center + Math.sign(d) * (2 * half - Math.abs(d))
+}
+
+function walkFrom(prev: LatLng, before: LatLng | undefined, center: LatLng, driveMin: number, rng: Rng): LatLng {
+  // Keep roughly heading the way the route was going (a turn of up to ±90°); the first leg picks any bearing.
+  const draw = rng.next()
+  const bearing = before ? Math.atan2(prev.lng - before.lng, prev.lat - before.lat) + (draw - 0.5) * Math.PI : draw * 2 * Math.PI
+  const km = driveMin * KM_PER_DRIVE_MIN * (0.7 + rng.next() * 0.6)
+  const lat = prev.lat + Math.cos(bearing) * km * DEG_PER_KM
+  const lng = prev.lng + (Math.sin(bearing) * km * DEG_PER_KM) / Math.cos((center.lat * Math.PI) / 180)
+  return { lat: reflect(lat, center.lat, REGION_HALF.lat), lng: reflect(lng, center.lng, REGION_HALF.lng) }
+}
+
 interface Generated { driver: Driver; truck: Truck; route: Route; deliveries: Delivery[] }
 
 function generateDriver(i: number, rng: Rng, anchor: number): Generated {
@@ -74,7 +96,7 @@ function generateDriver(i: number, rng: Rng, anchor: number): Generated {
     plannedT = plannedEta + service * MIN
 
     const deliveryId = `dlv-${n}-${String(k + 1).padStart(2, '0')}`
-    const stopPosition = jitterAround(REGION_CENTER[region], rng, 0.07)
+    const stopPosition = walkFrom(k === 0 ? position : deliveries[k - 1].position, k === 0 ? undefined : k === 1 ? position : deliveries[k - 2].position, REGION_CENTER[region], drive, rng)
     deliveries.push({
       id: deliveryId,
       customer: CUSTOMERS[rng.int(0, CUSTOMERS.length - 1)],
