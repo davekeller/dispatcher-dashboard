@@ -12,10 +12,16 @@ export function priorityAlertOf(card: DriverCard) {
   return card.alerts.find((alert) => PRIORITY_RULES.has(alert.ruleId))
 }
 
+interface RouteHeaderStatus {
+  label: string
+  title: string
+  className: string
+}
+
 /** The top line every route card shares, on the board and in the Lookout bar: band dot,
  *  route id, the priority chip, and the countdown on the right. The dot occupies the
  *  same 24px track as the miniature timeline below it on full cards. */
-export default function RouteHeader({ view, card, showPingAge = false }: { view: DriverView; card: DriverCard; showPingAge?: boolean }) {
+export default function RouteHeader({ view, card, showPingAge = false, status }: { view: DriverView; card: DriverCard; showPingAge?: boolean; status?: RouteHeaderStatus }) {
   const tone = BAND_TONE[card.band]
   const offline = view.staleness === 'offline'
   const priorityAlert = priorityAlertOf(card)
@@ -25,7 +31,8 @@ export default function RouteHeader({ view, card, showPingAge = false }: { view:
         <span className={`h-2 w-2 rounded-full ${offline ? `border border-dashed ${tone.border}` : tone.fill}`} />
       </span>
       <span className={`shrink-0 whitespace-nowrap font-mono font-semibold tracking-tight text-ink ${showPingAge ? 'text-[12px]' : 'text-[13px]'}`} title={`Route ${view.route.id.toUpperCase()}`}>{view.route.id.toUpperCase()}</span>
-      {showPingAge && <span className="tnum ml-1.5 whitespace-nowrap text-[8px] leading-4 text-muted" title={`Updated ${fmtAge(view.pingAgeMin)}`}>{fmtCompactAge(view.pingAgeMin)}</span>}
+      {status && <span className={`ml-1.5 shrink-0 whitespace-nowrap text-[8px] font-semibold leading-4 ${status.className}`} title={status.title}>{status.label}</span>}
+      {showPingAge && <span className="tnum ml-1.5 min-w-0 truncate text-[8px] leading-4 text-muted" title={`Updated ${fmtAge(view.pingAgeMin)}`}>{fmtCompactAge(view.pingAgeMin)}</span>}
       <span className={`ml-auto flex min-w-0 items-center ${showPingAge ? 'gap-1' : 'gap-1.5'}`}>
         {priorityAlert && <Chip tone={severityTone(priorityAlert.severity)} className={showPingAge ? 'px-1 py-0 text-[8px] leading-3.5' : 'px-1.5 py-0 text-[9px] leading-4'} title={priorityAlert.title}>{priorityAlert.label}</Chip>}
         <Countdown minutes={view.minutesUntilLimit} stale={view.staleness !== 'fresh'} size={showPingAge ? 'xs' : 'sm'} />
