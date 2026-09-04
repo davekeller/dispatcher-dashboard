@@ -42,7 +42,7 @@ Reviewers read the package.json. Nothing else goes in without a one-line reason 
 ```
 src/
   main.tsx · App.tsx (routes) · index.css (tokens)
-  app/          Layout.tsx · Header.tsx · DevPanel.tsx
+  app/          Layout.tsx · Header.tsx · SimulatedShift.tsx
   data/         types.ts · prng.ts · seed.ts · planted.ts · regions.ts
   time/         clock.ts · useNow.ts
   hos/          constants.ts · compute.ts · compute.test.ts
@@ -173,7 +173,7 @@ Everyone else is comfortably clear so the board is not all red. Each planted day
 - `useNow()`: one hook, ticks every `TICK_MS = 5000`, value rounded to the tick so memo keys are stable. Nothing else reads `Date.now()`.
 - **Simulated telematics.** Drivers without `pingsSuspended` are treated as pinging continuously: their effective `lastPingAt` is `now − jitter(driverId)` with jitter 0–90s. Planted stale/offline drivers keep their stored `lastPingAt`. This is derivation, not mutation, so the fleet does not go offline when the clock is scrubbed or a tab is left open.
 - **The world moves.** The generated fleet is a whole simulated day: every generated stop carries the time the driver will reach it and leave it, and `materialize(fleet, now)` (`src/data/simulate.ts`) sets stop statuses from the clock on every tick and every scrub. The planted scenarios carry no future times, so they hold still for the demo. Scrub an hour and the fleet has completed its next stops; leave a tab open through a panel and the board does not slowly fill with drivers who fell behind a frozen plan.
-- **Dev panel** (hidden behind `⌘.`, and a small "dev" toggle in the header): +15m, +1h, reset clock; "bring Dre online" (clears `pingsSuspended`); "advance Marcus one stop"; reset data; undo. The panel exists so any alert can be fired on demand during the walkthrough.
+- **The simulated-shift control.** The clock in the product bar is a button, "2:47 PM · Simulated shift" with a clock icon, that opens a panel anchored under it (`⌘.` too). The panel says in plain words that this is a simulated day pinned to 2:47 PM and that the clock is live, offers a horizontal scrubber across four hours plus +15 min, +1 hour, and back-to-2:47 buttons, and explains each demo action in a sentence: bring Dre online (clears `pingsSuspended`; the estimate corrects out loud), advance Marcus a stop, undo, reset the shift. It exists so a reviewer finds it, understands it, and can fire any alert on demand.
 
 ---
 
@@ -370,9 +370,9 @@ Each is designed, not discovered. Where it shows up is as important as what happ
 | Acknowledge | Snoozed 10 min, de-emphasized, never hidden for critical/act now; snooze expiry restores emphasis | Rail |
 | Reset mid-route | Stops after the reset point become unassigned; `stops_unassigned` fires; metrics show "need a driver" | Route file, metrics, rail |
 | All stops done | "Finished, heading in"; no exposure; card goes quiet | Card, route file |
-| Clock scrubbed far ahead | Everyone accumulates; the dev panel says "the scrubber advances the clock, not the world" | Dev panel |
+| Clock scrubbed far ahead | The generated fleet keeps completing stops; the planted scenarios hold still and accumulate | Simulated-shift panel |
 | Empty filter, empty region, nothing to flag | Explicit empty states | Board |
-| Undo | Last action reversible for 10s from the result toast, always from the dev panel | Toast, dev panel |
+| Undo | Last action reversible for 10s from the result toast, always from the simulated-shift panel | Toast, panel |
 
 ---
 

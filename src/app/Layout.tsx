@@ -4,7 +4,6 @@ import ActionDialogs from '../actions/ActionDialogs'
 import { LookoutProvider } from '../lookout/LookoutContext'
 import LookoutSidebar from '../lookout/LookoutSidebar'
 import Toast from '../ui/Toast'
-import DevPanel from './DevPanel'
 import Header from './Header'
 
 /** Two panes: main · Lookout. Lookout is mounted once here and reads derived state itself;
@@ -24,7 +23,6 @@ export default function Layout() {
         </div>
         <ActionDialogs />
         <Toast />
-        <DevPanel />
       </ActionProvider>
     </LookoutProvider>
   )
