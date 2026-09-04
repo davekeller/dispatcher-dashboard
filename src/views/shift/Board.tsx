@@ -12,11 +12,15 @@ import { useColumnTracks } from './useColumnTracks'
 /** Columns come from the grouping; rows are Lookout's rank. The top row of the board is
  *  therefore "the most urgent problem in each column." Quiet tail columns start as rails;
  *  every column can collapse, and expanded columns share the remaining width smoothly. */
+/** Status columns that start as count rails: Act now, Watch, and On break open by default;
+ *  Offline and Clear are quiet tails. One constant, read at mount and when the grouping changes. */
+const BAND_RAILS: Record<string, boolean> = { offline: false, clear: false }
+
 export default function Board({ cards, byId, grouping, pickId, filtering = false }: { cards: DriverCard[]; byId: Map<string, DriverView>; grouping: Grouping; pickId: string | null; filtering?: boolean }) {
   const columns = grouping.columns.map((col) => ({ ...col, cards: cards.filter((c) => grouping.keyOf(byId.get(c.driverId)!, c) === col.key) }))
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({ break: false, clear: false })
+  const [expanded, setExpanded] = useState<Record<string, boolean>>(BAND_RAILS)
   useEffect(() => {
-    setExpanded(grouping.id === 'band' ? { break: false, clear: false } : {})
+    setExpanded(grouping.id === 'band' ? BAND_RAILS : {})
   }, [grouping.id])
   const isExpanded = (key: string) => expanded[key] !== false
   const tracks = useColumnTracks(columns.map((column) => {
