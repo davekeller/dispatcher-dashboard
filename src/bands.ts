@@ -8,10 +8,10 @@ export type Band = 'act_now' | 'watch' | 'offline' | 'break' | 'clear'
 export const BAND_ORDER: Band[] = ['act_now', 'watch', 'break', 'offline', 'clear']
 
 export const BAND_LABEL: Record<Band, string> = {
-  act_now: 'Act now',
+  act_now: 'Act Now',
   watch: 'Watch',
   offline: 'Offline',
-  break: 'On break',
+  break: 'On Break',
   clear: 'Clear',
 }
 

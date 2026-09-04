@@ -77,7 +77,7 @@ The overall foundation should look warm white, not beige. The live board deliber
 
 Operational color always appears with a label, number, icon, or shape. Red is never used as a general brand accent.
 
-The board uses one intentionally vivid wash per status lane—Act now `#f8d6df`, Watch `#f5dfa7`, Offline `#dce3ed`, On break `#d8e5fb`, and Clear `#d3eedf`. These board-only grounds make column structure legible at a glance while the softer fills above remain available for inline alerts and receipts. The shift totals mirror the lane order; each label, dot, and value uses one corresponding saturated status hue rather than leaving the labels neutral. The throughput group remains on the same row but receives wider, evenly padded columns so its four values scan as a distinct block.
+The board uses one intentionally vivid wash per status lane—Act now `#f8d6df`, Watch `#f5dfa7`, Offline `#dce3ed`, On break `#d8e5fb`, and Clear `#d3eedf`. These board-only grounds make column structure legible at a glance while the softer fills above remain available for inline alerts and receipts. The shift totals mirror the lane order; each label, dot, and value uses an accessible light counterpart of its status hue on the darker hero rather than turning neutral. The throughput group remains on the same row but receives wider, evenly padded columns so its four values scan as a distinct block.
 
 ### Lookout and the AI spectrum
 
@@ -92,9 +92,10 @@ The board uses one intentionally vivid wash per status lane—Act now `#f8d6df`,
 | `ai-violet` | `#8259d6` | Cool bridge |
 | `ai-cool` | `#4f7cdd` | Decorative gradient end |
 
+The shift instrument is deliberately outside the AI spectrum. It uses a fully desaturated city photograph beneath a single 70%-opacity warm-black overlay. The five status readings reuse their board-header wash colors as high-contrast foregrounds; throughput remains white and translucent white. This keeps the hero neutral and distinct from Lookout's decorative branding while preserving the board-to-hero status mapping.
+
 The spectrum may appear in:
 
-- the light shift-metrics wash;
 - Lookout’s radial avatar field;
 - the AI ordering control and composer outline;
 - the thin active-tab indicator and softly washed recommendation header;
@@ -146,12 +147,12 @@ The original truck mark sits in a soft-orange outlined tile. Orange also marks t
 
 ### Shift instrument
 
-The hero is not a hero in the marketing sense. It is a light, two-sided instrument:
+The hero is not a hero in the marketing sense. It is a compact, two-sided instrument:
 
-- **Left:** Act now, Watch, Offline, On break, and Clear—ordered by dispatch priority and matched exactly to the board lanes.
+- **Left:** Act now, Watch, On break, Offline, and Clear—ordered by dispatch priority and matched exactly to the board lanes.
 - **Right:** Delivered, To deliver, Total stops, and Delivered percentage as four equally aligned facts in the same row.
 
-The soft warm-to-cool wash separates this instrument from the board without the visual weight of a dark block. Status figures remain interactive filter shortcuts.
+An original, brand-free photograph of a fictional Midwestern skyline and road network gives the instrument operational atmosphere. The photograph is completely desaturated before a warm near-black layer is applied at 70% opacity. Each status label, value, detail, and dot uses the same light color as its board-lane header background; the four throughput metrics remain white. Status figures remain interactive filter shortcuts.
 
 ### Board lanes
 
@@ -161,14 +162,14 @@ Lane headers use the status soft color as a wash. Cards remain white and use a r
 
 Completed paths and markers share one semantic progress gradient, moving from soft sage at the route start to dark clear-green at the current edge. These same endpoints are reserved for a future stop-map counterpart.
 
-Route cards use one combined assignment/status block instead of a separate header and driver row. On the left, route id sits directly above driver name and truck/region beside the avatar. On the right, the highest-priority badge—Over limit, Approaching limit, or Behind schedule—and countdown sit directly above the muted refresh age. The full-height stop spine runs down the left of this block and the scan grid:
+Route cards use the same distinct title row as Lookout recommendations. A compact overall-route status dot, matched to the board-lane header dots, leads the route id. Plain semantic text for route-level exceptions such as Won't finish or Offline follows the id, with the compact muted refresh age after it; exception text wins space over freshness at narrow widths. The highest-priority badge—Over limit, Approaching limit, or Behind schedule—and countdown share the right edge. Lookout omits the optional refresh age and board-only exception metadata from its form of the shared row. Directly below the dot, the stop spine continues down the left of the content rows, turning the overall status marker into the visual head of route progress. Driver name stacks over the license identifier beside the avatar:
 
 - green node: delivered;
 - gray circle: undelivered and still viable;
 - red circle: failed, past due, or beyond projected HOS;
 - red cross-tick: the HOS boundary.
 
-The spine stays narrow and every stop keeps one evenly spaced position on a single route scale, so a 15–20-stop route remains a literal sequence. Successfully completed deliveries recede into 5px green connective nodes; pending, failed, late, and post-HOS nodes use one fixed 6px size. There is no history compression, percentage-based allocation, or progressive magnification. Emphasis comes only from the small completed-versus-open size step and semantic color. The remainder of the card is one flat structure: a vertically centered driver row followed by a full-bleed 2×2 grid for Stops, Next, HOS fit, and Route risk. The top row is deliberately terse and value-first: `12 / 15 Stops` reads horizontally, followed by `#13` over `Next`; it does not repeat completion percentage or “up next.” Ping age is quiet gray text at the top right of the driver row, never a badge. The grid uses only the card's own dividers—no inset box, extra background, or padded wrapper. Repetitive headings such as "Assigned driver" and "Route progress" are omitted. Lookout’s pick may add a small orange chip; it must not recolor the card.
+The spine stays narrow and every stop keeps one evenly spaced position on a single route scale, so a 15–20-stop route remains a literal sequence. Successfully completed deliveries recede into 5px green connective nodes; pending, failed, late, and post-HOS nodes use one fixed 6px size. There is no history compression, percentage-based allocation, or progressive magnification. Emphasis comes only from the small completed-versus-open size step and semantic color. The remainder of the card is one flat structure. Its first row combines the driver assignment with two evenly divided, right-aligned progress cells—`12 / 15 Stops | #13 Up next`—so identity and route position scan together. The truck license identifier moves beneath the driver name in the same micro-label style as Stops and Up next, eliminating the loose inline gap. The second row retains the important HOS fit and Route risk columns. Ping age remains quiet gray title metadata, never a badge; it compacts to `Now`, `1m ago`, or `25m ago` at board width while the tooltip uses full wording. Both rows use only the card's own dividers—no inset box, extra background, or padded wrapper. Repetitive headings such as "Assigned driver" and "Route progress" are omitted. Lookout’s pick may add a small orange chip; it must not recolor the card.
 
 ### Route file
 
@@ -270,6 +271,7 @@ Honor `prefers-reduced-motion`.
 | Product bar | `src/app/Header.tsx` |
 | Shift instrument | `src/views/shift/ShiftHero.tsx` |
 | Board and route cards | `src/views/shift/Board.tsx`, `RouteCard.tsx`, `RouteTimelineMini.tsx` |
+| Shift city photograph | `public/images/dispatch-city-hero.webp` |
 | Detail timeline | `src/views/route/RouteRail.tsx` |
 | AI rail and focus treatments | `src/lookout/*` |
 | Contrast validation | `scripts/contrast.mjs` |

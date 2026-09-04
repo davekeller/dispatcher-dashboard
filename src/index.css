@@ -66,9 +66,34 @@ body { @apply bg-canvas text-ink font-sans antialiased; }
 .tnum { font-variant-numeric: tabular-nums; }
 
 .lookout-metrics-band {
-  background:
-    radial-gradient(circle at 4% -45%, color-mix(in srgb, var(--color-ai-warm) 24%, transparent), transparent 26rem),
-    linear-gradient(108deg, color-mix(in srgb, var(--color-ai-warm) 7%, white) 0%, color-mix(in srgb, var(--color-ai-gold) 5%, white) 24%, color-mix(in srgb, var(--color-ai-rose) 7%, white) 50%, color-mix(in srgb, var(--color-ai-violet) 6%, white) 74%, color-mix(in srgb, var(--color-ai-cool) 8%, white) 100%);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #272526;
+}
+
+.lookout-metrics-band::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: 0;
+  pointer-events: none;
+  background: url('/images/dispatch-city-hero.webp') center 56% / cover no-repeat;
+  filter: grayscale(1) saturate(0) contrast(1.12) brightness(.88);
+}
+
+.lookout-metrics-band::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: rgba(25, 24, 24, .7);
+}
+
+.lookout-metrics-band > * {
+  position: relative;
+  z-index: 1;
 }
 
 .lookout-soft-surface {
