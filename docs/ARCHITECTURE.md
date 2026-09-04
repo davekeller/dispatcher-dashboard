@@ -25,7 +25,7 @@ Vite · React 19 · TypeScript · Tailwind v4 (via `@tailwindcss/vite`). Light t
 | Runtime dependency | Why |
 |---|---|
 | `react`, `react-dom` | UI |
-| `react-router` | Three real routes now, two more in Phase 2; drivers get URLs worth sharing |
+| `react-router` | Four real routes (board, route file, map, not found), the phone view still Phase 2; drivers get URLs worth sharing |
 | `zustand` | One small store with actions and one-level undo; less ceremony than context + reducer |
 | `@phosphor-icons/react` | Interface icons in the duotone weight |
 | `@fontsource-variable/bricolage-grotesque`, `@fontsource-variable/inter` | Display and body faces, bundled, no CDN |
@@ -55,9 +55,9 @@ src/
     shift/      ActiveShiftPage.tsx · ShiftHero.tsx · FilterBar.tsx · OrderDropdown.tsx · FiltersDropdown.tsx · Board.tsx · RouteCard.tsx · RouteTimelineMini.tsx · boardSort.ts · useColumnTracks.ts
     route/      RouteFilePage.tsx · RouteRail.tsx · DriverCard.tsx · StaleBanner.tsx · AlertStrip.tsx · StopReceipt.tsx
     route/actions/  ReassignDialog.tsx · ResetDialog.tsx · NotifyDialog.tsx
-    route/map/  RouteMap.tsx                                  (lazy chunk: Leaflet, tiles, markers)
+    route/map/  RouteMap.tsx                                  (lazy chunk: the route file's map)
     driver/     DriverPhoneView.tsx · PhoneFrame.tsx        (Phase 2)
-    map/        MapView.tsx                                   (fleet map, Phase 2, lazy)
+    map/        MapPage.tsx · FleetMap.tsx (lazy) · leaflet.tsx (tiles, fit, fly, shared with the route map)
   ui/           Chip · Button · Card · Modal · Toast · Countdown · Bar · Avatar · EmptyState · CorrectionChip
   lib/          format.ts (clock times, durations, tilde precision)
 ```
@@ -356,11 +356,9 @@ Lookout never has its own data. It reads `ranked` and nothing else.
 
 Mobile-first. Header collapses to the driver's avatar and their own countdown chip, the same number Lena sees. Full-bleed map with the route to the next stop. A bottom sheet peeks with the next stop's name, ETA, and window; swipe up reveals the work order: items, instructions, contact, and Arrived / Delivered buttons that write to the store. When Lena reassigns a stop, the phone's next stop changes. The architecture commits to this now: the store is shared, `Delivery` carries items and instructions from day one, positions are seeded from day one, and `StopReceipt` and the map component are shared between the route file and the phone.
 
-### Map
+### Map (`/map`)
 
-The route file's map shipped as the List | Map toggle described above, with the truck's fix derived in `geo/truckPosition.ts`. The fleet map at `/map` stays Phase 2:
-
-react-leaflet, CARTO light basemap with OpenStreetMap attribution, lazy-loaded. The attention rule applies: every truck a small neutral dot at reduced opacity; act-now, watch, and offline markers in their band color with a name-and-countdown pill; offline hollow at the last known position with a "last seen" tooltip. The remaining route polyline draws only for the selected driver. Click opens the route file. If tiles fail, a message and the board are one click away.
+The fleet on one map, a Map tab beside Board in the product bar. It reads the same ranked list as the board and takes the board's filters (status, data, region, search), so "37 of 50 trucks" means the same thing on both. The attention rule applies: clear and on-break trucks are small neutral dots at reduced opacity with a hover tooltip; act-now, watch, and offline trucks carry their band color and a name-and-countdown pill ("Marcus R. · 0:12", "Dre W. · ~0:40 · last seen 25 min ago"); a dark truck is hollow and dashed whatever its band, because its fix is last known, not live. Every fix comes from `geo/truckPosition.ts`, so the trucks move with the same tick as everything else. Picking a truck (or arriving at `/map?driver=drv-01`) puts a small card over the map (name, route, plate, region, band, countdown, stops left, "Open route file"), draws only that driver's road ahead from the truck through the remaining stops (dashed, red when any of them is past the limit) with the stops numbered, pans to it, and focuses Lookout on that driver so its card and actions are one glance to the right. "Fit all" re-frames every visible truck. `geo/fleet.ts` turns views into markers and is tested against the seeded fleet, so the map view holds no logic. The route file's own map is the List | Map toggle described above.
 
 ---
 
@@ -384,6 +382,8 @@ Each is designed, not discovered. Where it shows up is as important as what happ
 | Offline driver on the map | Dashed hollow truck at its last known fix with a permanent "last known · N min ago" caption; legs and stops still draw | Route map |
 | Late planted driver on the map | The truck holds at 96% of its leg instead of landing on a stop that is still pending | Route map |
 | Map tiles unreachable | The basemap stays a blank canvas; legs, stops, the truck, and the attribution draw regardless | Route map |
+| Fleet map filters hide every truck | The count reads 0 of 50 and Clear resets the filters; the map keeps its last framing | Fleet map |
+| Selected truck on the fleet map is dark | Hollow dashed marker at the last known fix, the card says "last known position", and the road ahead still draws from that fix | Fleet map |
 | Two alerts, one driver | One card, two reasons | Rail, card badges |
 | Acknowledge | Snoozed 10 min, de-emphasized, never hidden for critical/act now; snooze expiry restores emphasis | Rail |
 | Reset mid-route | Stops after the reset point become unassigned; `stops_unassigned` fires; metrics show "need a driver" | Route file, metrics, rail |
@@ -442,6 +442,7 @@ Vitest, `*.test.ts` beside the module. No UI snapshot tests; the derivation test
 - `data/seed.test.ts`: same seed, same fleet; planted drivers present with the planted figures at the anchor.
 - `derive.test.ts`: the one-source-of-truth test: the rail's order equals the board's within-column order for the same driver set.
 - `geo/truckPosition.test.ts` and `.seed.test.ts`: the fix at the dock, mid-leg, before the first receipt, after the last, capped when a planted driver is late, skipping unassigned stops, and as of the ping; then every seeded truck inside the metro at 2:47, Dre's fix holding still while offline, and a fresh truck moving between ticks.
+- `geo/fleet.test.ts`: one marker per seeded driver; Marcus and Priya carry act-now pills with their countdowns, Omar a watch pill, Elena and Lucia stay quiet, Dre is dark with "last seen 25 min ago"; Marcus's road ahead runs from his fix through stops 13–15.
 
 ---
 

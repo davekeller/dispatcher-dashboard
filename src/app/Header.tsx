@@ -1,4 +1,4 @@
-import { CaretRight, SquaresFour, TruckTrailer } from '@phosphor-icons/react'
+import { CaretRight, MapTrifold, SquaresFour, TruckTrailer } from '@phosphor-icons/react'
 import { Link, useLocation } from 'react-router'
 import { useDerived } from '../store/hooks'
 import SimulatedShift from './SimulatedShift'
@@ -9,6 +9,9 @@ export default function Header() {
   const { byId } = useDerived()
   const routeMatch = pathname.match(/^\/routes\/(drv-\d+)$/)
   const focused = routeMatch ? byId.get(routeMatch[1]) : undefined
+  const onMap = pathname === '/map'
+  const onBoard = !onMap && !routeMatch
+  const tab = (on: boolean) => `flex h-8 items-center gap-1.5 rounded-control px-3 text-[13px] font-semibold transition hover:bg-well ${on ? 'text-ink' : 'text-muted hover:text-ink'}`
 
   return (
     <header className="flex h-14 shrink-0 items-center gap-0.5 border-b border-line bg-panel px-5">
@@ -17,9 +20,12 @@ export default function Header() {
       </Link>
       <Link to="/" className="ml-2 whitespace-nowrap font-display text-[17px] font-semibold tracking-[-0.02em] text-ink">Dispatch</Link>
       <span aria-hidden="true" className="ml-5 mr-3 h-5 w-px shrink-0 bg-line" />
-      <nav aria-label="Workspace navigation" className="flex items-center">
-        <Link to="/" aria-current="page" className="flex h-8 items-center gap-1.5 rounded-control px-3 text-[13px] font-semibold text-ink transition hover:bg-well">
-          <SquaresFour size={15} weight="fill" /> Board
+      <nav aria-label="Workspace navigation" className="flex items-center gap-0.5">
+        <Link to="/" aria-current={onBoard ? 'page' : undefined} className={tab(onBoard)}>
+          <SquaresFour size={15} weight={onBoard ? 'fill' : 'regular'} /> Board
+        </Link>
+        <Link to="/map" aria-current={onMap ? 'page' : undefined} className={tab(onMap)}>
+          <MapTrifold size={15} weight={onMap ? 'fill' : 'regular'} /> Map
         </Link>
       </nav>
       {focused && (

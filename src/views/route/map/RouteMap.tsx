@@ -1,21 +1,18 @@
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
-import { useEffect, useMemo, useRef } from 'react'
-import { MapContainer, Marker, Polyline, TileLayer, Tooltip, useMap } from 'react-leaflet'
+import { useMemo } from 'react'
+import { MapContainer, Marker, Polyline, Tooltip } from 'react-leaflet'
 import type { Delivery, LatLng, Stop } from '../../../data/types'
 import { truckFixAt, type TruckFix } from '../../../geo/truckPosition'
 import { projectedEta } from '../../../hos/compute'
 import { fmtAge, fmtClock } from '../../../lib/format'
 import { completedStopLightWeight } from '../../../lib/routeTimeline'
 import type { DriverView } from '../../../store/view'
+import { FitOnce, FlyTo, Tiles, escapeHtml, toLatLng } from '../../map/leaflet'
 
 // This file is a lazy chunk: Leaflet and its stylesheet load the first time someone opens
-// the map, never on the board. OpenStreetMap's tiles are the one network dependency in the
-// app, muted to gray by a CSS filter so only the route carries color; the legs and markers
-// draw with or without them. (CARTO's light basemap now requires an API key.)
-const TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
-const TILE_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-const FIT_PADDING: [number, number] = [32, 32]
+// the map, never on the board. Tiles, fitting, and flying live in views/map/leaflet.tsx,
+// shared with the fleet map.
 const FIT_MAX_ZOOM = 15
 const FOCUS_ZOOM = 14
 
@@ -25,10 +22,6 @@ interface MapStop {
   customer: string
   t: number
   late: boolean
-}
-
-function toLatLng(p: LatLng): L.LatLngExpression {
-  return [p.lat, p.lng]
 }
 
 /** The same states the route rail paints, as marker classes (styles live in index.css). */
@@ -56,7 +49,7 @@ function stopState(m: MapStop, pastLimitIds: Set<string>): string {
 function stopIcon(m: MapStop, lightWeight: number, className: string): L.DivIcon {
   return L.divIcon({
     className: 'route-map-stop',
-    html: `<span class="${className}" style="--route-history-light:${lightWeight}%">${m.stop.seq}</span>`,
+    html: `<span class="${className}" style="--route-history-light:${lightWeight}%">${escapeHtml(String(m.stop.seq))}</span>`,
     iconSize: [22, 22],
     iconAnchor: [11, 11],
     tooltipAnchor: [0, -12],
@@ -80,47 +73,6 @@ function truckCaption(view: DriverView, fix: TruckFix, stops: MapStop[]): string
     : 'parked'
   if (view.staleness === 'fresh') return `${view.driver.name} · ${where} · live`
   return `${view.driver.name} · last known ${where} · ${fmtAge(view.pingAgeMin)}`
-}
-
-/** Fit the route once per route, as soon as the container has a size. The container can be
- *  laid out after Leaflet mounts (a lazy chunk, a hidden pane, the rail collapsing), and a
- *  map measured at zero width fits nothing, so size changes re-measure and the first real
- *  size does the fit. A moving truck never re-centers the map under the dispatcher. */
-function FitToRoute({ routeId, points }: { routeId: string; points: L.LatLngExpression[] }) {
-  const map = useMap()
-  const fitted = useRef<string | null>(null)
-  useEffect(() => {
-    const container = map.getContainer()
-    const fit = () => {
-      map.invalidateSize({ animate: false })
-      if (fitted.current === routeId || points.length === 0) return
-      const { x, y } = map.getSize()
-      if (x === 0 || y === 0) return
-      map.fitBounds(L.latLngBounds(points), { padding: FIT_PADDING, maxZoom: FIT_MAX_ZOOM })
-      fitted.current = routeId
-    }
-    fit()
-    const observer = new ResizeObserver(fit)
-    observer.observe(container)
-    return () => observer.disconnect()
-    // Points move with the truck; only a new route re-fits.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, routeId])
-  return null
-}
-
-/** Pan to a stop the dispatcher picked on the rail or the map, after the first render. */
-function FlyToSelected({ position }: { position: LatLng | undefined }) {
-  const map = useMap()
-  const first = useRef(true)
-  useEffect(() => {
-    if (first.current) {
-      first.current = false
-      return
-    }
-    if (position) map.flyTo(toLatLng(position), Math.max(map.getZoom(), FOCUS_ZOOM), { duration: 0.6 })
-  }, [map, position])
-  return null
 }
 
 export default function RouteMap({ view, deliveryById, pastLimitIds, selectedStopId, onSelectStop }: { view: DriverView; deliveryById: Map<string, Delivery>; pastLimitIds: Set<string>; selectedStopId: string | null; onSelectStop: (id: string) => void }) {
@@ -155,9 +107,9 @@ export default function RouteMap({ view, deliveryById, pastLimitIds, selectedSto
       </div>
       <div className="h-[min(38rem,calc(100vh-21rem))] min-h-[22rem]">
         <MapContainer center={toLatLng(fix.position)} zoom={12} zoomControl scrollWheelZoom className="h-full w-full" attributionControl>
-          <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} maxZoom={19} />
-          <FitToRoute routeId={route.id} points={points} />
-          <FlyToSelected position={selected} />
+          <Tiles />
+          <FitOnce fitKey={route.id} points={points} maxZoom={FIT_MAX_ZOOM} />
+          <FlyTo id={selectedStopId} position={selected} minZoom={FOCUS_ZOOM} />
           {legs.map((leg) => <Polyline key={leg.id} positions={leg.positions} pathOptions={{ className: leg.tone, weight: 3 }} />)}
           {stops.map((m, index) => (
             <Marker
