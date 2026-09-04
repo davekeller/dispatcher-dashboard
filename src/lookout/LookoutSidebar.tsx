@@ -41,24 +41,24 @@ export default function LookoutSidebar() {
 
   return (
     <aside className="flex w-[26rem] shrink-0 flex-col border-l border-line bg-panel" aria-label={`${LOOKOUT.name}, the shift co-pilot`}>
-      <header className="flex items-center gap-3 border-b border-line px-4 py-3">
-        <div className="min-w-0 flex-1">
-          <p className="font-display text-[15px] font-semibold leading-tight text-lookout-strong">{LOOKOUT.name}</p>
-          <p className="text-[11px] text-muted">{LOOKOUT.role}</p>
+      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-line pl-2 pr-3">
+        <div className="flex h-full items-end" role="tablist" aria-label={`${LOOKOUT.name} views`}>
+          {(['alerts', 'chat'] as const).map((t) => (
+            <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`-mb-px flex h-full items-center gap-1.5 border-b-2 px-3 text-[12px] font-semibold capitalize ${tab === t ? 'border-lookout text-ink' : 'border-transparent text-muted hover:text-ink'}`}>
+              {t}
+              {t === 'alerts' && withAlerts.length > 0 && <span className={`tnum rounded-full px-1.5 text-[10px] leading-4 ${urgentCards.length > 0 ? 'bg-act-now text-on-accent' : 'bg-well text-muted'}`}>{withAlerts.length}</span>}
+            </button>
+          ))}
         </div>
-        <LookoutAvatar size={32} className="shrink-0" />
+        <div className="ml-auto min-w-0 text-right">
+          <p className="font-display text-[14px] font-semibold leading-tight text-lookout-strong">{LOOKOUT.name}</p>
+          <p className="text-[10px] leading-tight text-muted">{LOOKOUT.role}</p>
+        </div>
+        <LookoutAvatar size={30} className="shrink-0" />
         <button type="button" onClick={() => setCollapsed(true)} className="rounded-control p-1 text-muted hover:bg-well hover:text-ink" aria-label={`Collapse ${LOOKOUT.name}`}>
           <CaretDoubleRight size={16} />
         </button>
       </header>
-      <div className="flex border-b border-line px-2" role="tablist" aria-label={`${LOOKOUT.name} views`}>
-        {(['alerts', 'chat'] as const).map((t) => (
-          <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-[12px] font-semibold capitalize ${tab === t ? 'border-lookout text-ink' : 'border-transparent text-muted hover:text-ink'}`}>
-            {t}
-            {t === 'alerts' && withAlerts.length > 0 && <span className={`tnum rounded-full px-1.5 text-[10px] leading-4 ${urgentCards.length > 0 ? 'bg-act-now text-on-accent' : 'bg-well text-muted'}`}>{withAlerts.length}</span>}
-          </button>
-        ))}
-      </div>
       {tab === 'chat' ? (
         <ChatPanel d={d} />
       ) : (
