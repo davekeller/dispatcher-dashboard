@@ -29,6 +29,16 @@ export function fmtAge(minutes: number): string {
   return `${fmtMinutes(minutes)} ago`
 }
 
+/** Narrow-card freshness label; the full wording remains available in tooltips and detail views. */
+export function fmtCompactAge(minutes: number): string {
+  if (minutes < 1) return 'Now'
+  const m = Math.round(minutes)
+  if (m < 60) return `${m}m ago`
+  const h = Math.floor(m / 60)
+  const r = m % 60
+  return `${h}h${r ? ` ${r}m` : ''} ago`
+}
+
 export function fmtDrift(minutes: number): string {
   if (Math.abs(minutes) <= 5) return 'On time'
   return minutes > 0 ? `Behind ${fmtMinutes(minutes)}` : `Ahead ${fmtMinutes(-minutes)}`

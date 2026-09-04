@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fmtAge, fmtCountdown, fmtDrift, fmtHm, fmtMinutes } from './format'
+import { fmtAge, fmtCompactAge, fmtCountdown, fmtDrift, fmtHm, fmtMinutes } from './format'
 
 describe('fmtHm', () => {
   it('renders hours:minutes with a two-digit minute', () => {
@@ -31,6 +31,9 @@ describe('fmtMinutes / fmtAge', () => {
   it('ages read as "N ago" and "just now" under a minute', () => {
     expect(fmtAge(25)).toBe('25 min ago')
     expect(fmtAge(0.4)).toBe('just now')
+    expect(fmtCompactAge(0.4)).toBe('Now')
+    expect(fmtCompactAge(25)).toBe('25m ago')
+    expect(fmtCompactAge(65)).toBe('1h 5m ago')
   })
 })
 

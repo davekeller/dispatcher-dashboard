@@ -1,6 +1,5 @@
 import { Link } from 'react-router'
 import type { DriverCard } from '../../alerts/types'
-import { fmtAge } from '../../lib/format'
 import { routeHosSignal } from '../../lib/routeProgress'
 import { stopsPastLimit } from '../../store/actions'
 import { useStore } from '../../store/store'
@@ -30,7 +29,7 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
   const riskTone = pastLimitCount > 0 ? 'text-act-now' : view.lateStops.length > 0 ? 'text-watch' : 'text-clear'
   return (
     <Link to={`/routes/${view.driver.id}`} className={`group block shrink-0 overflow-hidden rounded-card border-[1.5px] transition hover:-translate-y-px hover:border-ink/25 hover:shadow-md ${surface} ${dim}`}>
-      <RouteHeader view={view} card={card} />
+      <RouteHeader view={view} card={card} showPingAge />
       <div className="flex min-h-[6.75rem]">
         <RouteTimelineMini view={view} />
         <div className="flex min-w-0 flex-1 flex-col">
@@ -42,15 +41,14 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
                   <p className="shrink-0 truncate text-[12px] font-semibold leading-4 text-ink" title={view.driver.name}>{view.driver.name}</p>
                   <span className="truncate font-mono text-[8px] leading-4 text-muted" title={`Truck license plate ${view.truck.plate}`}>{view.truck.plate}</span>
                 </div>
-                <span className="tnum block text-[9px] leading-4 text-muted" title="Age of the last telematics ping">{fmtAge(view.pingAgeMin)}</span>
               </div>
             </div>
-            <dl className="ml-auto grid w-[5.75rem] shrink-0 grid-cols-2 border-l border-line/80">
-              <div className="flex min-w-0 flex-col justify-center border-r border-line/80 px-1.5">
+            <dl className="ml-auto grid w-[6.5rem] shrink-0 grid-cols-2 border-l border-line/80">
+              <div className="flex min-w-0 flex-col items-center justify-center border-r border-line/80 px-1.5 text-center">
                 <dd className="tnum whitespace-nowrap text-[11px] font-semibold leading-none text-ink">{view.done} / {view.total}</dd>
                 <dt className="mt-1 text-[7px] font-semibold uppercase tracking-[0.03em] text-label">Stops</dt>
               </div>
-              <div className="flex min-w-0 flex-col justify-center px-1.5">
+              <div className="flex min-w-0 flex-col items-center justify-center px-1.5 text-center">
                 <dd className="tnum whitespace-nowrap text-[11px] font-semibold leading-none text-ink">{nextValue}</dd>
                 <dt className="mt-1 whitespace-nowrap text-[7px] font-semibold uppercase tracking-[0.03em] text-label">{nextLabel}</dt>
               </div>
