@@ -28,7 +28,6 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
   const hosText = hos.tone === 'act_now' ? 'text-act-now' : hos.tone === 'watch' ? 'text-watch' : 'text-clear'
   const hosFill = hos.tone === 'act_now' ? 'bg-act-now-fill' : hos.tone === 'watch' ? 'bg-watch-fill' : 'bg-clear-fill'
   const pastLimitCount = stopsPastLimit(view).length
-  const progress = view.total === 0 ? 100 : Math.round((view.done / view.total) * 100)
   const priorityAlert = card.alerts.find((alert) => PRIORITY_RULES.has(alert.ruleId))
   const detailAlerts = card.alerts.filter((alert) => !PRIORITY_RULES.has(alert.ruleId))
   const riskValue = pastLimitCount > 0 ? `${pastLimitCount} past HOS` : view.lateStops.length > 0 ? `${view.lateStops.length} late` : 'Clear'
@@ -57,15 +56,13 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
             </div>
           </div>
           <dl className="mt-auto grid grid-cols-2 border-t border-line/80">
-            <div className="flex min-h-[3.25rem] min-w-0 flex-col justify-center border-b border-r border-line/80 px-2.5 py-1.5">
-              <dt className="text-[8px] font-semibold uppercase tracking-[0.04em] text-label">Stops</dt>
-              <dd className="tnum mt-0.5 truncate text-[11px] font-semibold text-ink">{view.done} / {view.total}</dd>
-              <dd className="tnum mt-0.5 text-[9px] text-muted">{progress}% complete</dd>
+            <div className="flex min-h-[2.75rem] min-w-0 flex-col justify-center border-b border-r border-line/80 px-2.5 py-1.5">
+              <dt className="order-2 mt-0.5 text-[8px] font-semibold uppercase tracking-[0.04em] text-label">Stops</dt>
+              <dd className="tnum order-1 truncate text-[12px] font-semibold leading-none text-ink">{view.done} / {view.total}</dd>
             </div>
-            <div className="flex min-h-[3.25rem] min-w-0 flex-col justify-center border-b border-line/80 px-2.5 py-1.5">
-              <dt className="text-[8px] font-semibold uppercase tracking-[0.04em] text-label">Next</dt>
-              <dd className="tnum mt-0.5 truncate text-[11px] font-semibold text-ink">{view.next ? `#${view.next.seq}` : '—'}</dd>
-              <dd className="mt-0.5 truncate text-[9px] text-muted">{view.next ? view.next.status === 'in_progress' ? 'at the dock' : 'up next' : view.unassigned.length ? `${view.unassigned.length} unassigned` : 'route complete'}</dd>
+            <div className="flex min-h-[2.75rem] min-w-0 flex-col justify-center border-b border-line/80 px-2.5 py-1.5">
+              <dt className="order-2 mt-0.5 truncate text-[8px] font-semibold uppercase tracking-[0.04em] text-label">{view.next ? 'Next' : view.unassigned.length ? `${view.unassigned.length} unassigned` : 'Complete'}</dt>
+              <dd className="tnum order-1 truncate text-[12px] font-semibold leading-none text-ink">{view.next ? `#${view.next.seq}` : '—'}</dd>
             </div>
             <div className="flex min-h-[2.75rem] min-w-0 flex-col justify-center border-r border-line/80 px-2.5 py-1.5">
               <dt className="flex items-center gap-1 text-[8px] font-semibold uppercase tracking-[0.04em] text-label"><span className={`h-1.5 w-1.5 rounded-full ${hosFill}`} /> HOS fit</dt>

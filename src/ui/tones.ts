@@ -9,14 +9,15 @@ export interface Tone {
   fill: string
   soft: string
   border: string
+  board?: string
 }
 
 export const BAND_TONE: Record<Band, Tone> = {
-  act_now: { text: 'text-act-now', fill: 'bg-act-now-fill', soft: 'bg-act-now-soft', border: 'border-act-now' },
-  watch: { text: 'text-watch', fill: 'bg-watch-fill', soft: 'bg-watch-soft', border: 'border-watch' },
-  offline: { text: 'text-offline', fill: 'bg-offline-fill', soft: 'bg-offline-soft', border: 'border-offline' },
-  break: { text: 'text-break', fill: 'bg-break-fill', soft: 'bg-break-soft', border: 'border-break' },
-  clear: { text: 'text-clear', fill: 'bg-clear-fill', soft: 'bg-clear-soft', border: 'border-clear' },
+  act_now: { text: 'text-act-now', fill: 'bg-act-now-fill', soft: 'bg-act-now-soft', border: 'border-act-now', board: 'bg-act-now-board' },
+  watch: { text: 'text-watch', fill: 'bg-watch-fill', soft: 'bg-watch-soft', border: 'border-watch', board: 'bg-watch-board' },
+  offline: { text: 'text-offline', fill: 'bg-offline-fill', soft: 'bg-offline-soft', border: 'border-offline', board: 'bg-offline-board' },
+  break: { text: 'text-break', fill: 'bg-break-fill', soft: 'bg-break-soft', border: 'border-break', board: 'bg-break-board' },
+  clear: { text: 'text-clear', fill: 'bg-clear-fill', soft: 'bg-clear-soft', border: 'border-clear', board: 'bg-clear-board' },
 }
 
 /** Over the limit is the one state that must never be missed: solid dark red, white text. */

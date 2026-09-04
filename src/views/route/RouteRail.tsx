@@ -1,10 +1,11 @@
 import { ArrowLeft, CaretDown, Check, SidebarSimple } from '@phosphor-icons/react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import type { Delivery, Stop } from '../../data/types'
 import { projectedEta } from '../../hos/compute'
 import { fmtAge, fmtClock } from '../../lib/format'
 import { routeHosSignal, routeScheduleSignal, type RouteSignalTone } from '../../lib/routeProgress'
+import { completedStopLightWeight } from '../../lib/routeTimeline'
 import type { DriverView } from '../../store/view'
 
 interface Node {
@@ -33,10 +34,21 @@ const TIMELINE_COLUMNS = { gridTemplateColumns: '1.25rem minmax(0, 1fr)' }
 function stopTone(node: Node, pastLimitIds: Set<string>): string {
   const { stop } = node
   if (stop.status === 'failed') return 'bg-act-now-fill text-on-accent'
-  if (stop.status === 'done') return 'bg-clear-fill text-on-accent'
+  if (stop.status === 'done') return 'route-history-node text-on-accent'
   if (stop.status === 'unassigned') return 'border-2 border-dashed border-offline bg-panel text-offline'
   if (pastLimitIds.has(stop.id) || node.late) return 'border-2 border-act-now bg-panel text-act-now'
   return 'border-2 border-muted/70 bg-panel text-muted'
+}
+
+function detailNodeSize(index: number, firstRemainingIndex: number, status: Stop['status']): string {
+  if (status === 'done') return 'h-3 w-3'
+  if (index === firstRemainingIndex) return 'h-4 w-4'
+  if (index === firstRemainingIndex + 1) return 'h-[15px] w-[15px]'
+  return 'h-3.5 w-3.5'
+}
+
+function historyStyle(index: number, lastCompleteIndex: number): CSSProperties {
+  return { '--route-history-light': `${completedStopLightWeight(index, lastCompleteIndex)}%` } as CSSProperties
 }
 
 function rowTone(node: Node, pastLimitIds: Set<string>): string {
@@ -86,6 +98,8 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
   }), [deliveryById, now, route.stops, view.driftMin])
 
   const firstPastLimitId = nodes.find((node) => pastLimitIds.has(node.stop.id))?.stop.id
+  const firstRemainingIndex = nodes.findIndex((node) => node.stop.status !== 'done' && node.stop.status !== 'failed')
+  const lastCompleteIndex = nodes.reduce((last, node, index) => node.stop.status === 'done' || node.stop.status === 'failed' ? index : last, -1)
 
   useEffect(() => {
     setActive(route.stops[0]?.id ?? null)
@@ -201,13 +215,16 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
 
       {(collapsed || timelineOpen) && <div ref={timelineRef} data-collapsed={collapsed} className={`route-timeline-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain ${collapsed ? 'px-1 py-2' : 'px-2 pb-2'}`}>
         <ol>
-          {nodes.map((node) => {
+          {nodes.map((node, index) => {
             const { stop } = node
             const isActive = active === stop.id
             const isFirstPast = stop.id === firstPastLimitId
             const state = stopState(node, nextId, pastLimitIds)
             const isRed = stop.status === 'failed' || pastLimitIds.has(stop.id) || node.late
             const timePrefix = view.staleness !== 'fresh' && stop.status === 'pending' ? '~' : ''
+            const completed = stop.status === 'done'
+            const connectorTone = completed ? 'route-history-node' : isRed ? 'bg-act-now-fill/70' : 'bg-line'
+            const rowSize = collapsed ? completed ? 'h-5' : 'h-7' : completed ? 'min-h-8' : 'min-h-10'
             return (
               <li key={stop.id}>
                 {isFirstPast && (
@@ -233,13 +250,13 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
                   aria-label={`Stop ${stop.seq}, ${node.customer}, ${fmtClock(node.t)}, ${state}`}
                   title={`${stop.seq} · ${node.customer} · ${fmtClock(node.t)} · ${state}`}
                   style={collapsed ? undefined : TIMELINE_COLUMNS}
-                  className={`${collapsed ? 'flex h-7 w-full items-center justify-center rounded-control hover:bg-canvas' : `grid min-h-10 w-full items-stretch rounded-control text-left transition ${rowTone(node, pastLimitIds)}`}`}
+                  className={`${collapsed ? `flex ${rowSize} w-full items-center justify-center rounded-control hover:bg-canvas` : `grid ${rowSize} w-full items-stretch rounded-control text-left transition ${rowTone(node, pastLimitIds)}`}`}
                 >
-                  <span className={`relative flex ${collapsed ? 'h-7' : 'h-full min-h-9'} items-center justify-center`}>
-                    <span className={`absolute left-1/2 top-0 h-1/2 w-px -translate-x-1/2 ${stop.status === 'done' ? 'bg-clear-fill' : isRed ? 'bg-act-now-fill/70' : 'bg-line'}`} />
-                    <span className={`absolute bottom-0 left-1/2 h-1/2 w-px -translate-x-1/2 ${stop.status === 'done' ? 'bg-clear-fill' : isRed ? 'bg-act-now-fill/70' : 'bg-line'}`} />
-                    <span className={`relative z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full transition ${stopTone(node, pastLimitIds)} ${isActive ? 'ring-4 ring-ink/10' : ''}`}>
-                      {stop.status === 'done' && <Check size={9} weight="bold" />}
+                  <span className={`relative flex ${collapsed ? rowSize : 'h-full min-h-7'} items-center justify-center`}>
+                    <span className={`absolute left-1/2 top-0 h-1/2 w-px -translate-x-1/2 ${connectorTone}`} style={completed ? historyStyle(index - 0.5, lastCompleteIndex) : undefined} />
+                    <span className={`absolute bottom-0 left-1/2 h-1/2 w-px -translate-x-1/2 ${connectorTone}`} style={completed ? historyStyle(index + 0.5, lastCompleteIndex) : undefined} />
+                    <span className={`relative z-10 flex items-center justify-center rounded-full motion-safe:transition-[width,height] motion-safe:duration-150 ${detailNodeSize(index, firstRemainingIndex, stop.status)} ${stopTone(node, pastLimitIds)} ${isActive ? 'ring-4 ring-ink/10' : ''}`} style={completed ? historyStyle(index, lastCompleteIndex) : undefined}>
+                      {completed && <Check size={8} weight="bold" className="drop-shadow-[0_1px_1px_rgb(0_0_0/0.3)]" />}
                     </span>
                   </span>
                   {!collapsed && (
@@ -262,7 +279,7 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
 
       {!collapsed && timelineOpen && (
         <div className="flex shrink-0 items-center gap-3 border-t border-line px-3 py-2 text-[8px] text-label">
-          <span className="flex items-center gap-1"><span className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-clear-fill text-on-accent"><Check size={7} weight="bold" /></span> delivered</span>
+          <span className="flex items-center gap-1"><span className="route-history-progress flex h-2.5 w-2.5 items-center justify-center rounded-full text-on-accent"><Check size={7} weight="bold" className="drop-shadow-[0_1px_1px_rgb(0_0_0/0.3)]" /></span> delivered</span>
           <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full border-2 border-muted/70" /> undelivered</span>
           <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full border-2 border-act-now" /> late / HOS</span>
         </div>

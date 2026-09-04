@@ -27,7 +27,8 @@ export default function Board({ cards, byId, grouping, pickId, filtering = false
     return 1
   }))
   const isBand = (key: string): key is Band => BAND_ORDER.includes(key as Band)
-  const wash = (key: string) => grouping.id === 'band' && isBand(key) ? BAND_TONE[key].soft : 'bg-panel'
+  const wash = (key: string) => grouping.id === 'band' && isBand(key) ? BAND_TONE[key].board ?? BAND_TONE[key].soft : 'bg-panel'
+  const labelTone = (key: string) => grouping.id === 'band' && isBand(key) ? BAND_TONE[key].text : 'text-ink'
 
   return (
     <div className="h-full min-h-0 overflow-x-auto overflow-y-hidden pb-1">
@@ -40,7 +41,7 @@ export default function Board({ cards, byId, grouping, pickId, filtering = false
                 <div className="lane-content-enter flex min-h-0 flex-1 flex-col">
                   <header className={`mb-2.5 flex shrink-0 items-center gap-2 rounded-control px-3 py-2 ${wash(col.key)}`}>
                     <span className={`h-2 w-2 rounded-full ${grouping.id === 'band' && isBand(col.key) ? BAND_TONE[col.key].fill : 'bg-offline-fill'}`} aria-hidden="true" />
-                    <h2 className="min-w-0 truncate text-[12px] font-semibold text-ink">{col.label}</h2>
+                    <h2 className={`min-w-0 truncate text-[12px] font-semibold ${labelTone(col.key)}`}>{col.label}</h2>
                     <span className="tnum ml-auto rounded-full bg-panel/80 px-2 py-0.5 text-[10px] font-semibold text-ink/80">{col.cards.length}</span>
                     <button type="button" onClick={() => setExpanded((state) => ({ ...state, [col.key]: false }))} aria-expanded="true" aria-label={`Collapse ${col.label}`} title={`Collapse ${col.label}`} className="shrink-0 rounded-[6px] p-0.5 text-muted transition hover:bg-panel/70 hover:text-ink">
                       <CaretLeft size={14} />
@@ -63,7 +64,7 @@ export default function Board({ cards, byId, grouping, pickId, filtering = false
                   className={`lane-content-enter flex h-56 w-full shrink-0 flex-col items-center gap-2 rounded-control py-2.5 transition hover:brightness-[.97] ${wash(col.key)}`}
                 >
                   <span className="tnum rounded-full bg-panel px-1.5 py-0.5 text-[10px] font-semibold text-ink shadow-sm">{col.cards.length}</span>
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted [writing-mode:vertical-rl]">{col.label}</span>
+                  <span className={`text-[10px] font-semibold uppercase tracking-[0.08em] [writing-mode:vertical-rl] ${labelTone(col.key)}`}>{col.label}</span>
                   <CaretLeft size={14} className="mt-auto rotate-180 text-muted/70" />
                 </button>
               )}

@@ -4,7 +4,7 @@ const tokens = {
   panel: '#ffffff', canvas: '#f8f6f3', well: '#f1ede9',
   ink: '#211e1c', muted: '#625d59', label: '#6d6661',
   'lookout-strong': '#a93817', lookout: '#cf4620',
-  'act-now': '#a9333e', watch: '#805706', clear: '#276548', offline: '#5b5f66', break: '#3a5f9f',
+  'act-now': '#942b38', watch: '#6f4a00', clear: '#1f593e', offline: '#484d54', break: '#2e518d',
   'act-now-soft': '#fdf0f1', 'watch-soft': '#fff7e7', 'clear-soft': '#edf7f1', 'offline-soft': '#f2f1f0', 'break-soft': '#eef2fb', 'lookout-soft': '#fff0e9',
 }
 const lum = (hex) => {

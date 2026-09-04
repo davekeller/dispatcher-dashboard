@@ -26,27 +26,32 @@
   --color-ai-rose: #d979aa;
   --color-ai-cool: #6669ea;
 
-  --color-act-now: #a9333e;
-  --color-act-now-fill: #c43f4d;
+  --color-act-now: #942b38;
+  --color-act-now-fill: #b63846;
   --color-act-now-soft: #fdf0f1;
+  --color-act-now-board: #f6dfe3;
 
-  --color-watch: #805706;
-  --color-watch-fill: #c89528;
+  --color-watch: #6f4a00;
+  --color-watch-fill: #ad7c1c;
   --color-watch-soft: #fff7e7;
+  --color-watch-board: #f4e6c2;
 
-  --color-clear: #276548;
-  --color-clear-fill: #5d9a78;
+  --color-clear: #1f593e;
+  --color-clear-fill: #4b8769;
   --color-clear-soft: #edf7f1;
+  --color-clear-board: #dfeee5;
   --color-route-done-start: #9bc5ae;
   --color-route-done-end: #276548;
 
-  --color-offline: #5b5f66;
-  --color-offline-fill: #999ba2;
+  --color-offline: #484d54;
+  --color-offline-fill: #7f858d;
   --color-offline-soft: #f2f1f0;
+  --color-offline-board: #e7e8eb;
 
-  --color-break: #3a5f9f;
-  --color-break-fill: #7798d2;
+  --color-break: #2e518d;
+  --color-break-fill: #5f82c1;
   --color-break-soft: #eef2fb;
+  --color-break-board: #e2e8f5;
 
   --radius-card: 14px;
   --radius-control: 8px;
@@ -60,8 +65,8 @@ body { @apply bg-canvas text-ink font-sans antialiased; }
 
 .iq-metrics-band {
   background:
-    radial-gradient(circle at 4% -45%, color-mix(in srgb, var(--color-ai-warm) 18%, transparent), transparent 26rem),
-    linear-gradient(108deg, #fffaf6 0%, #fff8f8 48%, #f4f3ff 100%);
+    radial-gradient(circle at 4% -45%, color-mix(in srgb, var(--color-ai-warm) 24%, transparent), transparent 26rem),
+    linear-gradient(108deg, color-mix(in srgb, var(--color-ai-warm) 7%, white) 0%, color-mix(in srgb, var(--color-ai-rose) 7%, white) 48%, color-mix(in srgb, var(--color-ai-cool) 8%, white) 100%);
 }
 
 .iq-soft-surface {
