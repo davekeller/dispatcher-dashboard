@@ -3,7 +3,9 @@ import type { DriverView } from './store/view'
 
 export type Band = 'act_now' | 'watch' | 'offline' | 'break' | 'clear'
 
-export const BAND_ORDER: Band[] = ['act_now', 'watch', 'offline', 'break', 'clear']
+// Column order on the board and in the status filter. On break sits before Offline because
+// the Offline band only holds dark-but-clear drivers; anyone dark near the limit is in Act now.
+export const BAND_ORDER: Band[] = ['act_now', 'watch', 'break', 'offline', 'clear']
 
 export const BAND_LABEL: Record<Band, string> = {
   act_now: 'Act now',
