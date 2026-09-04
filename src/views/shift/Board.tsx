@@ -9,7 +9,7 @@ import RouteCard from './RouteCard'
 export default function Board({ cards, byId, grouping, pickId }: { cards: DriverCard[]; byId: Map<string, DriverView>; grouping: Grouping; pickId: string | null }) {
   const columns = grouping.columns.map((col) => ({ ...col, cards: cards.filter((c) => grouping.keyOf(byId.get(c.driverId)!, c) === col.key) }))
   return (
-    <div className="grid h-full min-h-0 gap-3" style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(14rem, 1fr))` }}>
+    <div className="grid h-full min-h-0 gap-3" style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(11rem, 1fr))` }}>
       {columns.map((col) => (
         <section key={col.key} className="flex min-h-0 flex-col rounded-card bg-well/60 p-2" aria-label={col.label}>
           <header className="flex items-center gap-2 px-1.5 pb-2 pt-1">

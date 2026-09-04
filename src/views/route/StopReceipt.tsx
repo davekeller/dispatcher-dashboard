@@ -8,7 +8,7 @@ import { BAND_TONE } from '../../ui/tones'
 
 /** The receipt of what happened at a stop, or what is planned to. Pending and unassigned
  *  stops carry a checkbox, so a partial reassign is just selecting cards. */
-export default function StopReceipt({ stop, delivery, view, selected, onToggle }: { stop: Stop; delivery: Delivery | undefined; view: DriverView; selected: boolean; onToggle: () => void }) {
+export default function StopReceipt({ stop, delivery, view, selected, onToggle, pastLimit = false }: { stop: Stop; delivery: Delivery | undefined; view: DriverView; selected: boolean; onToggle: () => void; pastLimit?: boolean }) {
   const isNext = view.next?.id === stop.id
   const pending = stop.status === 'pending'
   const eta = pending ? projectedEta(stop, view.driftMin) : undefined
@@ -17,7 +17,7 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle }
   const statusLabel = stop.status === 'failed' ? 'failed' : stop.status === 'unassigned' ? 'needs a driver' : isNext ? 'next' : undefined
   const selectable = pending || stop.status === 'unassigned'
   return (
-    <li className={`flex gap-3 rounded-card border bg-panel px-3 py-2.5 ${isNext ? 'border-break shadow-card' : 'border-line'} ${stop.status === 'done' ? 'opacity-80' : ''} ${stop.status === 'unassigned' ? 'border-dashed' : ''}`}>
+    <div className={`flex gap-3 rounded-card border bg-panel px-3 py-2.5 ${isNext ? 'border-break shadow-card' : pastLimit ? 'border-act-now/50' : 'border-line'} ${stop.status === 'done' ? 'opacity-80' : ''} ${stop.status === 'unassigned' ? 'border-dashed' : ''}`}>
       {selectable ? (
         <input type="checkbox" checked={selected} onChange={onToggle} aria-label={`Select stop ${stop.seq} to reassign`} className="mt-1 accent-ink" />
       ) : (
@@ -29,6 +29,7 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle }
           <span className="font-semibold text-ink">{delivery?.customer ?? stop.deliveryId}</span>
           {delivery?.priority === 'priority' && <Chip tone={BAND_TONE.watch}>priority</Chip>}
           {statusTone && statusLabel && <Chip tone={statusTone} dashed={stop.status === 'unassigned'}>{statusLabel}</Chip>}
+          {pastLimit && stop.status !== 'unassigned' && <Chip tone={BAND_TONE.act_now}>past the limit</Chip>}
           {stop.notifiedAt !== undefined && <Chip>customer notified {fmtClock(stop.notifiedAt)}</Chip>}
           {pastWindow && <Chip tone={BAND_TONE.act_now}>past window</Chip>}
         </div>
@@ -55,6 +56,6 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle }
           )}
         </p>
       </div>
-    </li>
+    </div>
   )
 }

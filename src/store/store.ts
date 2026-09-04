@@ -60,7 +60,7 @@ export const useStore = create<State>()((set, get) => {
     scrubOffsetMs: 0,
     snoozes: {},
     corrections: {},
-    groupBy: 'region',
+    groupBy: 'band', // act on it to the left: Act now is the first column
     devOpen: false,
     now: () => simNow(get().scrubOffsetMs),
     reassignStops: (from, to, stopIds) =>

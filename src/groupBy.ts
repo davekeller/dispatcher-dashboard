@@ -14,8 +14,8 @@ export interface Grouping {
 }
 
 export const GROUPINGS: Grouping[] = [
-  { id: 'region', label: 'Region', columns: REGIONS.map((r) => ({ key: r, label: r })), keyOf: (v) => v.driver.region },
   { id: 'band', label: 'Status', columns: BAND_ORDER.map((b) => ({ key: b, label: BAND_LABEL[b] })), keyOf: (_v, c) => c.band },
+  { id: 'region', label: 'Region', columns: REGIONS.map((r) => ({ key: r, label: r })), keyOf: (v) => v.driver.region },
 ]
 
 export function groupingById(id: GroupingId): Grouping {

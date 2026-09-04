@@ -6,17 +6,14 @@ import { useLookout } from '../../lookout/LookoutContext'
 import { useDerived } from '../../store/hooks'
 import { useStore } from '../../store/store'
 import Button from '../../ui/Button'
-import Card from '../../ui/Card'
 import EmptyState from '../../ui/EmptyState'
 import AlertStrip from './AlertStrip'
-import DayMetrics from './DayMetrics'
-import DutyTimeline from './DutyTimeline'
-import RouteHeader from './RouteHeader'
-import RouteRibbon from './RouteRibbon'
+import DriverCard from './DriverCard'
 import StaleBanner from './StaleBanner'
-import StopReceipt from './StopReceipt'
+import StopTimeline from './StopTimeline'
 
-/** A file for one driver's day. Lookout stays open and focuses on this driver. */
+/** A file for one driver's day: the driver card, the alerts, then the stops on a spine.
+ *  Lookout stays open and focuses on this driver. */
 export default function RouteFilePage() {
   const { driverId = '' } = useParams()
   const d = useDerived()
@@ -37,7 +34,7 @@ export default function RouteFilePage() {
   if (!view || !card) {
     return (
       <div className="p-6">
-        <EmptyState title="No driver with that id is on this shift." action={<Link to="/"><Button size="sm">Back to Active Shift</Button></Link>} />
+        <EmptyState title="No driver with that id is on this shift." action={<Link to="/"><Button size="sm">Back to the board</Button></Link>} />
       </div>
     )
   }
@@ -45,22 +42,16 @@ export default function RouteFilePage() {
   const stale = view.staleness !== 'fresh'
   const staleReason = stale ? 'Position unknown. This action is disabled until the truck reports in.' : undefined
   const toggle = (id: string) => setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]))
-  const remainingLabel = view.remaining.length === 0 && view.unassigned.length === 0 ? 'Route complete. Heading in.' : undefined
 
   return (
     <div className="flex flex-col gap-4 p-5">
-      <RouteHeader view={view} card={card} />
+      <DriverCard view={view} card={card} />
       {stale && <StaleBanner view={view} />}
       {card.alerts.length > 0 && <AlertStrip view={view} card={card} />}
-      <DayMetrics view={view} />
-      <Card className="px-4 py-3">
-        <RouteRibbon view={view} />
-        <DutyTimeline view={view} className="mt-3" />
-      </Card>
       <section>
         <header className="mb-2 flex items-center gap-3">
           <h2 className="text-[12px] font-semibold uppercase tracking-wide text-label">Stops</h2>
-          <span className="tnum text-[12px] text-muted">{view.done} of {view.total} done{remainingLabel ? ` · ${remainingLabel}` : ''}</span>
+          <span className="tnum text-[12px] text-muted">{view.done} of {view.total} done</span>
           <div className="ml-auto flex gap-2">
             <Button size="sm" variant="primary" disabled={selected.length === 0 || stale} title={staleReason} onClick={() => open('reassign', view.driver.id, { stopIds: selected })}>
               Reassign selected{selected.length > 0 ? ` (${selected.length})` : ''}
@@ -69,11 +60,7 @@ export default function RouteFilePage() {
             <Button size="sm" disabled={stale || view.remaining.length === 0} title={staleReason} onClick={() => open('notify_customer', view.driver.id)}>Notify customers</Button>
           </div>
         </header>
-        <ol className="flex flex-col gap-2">
-          {view.route.stops.map((s) => (
-            <StopReceipt key={s.id} stop={s} delivery={deliveryById.get(s.deliveryId)} view={view} selected={selected.includes(s.id)} onToggle={() => toggle(s.id)} />
-          ))}
-        </ol>
+        <StopTimeline view={view} deliveryById={deliveryById} selected={selected} onToggle={toggle} />
       </section>
     </div>
   )

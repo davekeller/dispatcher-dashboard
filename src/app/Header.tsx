@@ -5,6 +5,7 @@ import { fmtClock } from '../lib/format'
 import { useDerived } from '../store/hooks'
 import { useStore } from '../store/store'
 
+/** The product bar. Dispatch is the product; the board is its home; a route file is one level in. */
 export default function Header() {
   const { pathname } = useLocation()
   const { now, byId } = useDerived()
@@ -19,12 +20,12 @@ export default function Header() {
       <h1 className="flex items-center gap-2 font-display text-lg font-semibold tracking-tight">
         {focused ? (
           <>
-            <Link to="/" className="text-muted hover:text-ink">Active Shift</Link>
+            <Link to="/" className="text-muted hover:text-ink">Dispatch</Link>
             <span className="text-muted">/</span>
             <span>{focused.driver.name}</span>
           </>
         ) : (
-          'Active Shift'
+          'Dispatch'
         )}
       </h1>
       {!focused && (
