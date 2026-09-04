@@ -52,7 +52,7 @@ src/
   lookout/      LookoutSidebar.tsx · LookoutPortal.tsx · AlertBar.tsx · RecommendationCard.tsx · ActionConfirm.tsx · voice.ts
   views/
     shift/      ActiveShiftPage.tsx · MetricsRow.tsx · Board.tsx · RouteCard.tsx · FilterBar.tsx
-    route/      RouteFilePage.tsx · DriverCard.tsx · DutyBar.tsx · StaleBanner.tsx · AlertStrip.tsx · StopTimeline.tsx · StopReceipt.tsx
+    route/      RouteFilePage.tsx · RouteRail.tsx · DriverCard.tsx · StaleBanner.tsx · AlertStrip.tsx · StopReceipt.tsx
     route/actions/  ReassignDialog.tsx · ResetDialog.tsx · NotifyDialog.tsx
     driver/     DriverPhoneView.tsx · PhoneFrame.tsx        (Phase 2)
     map/        MapView.tsx                                   (Phase 2, lazy)
@@ -319,12 +319,16 @@ The board groups by **Status** by default, Act now leftmost, because that is whe
 
 ### Route file (`/routes/:driverId`)
 
-A page in the main pane; Lookout stays open and focuses on this driver. Breadcrumb back to the board. Sections in reading order:
+A page in the main pane; Lookout stays open and focuses on this driver. It has the shape of a case file: a **route rail** down the left, the content to its right.
 
-1. **Driver card.** One card: avatar, name, band and drift chips, a scheduled-reset chip when one exists, plate, region, status, the large live countdown with data age; then the five day figures (driving today · on duty since · break taken or "none yet" · stops done / remaining · driving left vs. time to limit, the pair that decides everything); then a slim duty bar (driving, on duty, break, planned reset dashed) from the start of the shift to now.
+**Route rail.** Sticky, in the case-file navigation pattern: a back link and a collapse toggle at the top, then a vertical time axis from the start of the shift through the projected finish. Up to now it is the duty timeline turned vertical (driving, on duty, break, and a planned reset dashed); after now it is a dashed projection. Every stop is a node on the axis at its actual time (done, at the dock) or its projected time (pending), so the rail shows at a glance where the driver is and what is done. A now marker sits at the current time, the 11-hour limit is marked where it lands, and the axis turns red past it. Expanded (about 13rem) the nodes carry their stop number, customer, and time, with hour ticks along the axis; collapsed (3.5rem) it is the bar and the dots. The node whose receipt is in view is highlighted, and clicking a node scrolls to its receipt.
+
+Content, in reading order:
+
+1. **Driver card.** One card: avatar, name, band and drift chips, a scheduled-reset chip when one exists, plate, region, status, the large live countdown with data age; then the five day figures (driving today · on duty since · break taken or "none yet" · stops done / remaining · driving left vs. time to limit, the pair that decides everything).
 2. **Stale banner.** If stale or offline: "Last ping 25 min ago. Figures are estimates."
 3. **Alert strip.** Only when alerts exist. One row per firing rule, copy and actions from the rule object, confirm inline. New rules render here with no new UI.
-4. **Stop timeline.** The stops on a vertical spine, oldest first, one node per stop with its actual or projected time beside it. A "now" marker sits on the spine between the last stop reached and the next. The 11-hour limit is marked where it lands among the remaining stops (from the same walk `suggestResetStop` uses), and the spine turns red past it, so the won't-finish case is visible as red nodes below the line; over the limit, the mark sits at now. The spine is one row per stop, not proportional to time; the times on each node and the drift chip carry the behind-or-ahead read. Receipts: done stops show arrived, departed, dwell, items, signed by, outcome, any note; the next stop is highlighted; pending stops show projected ETA, window, priority, and a checkbox for partial reassign; notified stops show the stamp; unassigned stops show "needs a driver."
+4. **Stop receipts.** Oldest first, each the scroll target of its rail node. Done stops show arrived, departed, dwell, items, signed by, outcome, any note; the next stop is highlighted; pending stops show projected ETA, window, priority, and a checkbox for partial reassign; stops past the limit carry a chip; notified stops show the stamp; unassigned stops show "needs a driver."
 5. **Actions.** Reassign, schedule reset, notify customer; each opens its dialog, previews, confirms, commits. Position-dependent actions are disabled with a reason when data is stale or offline; schedule reset is disabled once one is scheduled.
 6. **Driver's phone** button (Phase 2) renders `DriverPhoneView` in a phone frame overlay, so the dispatcher's action and the driver's screen are visible together.
 
@@ -353,8 +357,8 @@ Each is designed, not discovered. Where it shows up is as important as what happ
 | Stale (3–15 min) | Tilde, seconds dropped, age shown; band unchanged | Card, header, rail |
 | Offline (>15 min) | Hollow marker; projection continues the last-known segment; own band unless inside the watch window, then Act now | Board, rail, route file banner |
 | Ping recovers | Figures jump; "Updated: was ~40 min, now 33 min" shown for one tick rather than silently replaced | Card, route file |
-| Behind schedule | Drift chip, amber node times on the spine, `behind_schedule` at watch when a window is missed, notify action | Route file, card badge |
-| Won't finish before limit | The limit mark on the spine with red nodes below it, `wont_finish` at act now, reassign pre-selects the stops past the limit | Route file, rail |
+| Behind schedule | Drift chip, amber node times on the route rail, `behind_schedule` at watch when a window is missed, notify action | Route file, card badge |
+| Won't finish before limit | The limit mark on the route rail with the axis red past it, `wont_finish` at act now, reassign pre-selects the stops past the limit | Route file, Lookout |
 | Already over the limit | Critical card with different copy and actions: stop now, who takes the stops | Rail, route file |
 | On break | Countdown paused; resumes when the break ends; `limit_*` rules skip on_break | Card, duty timeline |
 | Failed stop | Receipt shows the failure and note; remaining stops shift; drift recomputes | Route file |

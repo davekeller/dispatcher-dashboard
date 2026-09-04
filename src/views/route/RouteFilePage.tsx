@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { useActions } from '../../actions/ActionContext'
+import { stopsPastLimit } from '../../store/actions'
 import { fmtClock } from '../../lib/format'
 import { useLookout } from '../../lookout/LookoutContext'
 import { useDerived } from '../../store/hooks'
@@ -10,10 +11,11 @@ import EmptyState from '../../ui/EmptyState'
 import AlertStrip from './AlertStrip'
 import DriverCard from './DriverCard'
 import StaleBanner from './StaleBanner'
-import StopTimeline from './StopTimeline'
+import RouteRail from './RouteRail'
+import StopReceipt from './StopReceipt'
 
-/** A file for one driver's day: the driver card, the alerts, then the stops on a spine.
- *  Lookout stays open and focuses on this driver. */
+/** A file for one driver's day, in the case-file shape: the route rail down the left, then the
+ *  driver card, the alerts, and the stop receipts. Lookout stays open and focuses on this driver. */
 export default function RouteFilePage() {
   const { driverId = '' } = useParams()
   const d = useDerived()
@@ -22,6 +24,7 @@ export default function RouteFilePage() {
   const { setFocus } = useLookout()
   const { open } = useActions()
   const [selected, setSelected] = useState<string[]>([])
+  const [railCollapsed, setRailCollapsed] = useState(false)
   const view = d.byId.get(driverId)
   const card = d.cardById.get(driverId)
 
@@ -42,9 +45,12 @@ export default function RouteFilePage() {
   const stale = view.staleness !== 'fresh'
   const staleReason = stale ? 'Position unknown. This action is disabled until the truck reports in.' : undefined
   const toggle = (id: string) => setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]))
+  const pastLimitIds = new Set(stopsPastLimit(view))
 
   return (
-    <div className="flex flex-col gap-4 p-5">
+    <div className="flex items-start gap-5 p-5">
+      <RouteRail view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} collapsed={railCollapsed} onCollapsedChange={setRailCollapsed} />
+      <div className="flex min-w-0 flex-1 flex-col gap-4">
       <DriverCard view={view} card={card} />
       {stale && <StaleBanner view={view} />}
       {card.alerts.length > 0 && <AlertStrip view={view} card={card} />}
@@ -60,8 +66,15 @@ export default function RouteFilePage() {
             <Button size="sm" disabled={stale || view.remaining.length === 0} title={staleReason} onClick={() => open('notify_customer', view.driver.id)}>Notify customers</Button>
           </div>
         </header>
-        <StopTimeline view={view} deliveryById={deliveryById} selected={selected} onToggle={toggle} />
+        <ol className="flex flex-col gap-2">
+          {view.route.stops.map((s) => (
+            <li key={s.id} id={`stop-${s.id}`} className="scroll-mt-4">
+              <StopReceipt stop={s} delivery={deliveryById.get(s.deliveryId)} view={view} selected={selected.includes(s.id)} onToggle={() => toggle(s.id)} pastLimit={pastLimitIds.has(s.id)} />
+            </li>
+          ))}
+        </ol>
       </section>
+      </div>
     </div>
   )
 }

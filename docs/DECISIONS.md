@@ -38,3 +38,4 @@ One line per meaningful choice or cut. Newest at the bottom.
 | 32 | Board groups by status by default, Act now leftmost | Lena acts on the left; region is one click away for "where are my problems" |
 | 33 | Route file: one driver card, alerts, then stops on a vertical spine with the now and limit marks; the horizontal ribbon is gone | Attached to the stops, "where is he and can he make it" reads better than a proportional time axis |
 | 34 | Filter bar is dropdowns on one row with search at the right | Chip rows wrapped beside the open rail |
+| 35 | Route file gets a sticky left rail in the case-file pattern: a vertical, proportional duty timeline with the stops as nodes, now and limit marks, active node following scroll, click to jump; collapses to the bar and dots. Supersedes 33 | Dave's directive: a vertical combination of the Duty Today line and the stops line, in the same navigation pattern as the Meridian case file |

@@ -9,12 +9,11 @@ import Chip from '../../ui/Chip'
 import CorrectionChip from '../../ui/CorrectionChip'
 import Countdown from '../../ui/Countdown'
 import { BAND_TONE, STALENESS_TONE } from '../../ui/tones'
-import DutyBar from './DutyBar'
 
 const STATUS_LABEL: Record<DutyStatus, string> = { driving: 'driving', on_duty: 'on duty at a stop', on_break: 'on break', off_duty: 'off duty' }
 
 /** The driver and the day in one card: who, where they stand, the five figures that matter,
- *  and a slim duty bar. Alerts sit under it; the stops under those. */
+ *  Alerts sit under it; the stops under those; the route rail carries the day's timeline. */
 export default function DriverCard({ view, card }: { view: DriverView; card: Ranked }) {
   const tone = BAND_TONE[card.band]
   const stale = view.staleness !== 'fresh'
@@ -60,7 +59,6 @@ export default function DriverCard({ view, card }: { view: DriverView; card: Ran
           </div>
         ))}
       </dl>
-      <DutyBar view={view} className="mt-4" />
     </Card>
   )
 }
