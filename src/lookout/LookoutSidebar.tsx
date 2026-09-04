@@ -1,24 +1,35 @@
 import { CaretDoubleLeft, CaretDoubleRight } from '@phosphor-icons/react'
 import { useState } from 'react'
+import { useActions } from '../actions/ActionContext'
 import { useDerived } from '../store/hooks'
+import { useStore } from '../store/store'
 import Button from '../ui/Button'
-import EmptyState from '../ui/EmptyState'
-import ChatPanel from './ChatPanel'
+import ChatThread, { type Message } from './ChatThread'
+import Composer from './Composer'
+import { INTENTS, matchIntent } from './intents'
 import LookoutAvatar from './LookoutAvatar'
 import { useLookout } from './LookoutContext'
 import RecommendationCard from './RecommendationCard'
+import RecommendationsBar from './RecommendationsBar'
+import TimelinePanel from './TimelinePanel'
 import { LOOKOUT } from './voice'
 
 const TOP_N = 3
 
-/** Lookout never has its own data. It reads `ranked` and nothing else. Two tabs: Alerts, the
- *  top few with the rest behind a count, and Chat, a conversational way to the same cards. */
+/** Lookout never has its own data. It reads `ranked` and nothing else. Two tabs: Chat, with the
+ *  recommendations as a sticky bar over the conversation, and Timeline, the shift's log. The
+ *  composer is on both; sending from the timeline lands in the chat. */
 export default function LookoutSidebar() {
   const { collapsed, setCollapsed, focusDriverId } = useLookout()
+  const { open } = useActions()
   const d = useDerived()
-  const { ranked, byId, metrics } = d
-  const [tab, setTab] = useState<'alerts' | 'chat'>('alerts')
+  const events = useStore((s) => s.events)
+  const { ranked, byId } = d
+  const [tab, setTab] = useState<'chat' | 'timeline'>('chat')
+  const [recOpen, setRecOpen] = useState(true)
   const [showAll, setShowAll] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([{ role: 'lookout', text: LOOKOUT.chatIntro, reply: { text: '', examples: INTENTS.map((i) => i.example) } }])
+
   const withAlerts = ranked.filter((c) => c.alerts.length > 0)
   const urgentCards = withAlerts.filter((c) => c.severity === 'critical' || c.severity === 'act_now')
   const pinned = focusDriverId ? withAlerts.find((c) => c.driverId === focusDriverId) : undefined
@@ -26,6 +37,16 @@ export default function LookoutSidebar() {
   const shown = showAll ? rest : rest.slice(0, TOP_N)
   const hidden = rest.length - shown.length
   const first = urgentCards[0] ? byId.get(urgentCards[0].driverId)?.driver.name : undefined
+  const summary = LOOKOUT.summary(urgentCards.length, first)
+
+  const send = (text: string) => {
+    const trimmed = text.trim()
+    if (!trimmed) return
+    const reply = matchIntent(trimmed, d)
+    setMessages((m) => [...m, { role: 'user', text: trimmed }, { role: 'lookout', text: reply.text, reply }])
+    setTab('chat')
+    if (reply.open) open(reply.open.action, reply.open.driverId)
+  }
 
   if (collapsed) {
     return (
@@ -43,10 +64,9 @@ export default function LookoutSidebar() {
     <aside className="flex w-[26rem] shrink-0 flex-col border-l border-line bg-panel" aria-label={`${LOOKOUT.name}, the shift co-pilot`}>
       <header className="flex h-14 shrink-0 items-center gap-3 border-b border-line pl-2 pr-3">
         <div className="flex h-full items-end" role="tablist" aria-label={`${LOOKOUT.name} views`}>
-          {(['alerts', 'chat'] as const).map((t) => (
+          {(['chat', 'timeline'] as const).map((t) => (
             <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`-mb-px flex h-full items-center gap-1.5 border-b-2 px-3 text-[12px] font-semibold capitalize ${tab === t ? 'border-lookout text-ink' : 'border-transparent text-muted hover:text-ink'}`}>
               {t}
-              {t === 'alerts' && withAlerts.length > 0 && <span className={`tnum rounded-full px-1.5 text-[10px] leading-4 ${urgentCards.length > 0 ? 'bg-act-now text-on-accent' : 'bg-well text-muted'}`}>{withAlerts.length}</span>}
             </button>
           ))}
         </div>
@@ -60,23 +80,26 @@ export default function LookoutSidebar() {
         </button>
       </header>
       {tab === 'chat' ? (
-        <ChatPanel d={d} />
-      ) : (
-        <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3">
-          <p className="text-[12px] text-ink">{LOOKOUT.summary(urgentCards.length, first)}</p>
-          {pinned && (
-            <>
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-label">{LOOKOUT.focusIntro(byId.get(pinned.driverId)!.driver.name)}</p>
-              <RecommendationCard view={byId.get(pinned.driverId)!} card={pinned} pinned />
-              {rest.length > 0 && <p className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-label">Everyone else</p>}
-            </>
-          )}
-          {shown.map((c) => <RecommendationCard key={c.driverId} view={byId.get(c.driverId)!} card={c} />)}
-          {hidden > 0 && <Button size="sm" variant="ghost" onClick={() => setShowAll(true)}>Show {hidden} more</Button>}
-          {showAll && rest.length > TOP_N && <Button size="sm" variant="ghost" onClick={() => setShowAll(false)}>Show fewer</Button>}
-          {withAlerts.length === 0 && <EmptyState title={LOOKOUT.allClear(metrics.onShift)} body={`${LOOKOUT.name} re-checks every 5 seconds.`} />}
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <RecommendationsBar open={recOpen} onToggle={() => setRecOpen((o) => !o)} summary={summary} count={urgentCards.length}>
+            {pinned && (
+              <>
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-label">{LOOKOUT.focusIntro(byId.get(pinned.driverId)!.driver.name)}</p>
+                <RecommendationCard view={byId.get(pinned.driverId)!} card={pinned} pinned />
+                {rest.length > 0 && <p className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-label">Everyone else</p>}
+              </>
+            )}
+            {shown.map((c) => <RecommendationCard key={c.driverId} view={byId.get(c.driverId)!} card={c} />)}
+            {hidden > 0 && <Button size="sm" variant="ghost" onClick={() => setShowAll(true)}>Show {hidden} more</Button>}
+            {showAll && rest.length > TOP_N && <Button size="sm" variant="ghost" onClick={() => setShowAll(false)}>Show fewer</Button>}
+            {withAlerts.length === 0 && <p className="text-[12px] text-muted">{LOOKOUT.allClear(d.metrics.onShift)}</p>}
+          </RecommendationsBar>
+          <ChatThread messages={messages} d={d} onExample={send} />
         </div>
+      ) : (
+        <TimelinePanel events={events} />
       )}
+      <Composer onSend={send} />
     </aside>
   )
 }

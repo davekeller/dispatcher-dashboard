@@ -86,7 +86,7 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
   }
 
   return (
-    <nav aria-label="Route" className={`sticky top-0 flex h-[calc(100vh-3.5rem-2.5rem)] shrink-0 flex-col rounded-card border border-line bg-panel shadow-card transition-[width] duration-200 ${collapsed ? 'w-14' : 'w-52'}`}>
+    <nav aria-label="Route" className={`sticky top-0 flex h-[calc(100vh-3.5rem-2.5rem)] shrink-0 flex-col rounded-card border border-line bg-panel shadow-card transition-[width] duration-200 ${collapsed ? 'w-14' : 'w-44'}`}>
       <div className={`flex items-center border-b border-line px-2 py-2 ${collapsed ? 'flex-col gap-1' : 'gap-2'}`}>
         <Link to="/" title="Back to the board" aria-label="Back to the board" className="flex h-7 w-7 items-center justify-center rounded-control text-muted hover:bg-well hover:text-ink">
           <ArrowLeft size={16} />
@@ -153,7 +153,7 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
                 <span className={`ml-[7px] block h-3 w-3 shrink-0 rounded-full transition ${dot} ${isActive ? 'ring-4 ring-lookout/30' : ''}`} />
                 {!collapsed && showLabel[i] && (
                   <span className="flex min-w-0 flex-col items-start text-left leading-tight">
-                    <span className={`max-w-[9.5rem] truncate text-[10px] ${isActive ? 'font-semibold text-ink' : s.status === 'done' ? 'text-muted' : 'text-ink'} group-hover:text-ink`}>{customer}</span>
+                    <span className={`max-w-[7.5rem] truncate text-[10px] ${isActive ? 'font-semibold text-ink' : s.status === 'done' ? 'text-muted' : 'text-ink'} group-hover:text-ink`}>{customer}</span>
                     <span className={`tnum text-[9px] ${n.late ? 'font-semibold text-watch' : 'text-label'}`}>{s.seq} · {fmtClock(n.t)}</span>
                   </span>
                 )}

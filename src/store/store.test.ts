@@ -17,6 +17,19 @@ describe('store', () => {
     expect(useStore.getState().fleet).toBe(before)
   })
 
+  it('every action lands on the shift log, newest last, and reset wipes it', () => {
+    const s = useStore.getState()
+    expect(s.events.map((e) => e.kind)).toEqual(['system'])
+    s.callDriver('drv-03')
+    useStore.getState().undo()
+    useStore.getState().acknowledge('offline_near_limit:drv-03')
+    expect(useStore.getState().events.map((e) => e.kind)).toEqual(['system', 'action', 'undo', 'snooze'])
+    expect(useStore.getState().events[1]).toMatchObject({ seq: 2, label: 'Call to Dre W. logged', driverId: 'drv-03' })
+    expect(useStore.getState().events[2].label).toBe('Undone: Call to Dre W. logged')
+    useStore.getState().resetFleet()
+    expect(useStore.getState().events).toHaveLength(1)
+  })
+
   it('acknowledge snoozes for ten minutes on the simulated clock', () => {
     const s = useStore.getState()
     s.acknowledge('offline_near_limit:drv-03')
