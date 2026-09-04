@@ -2,6 +2,7 @@ import { Link, Route, Routes } from 'react-router'
 import Layout from './app/Layout'
 import ActiveShiftPage from './views/shift/ActiveShiftPage'
 import RouteFilePage from './views/route/RouteFilePage'
+import MapPage from './views/map/MapPage'
 import Button from './ui/Button'
 import EmptyState from './ui/EmptyState'
 
@@ -19,6 +20,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route index element={<ActiveShiftPage />} />
         <Route path="routes/:driverId" element={<RouteFilePage />} />
+        <Route path="map" element={<MapPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
