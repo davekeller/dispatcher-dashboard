@@ -1,5 +1,5 @@
 import type { DriverCard } from '../../alerts/types'
-import type { Band } from '../../bands'
+import { BAND_LABEL, type Band } from '../../bands'
 import type { FilterState } from '../../filters'
 import { EMPTY_FILTERS } from '../../filters'
 import type { Metrics } from '../../store/derive'
@@ -24,11 +24,11 @@ function sameFilters(a: FilterState, b: FilterState): boolean {
 export default function ShiftHero({ metrics, ranked, filters, onPreset }: { metrics: Metrics; ranked: DriverCard[]; filters: FilterState; onPreset: (filters: FilterState) => void }) {
   const count = (band: Band) => ranked.filter((card) => card.band === band).length
   const items: Metric[] = [
-    { id: 'act_now', label: 'Act now', value: count('act_now'), preset: { ...EMPTY_FILTERS, band: ['act_now'] }, dot: 'bg-act-now', tone: 'text-act-now', detail: `${metrics.over} over limit`, detailTone: 'text-act-now' },
-    { id: 'watch', label: 'Watch', value: count('watch'), preset: { ...EMPTY_FILTERS, band: ['watch'] }, dot: 'bg-watch', tone: 'text-watch' },
-    { id: 'break', label: 'On break', value: count('break'), preset: { ...EMPTY_FILTERS, band: ['break'] }, dot: 'bg-break', tone: 'text-break' },
-    { id: 'offline', label: 'Offline', value: count('offline'), preset: { ...EMPTY_FILTERS, band: ['offline'] }, dot: 'bg-offline', tone: 'text-offline' },
-    { id: 'clear', label: 'Clear', value: count('clear'), preset: { ...EMPTY_FILTERS, band: ['clear'] }, dot: 'bg-clear', tone: 'text-clear' },
+    { id: 'act_now', label: BAND_LABEL.act_now, value: count('act_now'), preset: { ...EMPTY_FILTERS, band: ['act_now'] }, dot: 'bg-act-now', tone: 'text-act-now', detail: `${metrics.over} over limit`, detailTone: 'text-act-now' },
+    { id: 'watch', label: BAND_LABEL.watch, value: count('watch'), preset: { ...EMPTY_FILTERS, band: ['watch'] }, dot: 'bg-watch', tone: 'text-watch' },
+    { id: 'break', label: BAND_LABEL.break, value: count('break'), preset: { ...EMPTY_FILTERS, band: ['break'] }, dot: 'bg-break', tone: 'text-break' },
+    { id: 'offline', label: BAND_LABEL.offline, value: count('offline'), preset: { ...EMPTY_FILTERS, band: ['offline'] }, dot: 'bg-offline', tone: 'text-offline' },
+    { id: 'clear', label: BAND_LABEL.clear, value: count('clear'), preset: { ...EMPTY_FILTERS, band: ['clear'] }, dot: 'bg-clear', tone: 'text-clear' },
   ]
   const toDeliver = metrics.stopsRemaining + metrics.needDriver
   const totalStops = metrics.stopsDelivered + toDeliver + metrics.stopsFailed
