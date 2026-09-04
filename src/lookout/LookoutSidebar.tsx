@@ -42,11 +42,11 @@ export default function LookoutSidebar() {
   return (
     <aside className="flex w-[26rem] shrink-0 flex-col border-l border-line bg-panel" aria-label={`${LOOKOUT.name}, the shift co-pilot`}>
       <header className="flex items-center gap-3 border-b border-line px-4 py-3">
-        <LookoutAvatar size={32} className="shrink-0" />
         <div className="min-w-0 flex-1">
           <p className="font-display text-[15px] font-semibold leading-tight text-lookout-strong">{LOOKOUT.name}</p>
-          <p className="truncate text-[11px] text-muted">{LOOKOUT.summary(urgentCards.length, first)}</p>
+          <p className="text-[11px] text-muted">{LOOKOUT.role}</p>
         </div>
+        <LookoutAvatar size={32} className="shrink-0" />
         <button type="button" onClick={() => setCollapsed(true)} className="rounded-control p-1 text-muted hover:bg-well hover:text-ink" aria-label={`Collapse ${LOOKOUT.name}`}>
           <CaretDoubleRight size={16} />
         </button>
@@ -63,6 +63,7 @@ export default function LookoutSidebar() {
         <ChatPanel d={d} />
       ) : (
         <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3">
+          <p className="text-[12px] text-ink">{LOOKOUT.summary(urgentCards.length, first)}</p>
           {pinned && (
             <>
               <p className="text-[11px] font-semibold uppercase tracking-wide text-label">{LOOKOUT.focusIntro(byId.get(pinned.driverId)!.driver.name)}</p>

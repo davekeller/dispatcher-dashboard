@@ -2,6 +2,7 @@
 // own voice: a competent colleague who says what she sees and what Lena can do about it.
 export const LOOKOUT = {
   name: 'Lookout',
+  role: 'AI Agent',
   tagline: 'Watching the shift',
   allClear: (onShift: number) => `All clear. ${onShift} drivers on shift, nothing needs you right now.`,
   /** The one line under the name: what needs Lena right now, and where to start. */
