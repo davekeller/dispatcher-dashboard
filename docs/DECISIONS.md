@@ -46,3 +46,5 @@ One line per meaningful choice or cut. Newest at the bottom.
 | 40 | Neutrals settle on the bento key: faint violet-gray canvas, hairline borders, 16px cards | Dave: "more like the bento theme" |
 | 41 | Route rail labels stack on two lines (customer, then stop and time); hour marks are ticks, not text | Horizontal room is short in the rail; vertical room is not |
 | 42 | Illustrated placeholder avatars, deterministic per driver, gender from the first name | Faces read faster than initials; real photos replace one component |
+| 43 | Lookout's tabs are Chat and Timeline, in the claim-rail pattern: recommendations as a sticky bar over the chat, expanded by default; the timeline is the store's append-only shift log; one composer on both tabs | Dave's directive; the route rail already owns the driver's timeline, so this one is the shift's |
+| 44 | Route rail narrowed to 11rem | Horizontal room beside the open Lookout is short |

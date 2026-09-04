@@ -270,7 +270,7 @@ Metrics cards set filter presets. Adding a filter or a grouping is one object.
 
 ## 7. Store and actions
 
-Zustand, one store: `{ drivers, trucks, routes, deliveries, scrubOffset, snoozes, lastAction, undoSnapshot }`. Views subscribe to the derived layer, not the raw entities.
+Zustand, one store: `{ fleet, scrubOffset, snoozes, corrections, events, lastAction, undoSnapshot, groupBy, devOpen }`. `events` is the shift log: every action appends `{ seq, at, kind, label, driverId }`, and the Timeline tab renders it. Views subscribe to the derived layer, not the raw entities.
 
 Every action follows the same protocol: **preview → confirm → commit → recompute → inline result → undo available for 10s.** The rail and the route file call the same functions in `store/actions.ts`; there is no second implementation anywhere.
 
@@ -334,7 +334,7 @@ Content, in reading order:
 
 ### Lookout rail
 
-Header: Lookout's face (a placeholder circle until Dave draws the real one), the name, and one line that reads the shift ("3 need you now. Start with Priya S."), with a collapse control. Two tabs. **Alerts**: the top three ranked cards, one card per driver with every reason and 2–3 actions, same handlers as the route file; the rest sit behind "Show N more" so the rail never feels like a list of fifty. On a route file the tab pins that driver's card first. **Chat**: a conversational way to the same cards. Intent matching is a lookup, not a model (`lookout/intents.ts`): near the limit, offline, and reassign by first name; the no-match reply lists what Lookout can do as tappable examples. Replies render the same cards, so the two tabs can never disagree.
+One bar, the height of the app header: the tabs on the left, and on the right the name over "AI Agent", Lookout's face (a placeholder circle until Dave draws the real one), and the collapse control. **Chat** is the first tab. A sticky "✦ Lookout recommends" bar sits over the conversation, expanded by default and collapsible to just the bar, carrying one line that reads the shift ("3 need you now. Start with Priya S.") and the top three ranked cards, one per driver with every reason and 2–3 actions, the same handlers as the route file; the rest sit behind "Show N more." On a route file that driver's card is pinned first. The conversation runs underneath. Intent matching is a lookup, not a model (`lookout/intents.ts`): near the limit, offline, and reassign by first name; the no-match reply lists what Lookout can do as tappable examples, and replies render the same cards, so the bar and the thread can never disagree. **Timeline** is the second tab: what happened this shift, newest first, from the store's append-only event log (`ShiftEvent`: actions, snoozes, reconnects, undos, and the opening entry); nothing there is invented. The composer sits at the bottom of both tabs; sending from the timeline lands in the chat.
 
 Lookout never has its own data. It reads `ranked` and nothing else.
 
