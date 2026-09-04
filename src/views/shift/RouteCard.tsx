@@ -27,8 +27,7 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
       <div className="flex min-w-0 flex-1 flex-col gap-2 px-3 py-2.5">
         <div className="flex items-center gap-2">
           <Truck size={18} weight="duotone" className={quiet ? 'text-muted' : tone.text} />
-          <span className="truncate text-[13px] font-semibold text-ink">{view.driver.name}</span>
-          <span className="truncate text-[11px] text-muted">{view.truck.plate}</span>
+          <span className="truncate text-[13px] font-semibold text-ink" title={`${view.driver.name} · ${view.truck.plate}`}>{view.driver.name}</span>
           <Countdown minutes={view.minutesUntilLimit} stale={stale} className="ml-auto" />
         </div>
         <Bar value={view.drivingMin / LIMIT_MIN} tone={quiet ? { ...tone, fill: 'bg-offline-fill' } : tone} />

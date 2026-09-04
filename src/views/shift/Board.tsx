@@ -6,7 +6,7 @@ import RouteCard from './RouteCard'
 
 /** Columns come from the grouping; rows are Lookout's rank. The top row of the board is
  *  therefore "the most urgent problem in each column." Each column scrolls on its own. */
-export default function Board({ cards, byId, grouping, pickId }: { cards: DriverCard[]; byId: Map<string, DriverView>; grouping: Grouping; pickId: string | null }) {
+export default function Board({ cards, byId, grouping, pickId, filtering = false }: { cards: DriverCard[]; byId: Map<string, DriverView>; grouping: Grouping; pickId: string | null; filtering?: boolean }) {
   const columns = grouping.columns.map((col) => ({ ...col, cards: cards.filter((c) => grouping.keyOf(byId.get(c.driverId)!, c) === col.key) }))
   return (
     <div className="grid h-full min-h-0 gap-3" style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(11rem, 1fr))` }}>
@@ -18,7 +18,7 @@ export default function Board({ cards, byId, grouping, pickId }: { cards: Driver
           </header>
           <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-0.5">
             {col.cards.length === 0 ? (
-              <EmptyState title={`No trucks in ${col.label}`} body="Nothing here matches the current filters." />
+              <EmptyState title={grouping.id === 'band' ? `No one in ${col.label.toLowerCase()}` : `No trucks in ${col.label}`} body={filtering ? 'Nothing here matches the current filters.' : grouping.id === 'band' ? 'Nothing needs you here right now.' : 'No trucks are assigned here.'} />
             ) : (
               col.cards.map((c) => <RouteCard key={c.driverId} view={byId.get(c.driverId)!} card={c} pick={c.driverId === pickId} />)
             )}

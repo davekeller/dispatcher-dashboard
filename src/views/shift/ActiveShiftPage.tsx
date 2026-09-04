@@ -24,7 +24,7 @@ export default function ActiveShiftPage() {
         {visible.length === 0 && isFiltering(filters) ? (
           <EmptyState title="Nothing matches those filters." body="Every driver is hidden by the current status, data, region, or search filter." action={<Button size="sm" onClick={() => setFilters(EMPTY_FILTERS)}>Clear filters</Button>} />
         ) : (
-          <Board cards={visible} byId={d.byId} grouping={groupingById(groupBy)} pickId={pick?.driverId ?? null} />
+          <Board cards={visible} byId={d.byId} grouping={groupingById(groupBy)} pickId={pick?.driverId ?? null} filtering={isFiltering(filters)} />
         )}
       </div>
     </div>
