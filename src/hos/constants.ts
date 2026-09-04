@@ -1,5 +1,5 @@
 // Thresholds. Every one of these is a guess a real deployment would tune; the
-// point is that they live in one place and the walkthrough can say so.
+// point is that they live in one place and the docs can say so.
 export const LIMIT_MIN = 660 // 11 hours of driving
 export const ACT_NOW_MIN = 30
 export const WATCH_MIN = 90

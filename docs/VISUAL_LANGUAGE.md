@@ -18,7 +18,7 @@ Dispatch combines three layers:
 
 The product bar adds one industrial counterweight to those lighter surfaces: the truck logo is an icon-only warm near-black `ink` tile, followed by the Dispatch wordmark as dark text on the white bar. Board remains a lightweight dark text-and-icon navigation item with no resting fill, so it does not compete with the product mark.
 
-The result should read as hospitality-adjacent product software, not a marketing page placed around a dashboard.
+The result should read as product software, not a marketing page placed around a dashboard.
 
 ### Identity boundary
 

@@ -8,7 +8,7 @@ import EmptyState from './ui/EmptyState'
 function NotFound() {
   return (
     <div className="p-6">
-      <EmptyState title="Nothing here." body="The board is the whole product for this exercise." action={<Link to="/"><Button size="sm">Back to the board</Button></Link>} />
+      <EmptyState title="Nothing here." body="The board is the whole product for now." action={<Link to="/"><Button size="sm">Back to the board</Button></Link>} />
     </div>
   )
 }

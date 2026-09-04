@@ -34,7 +34,7 @@ export default function ShiftHero({ metrics, ranked, filters, onPreset }: { metr
   const deliveredPercent = totalStops === 0 ? 100 : Math.round((metrics.stopsDelivered / totalStops) * 100)
 
   return (
-    <section className="iq-metrics-band shrink-0 border-b border-white/15 px-5 py-4 text-on-accent" aria-label="Shift status">
+    <section className="lookout-metrics-band shrink-0 border-b border-white/15 px-5 py-4 text-on-accent" aria-label="Shift status">
       <div className="flex min-w-[46rem] items-stretch">
         <dl className="flex min-w-0 flex-1 items-stretch divide-x divide-white/15">
           {items.map((item) => {
@@ -52,7 +52,7 @@ export default function ShiftHero({ metrics, ranked, filters, onPreset }: { metr
                     onPreset(active ? EMPTY_FILTERS : item.preset)
                   }
                 }}
-                className={`min-w-[5.75rem] cursor-pointer px-4 py-1 text-left outline-none transition first:pl-0 hover:bg-white/10 focus-visible:bg-white/15 ${active ? 'iq-metric-active bg-white/15' : ''}`}
+                className={`min-w-[5.75rem] cursor-pointer px-4 py-1 text-left outline-none transition first:pl-0 hover:bg-white/10 focus-visible:bg-white/15 ${active ? 'lookout-metric-active bg-white/15' : ''}`}
               >
                 <dt className={`flex items-center gap-1.5 whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.05em] ${item.tone}`}>
                   <span className={`h-2 w-2 rounded-full ${item.dot}`} /> {item.label}

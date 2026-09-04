@@ -70,13 +70,15 @@ function stopState(node: Node, nextId: string | undefined, pastLimitIds: Set<str
 /** A route-first progress rail. The summary answers "where are we?" and "does it fit?"
  * before the stop sequence supplies detail. Stop spacing follows route order rather than
  * elapsed time so completed, current, upcoming, and post-limit work remain scannable. */
-export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed, onCollapsedChange }: { view: DriverView; deliveryById: Map<string, Delivery>; pastLimitIds: Set<string>; collapsed: boolean; onCollapsedChange: (c: boolean) => void }) {
+export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed, onCollapsedChange, activeStopId, onSelectStop }: { view: DriverView; deliveryById: Map<string, Delivery>; pastLimitIds: Set<string>; activeStopId?: string | null; onSelectStop?: (id: string) => void; collapsed: boolean; onCollapsedChange: (c: boolean) => void }) {
   const { route, now } = view
   const schedule = routeScheduleSignal(view)
   const hos = routeHosSignal(view)
   const nextId = view.next?.id
   const progress = view.total === 0 ? 1 : view.done / view.total
   const [active, setActive] = useState<string | null>(route.stops[0]?.id ?? null)
+  // In map mode the page owns the selection; in list mode the receipt being read does.
+  const shownActive = activeStopId !== undefined ? activeStopId : active
   const [summaryOpen, setSummaryOpen] = useState(true)
   const [timelineOpen, setTimelineOpen] = useState(true)
   const timelineRef = useRef<HTMLDivElement>(null)
@@ -113,7 +115,7 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
       const container = timelineRef.current
-      const node = active ? nodeRefs.current.get(active) : undefined
+      const node = shownActive ? nodeRefs.current.get(shownActive) : undefined
       if (!container || !node) return
       const top = node.offsetTop
       const bottom = top + node.offsetHeight
@@ -122,7 +124,7 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
       }
     })
     return () => cancelAnimationFrame(frame)
-  }, [active, collapsed, route.id])
+  }, [shownActive, collapsed, route.id])
 
   // The selected timeline node still follows the receipt currently being read.
   useEffect(() => {
@@ -141,6 +143,10 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
 
   const jump = (id: string) => {
     setActive(id)
+    if (onSelectStop) {
+      onSelectStop(id)
+      return
+    }
     document.getElementById(`stop-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 
@@ -217,7 +223,7 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
         <ol>
           {nodes.map((node, index) => {
             const { stop } = node
-            const isActive = active === stop.id
+            const isActive = shownActive === stop.id
             const isFirstPast = stop.id === firstPastLimitId
             const state = stopState(node, nextId, pastLimitIds)
             const isRed = stop.status === 'failed' || pastLimitIds.has(stop.id) || node.late
