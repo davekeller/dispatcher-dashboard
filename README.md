@@ -21,7 +21,8 @@ Node 20+. No backend, no keys. The shift is simulated: the clock is pinned to 2:
 2. **Marcus R.** Twelve minutes of drive time, three stops that need thirty-four. On his route file the 11-hour limit is marked on the stop timeline with two stops in red below it. Reassign from the card: the picker only offers drivers who won't become the next problem, and previews both drivers' new figures before you confirm.
 3. **Dre W.** Dark for 25 minutes with ~40 minutes left. Every figure carries a tilde and an age; position-dependent actions are disabled. Bring him online from the simulated-shift panel and watch the estimate correct itself, out loud.
 4. **Lookout**, the rail on the right, reads the same ranked list the board does. If they ever disagree, that is the bug.
-5. **`src/alerts/rules.ts`.** Every alert is one object. Adding a rule is appending one.
+5. **Map.** On any route file, the List | Map toggle beside the stop actions puts the route on a map: stops in the rail's own colors, the truck as a live fix that glides along its leg with the clock. Open Dre's and the truck is a dashed "last known" marker instead. The position is derived from the receipts and the last ping, never stored (`src/geo/truckPosition.ts`).
+6. **`src/alerts/rules.ts`.** Every alert is one object. Adding a rule is appending one.
 
 ## How it is built
 
@@ -31,7 +32,7 @@ The visual system is documented separately in [`docs/VISUAL_LANGUAGE.md`](docs/V
 
 ## Scope
 
-Phase 1 is the board, the route file with receipts and a schedule ribbon, and the Lookout rail. The core was scoped with discipline; the extras are labeled as extras in `docs/DECISIONS.md`. Not built yet: the driver's phone view, the map, routing, auth, dark mode, mobile layouts. Chat is three matched intents, not a model.
+Phase 1 is the board, the route file with receipts and a schedule ribbon, and the Lookout rail. The core was scoped with discipline; the extras are labeled as extras in `docs/DECISIONS.md`. Not built yet: the driver's phone view, the fleet-wide map, routing, auth, dark mode, mobile layouts. Chat is three matched intents, not a model.
 
 ## Adding a rule
 
