@@ -72,9 +72,19 @@ body { @apply bg-canvas text-ink font-sans antialiased; }
 .tnum { font-variant-numeric: tabular-nums; }
 
 .iq-metrics-band {
-  background:
-    radial-gradient(circle at 6% -50%, color-mix(in srgb, white 24%, transparent), transparent 27rem),
-    linear-gradient(108deg, var(--color-hero-warm) 0%, var(--color-hero-gold) 24%, var(--color-hero-rose) 50%, var(--color-hero-violet) 74%, var(--color-hero-cool) 100%);
+  background-image:
+    radial-gradient(circle at 6% -50%, color-mix(in srgb, white 28%, transparent), transparent 27rem),
+    linear-gradient(108deg,
+      color-mix(in srgb, var(--color-hero-warm) 64%, transparent) 0%,
+      color-mix(in srgb, var(--color-hero-gold) 64%, transparent) 24%,
+      color-mix(in srgb, var(--color-hero-rose) 64%, transparent) 50%,
+      color-mix(in srgb, var(--color-hero-violet) 64%, transparent) 74%,
+      color-mix(in srgb, var(--color-hero-cool) 64%, transparent) 100%),
+    linear-gradient(color-mix(in srgb, white 42%, transparent), color-mix(in srgb, white 42%, transparent)),
+    url('/images/dispatch-city-hero.webp');
+  background-position: center, center, center, center 56%;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .iq-soft-surface {

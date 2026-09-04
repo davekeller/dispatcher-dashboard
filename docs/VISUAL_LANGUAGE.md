@@ -96,7 +96,7 @@ The shift instrument uses dedicated saturated pastel counterparts—`hero-warm` 
 
 The spectrum may appear in:
 
-- the saturated pastel shift-metrics field;
+- the translucent spectrum over the shift instrument's city photograph;
 - Lookout’s radial avatar field;
 - the AI ordering control and composer outline;
 - the thin active-tab indicator and softly washed recommendation header;
@@ -153,7 +153,7 @@ The hero is not a hero in the marketing sense. It is a light, two-sided instrume
 - **Left:** Act now, Watch, Offline, On break, and Clear—ordered by dispatch priority and matched exactly to the board lanes.
 - **Right:** Delivered, To deliver, Total stops, and Delivered percentage as four equally aligned facts in the same row.
 
-The saturated pastel warm-to-cool wash separates this instrument from both the board and Lookout's much lighter recommendation wash. Status labels and figures use their dark matching operational hues; throughput metrics use near-black. Status figures remain interactive filter shortcuts.
+An original, brand-free photograph of a fictional Midwestern skyline and road network gives the instrument operational atmosphere. A light scrim and translucent saturated-pastel warm-to-cool wash keep the image subordinate, separating the hero from both the board and Lookout's much lighter recommendation wash. Status labels and figures use their dark matching operational hues; throughput metrics use near-black. Status figures remain interactive filter shortcuts.
 
 ### Board lanes
 
@@ -272,6 +272,7 @@ Honor `prefers-reduced-motion`.
 | Product bar | `src/app/Header.tsx` |
 | Shift instrument | `src/views/shift/ShiftHero.tsx` |
 | Board and route cards | `src/views/shift/Board.tsx`, `RouteCard.tsx`, `RouteTimelineMini.tsx` |
+| Shift city photograph | `public/images/dispatch-city-hero.webp` |
 | Detail timeline | `src/views/route/RouteRail.tsx` |
 | AI rail and focus treatments | `src/lookout/*` |
 | Contrast validation | `scripts/contrast.mjs` |
