@@ -18,6 +18,7 @@ export interface Driver {
   id: string
   name: string // "Marcus R."
   initials: string
+  gender: 'm' | 'f' // for the placeholder avatar only
   truckId: string
   routeId: string
   region: Region

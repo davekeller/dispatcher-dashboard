@@ -2,20 +2,20 @@
 @import "@fontsource-variable/bricolage-grotesque";
 @import "@fontsource-variable/inter";
 
-/* Blue-slate neutral ops palette: cool grays so the warm coral and the band colors are the
-   only warmth on screen. Text variants pass AA on panel; fills are for bars and markers
+/* Cool neutral ops palette in the bento key: a faint violet-gray canvas and hairline borders,
+   so the coral and the band colors are the only warmth on screen. Text variants pass AA on panel; fills are for bars and markers
    only. Lookout wears coral and nothing else does. */
 @theme {
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-display: "Bricolage Grotesque Variable", "Inter Variable", ui-sans-serif, sans-serif;
 
-  --color-canvas: #f3f4f6;
+  --color-canvas: #f4f4f6;
   --color-panel: #ffffff;
-  --color-well: #e8ebef;
-  --color-line: #dde2e8;
-  --color-ink: #161a20;
-  --color-muted: #5b6472;
-  --color-label: #67707e;
+  --color-well: #ececf1;
+  --color-line: #e3e3ea;
+  --color-ink: #17171b;
+  --color-muted: #63636c;
+  --color-label: #6e6e76;
   --color-on-accent: #ffffff;
 
   --color-lookout: #cf4620;
@@ -42,10 +42,10 @@
   --color-break-fill: #6f9bd6;
   --color-break-soft: #e9f0fa;
 
-  --radius-card: 12px;
+  --radius-card: 16px;
   --radius-control: 8px;
 
-  --shadow-card: 0 1px 2px rgba(22, 26, 32, 0.06), 0 1px 3px rgba(22, 26, 32, 0.08);
+  --shadow-card: 0 1px 2px rgba(23, 23, 27, 0.06), 0 1px 3px rgba(23, 23, 27, 0.08);
 }
 
 html, body, #root { height: 100%; }

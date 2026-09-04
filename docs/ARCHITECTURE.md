@@ -27,7 +27,7 @@ Vite · React 19 · TypeScript · Tailwind v4 (via `@tailwindcss/vite`). Light t
 | `react`, `react-dom` | UI |
 | `react-router` | Three real routes now, two more in Phase 2; drivers get URLs for the walkthrough |
 | `zustand` | One small store with actions and one-level undo; less ceremony than context + reducer |
-| `@phosphor-icons/react` | The duotone weight gives the friendly two-tone icon feel common in hospitality software without copying anyone's set; has a truck |
+| `@phosphor-icons/react` | Interface icons in the duotone weight |
 | `@fontsource-variable/bricolage-grotesque`, `@fontsource-variable/inter` | Display and body faces, bundled, no CDN |
 | Phase 2 only: `leaflet`, `react-leaflet` | Map and phone view; lazy-loaded, never on the critical path |
 
@@ -313,7 +313,7 @@ The board groups by **Status** by default, Act now leftmost, because that is whe
 
 **Board.** Columns are status bands by default (Act now, Watch, Offline, On break, Clear), switchable to regions. Within a column, cards sort by Lookout's rank, most urgent at the top. Each column scrolls independently. Clear cards stay in their column in a quiet tone. The filter bar above the board is one row: a dropdown per filter (Status, Data, Region, each a checkbox list with a count when active), a Clear button when anything is set, and search at the right end.
 
-**Route card.** Left marker strip in the band color (hollow/dashed for offline) · duotone truck glyph, colored only when the card has attention · driver name and truck plate · live countdown in tabular figures, tilde when stale · drive-time bar on an 11h scale · route progress `done/total` and next stop · data age chip · badge row, one badge per firing rule · Lookout pick marker on the board's overall top card. Click opens the route file. Nothing drags: a card's position is computed, not assigned.
+**Route card.** Left marker strip in the band color (hollow/dashed for offline) · the driver's avatar (an illustrated placeholder, deterministic per driver, gender from the name; real photos replace one component) · driver name · live countdown in tabular figures, tilde when stale · drive-time bar on an 11h scale · route progress `done/total` and next stop · data age chip · badge row, one badge per firing rule · Lookout pick marker on the board's overall top card. Click opens the route file. Nothing drags: a card's position is computed, not assigned.
 
 **Empty states.** Nothing needs attention: "All clear. 46 drivers on shift, next check-in in 5s." A filter that matches nothing: say which filter, offer to clear it. A region with no trucks: the column says so.
 
@@ -321,7 +321,7 @@ The board groups by **Status** by default, Act now leftmost, because that is whe
 
 A page in the main pane; Lookout stays open and focuses on this driver. It has the shape of a case file: a **route rail** down the left, the content to its right.
 
-**Route rail.** Sticky, in the case-file navigation pattern: a back link and a collapse toggle at the top, then a vertical time axis from the start of the shift through the projected finish. Up to now it is the duty timeline turned vertical (driving, on duty, break, and a planned reset dashed); after now it is a dashed projection. Every stop is a node on the axis at its actual time (done, at the dock) or its projected time (pending), so the rail shows at a glance where the driver is and what is done. A now marker sits at the current time, the 11-hour limit is marked where it lands, and the axis turns red past it. Expanded (about 13rem) the nodes carry their stop number, customer, and time, with hour ticks along the axis; collapsed (3.5rem) it is the bar and the dots. The node whose receipt is in view is highlighted, and clicking a node scrolls to its receipt.
+**Route rail.** Sticky, in the case-file navigation pattern: a back link and a collapse toggle at the top, then a vertical time axis from the start of the shift through the projected finish. Up to now it is the duty timeline turned vertical (driving, on duty, break, and a planned reset dashed); after now it is a dashed projection. Every stop is a node on the axis at its actual time (done, at the dock) or its projected time (pending), so the rail shows at a glance where the driver is and what is done. A now marker sits at the current time, the 11-hour limit is marked where it lands, and the axis turns red past it. Expanded (about 13rem) each node carries two short lines, the customer and then the stop number and time, with hour ticks along the axis; collapsed (3.5rem) it is the bar and the dots. The node whose receipt is in view is highlighted, and clicking a node scrolls to its receipt.
 
 Content, in reading order:
 
@@ -382,13 +382,13 @@ Neutral, dense, calm, cool. Ops software used mid-shift. Rhymes with the warmth 
 
 | Token | Value | Use |
 |---|---|---|
-| `--color-canvas` | `#f3f4f6` | Page ground (blue-slate neutrals; the coral and the bands are the only warmth) |
+| `--color-canvas` | `#f4f4f6` | Page ground (blue-slate neutrals; the coral and the bands are the only warmth) |
 | `--color-panel` | `#ffffff` | Cards, rail |
-| `--color-well` | `#e8ebef` | Inset grounds, column backgrounds |
-| `--color-line` | `#dde2e8` | Keylines |
-| `--color-ink` | `#161a20` | Text, primary buttons |
-| `--color-muted` | `#5b6472` | Secondary text |
-| `--color-label` | `#67707e` | Micro-labels on panel only |
+| `--color-well` | `#ececf1` | Inset grounds, column backgrounds |
+| `--color-line` | `#e3e3ea` | Keylines |
+| `--color-ink` | `#17171b` | Text, primary buttons |
+| `--color-muted` | `#63636c` | Secondary text |
+| `--color-label` | `#6e6e76` | Micro-labels on panel only |
 | `--color-lookout` / `-strong` / `-soft` | `#cf4620` / `#a83a15` / `#ffe9e2` | Lookout, and only Lookout |
 | `--color-act-now` / `-fill` / `-soft` | `#b3323f` / `#c9414f` / `#fbeaec` | Act now and Over limit |
 | `--color-watch` / `-fill` / `-soft` | `#8f5f0e` / `#d19a2a` / `#fbf3e3` | Watch |
@@ -401,7 +401,7 @@ Over the limit is the one state that must never be missed: its chip is solid dar
 
 **Type.** Bricolage Grotesque Variable for display: page titles, the large countdown, metric numbers. Inter Variable for everything else, `font-variant-numeric: tabular-nums` on every countdown and duration so rows never jitter. Two faces, no serif.
 
-**Shape and rhythm.** 12px radius on cards, 8px on controls, pill chips. Rows ~40px, cards compact, whitespace spent on grouping. Quiet keylines, one soft shadow level. Phosphor duotone icons. Motion: countdown ticks and a subtle band-change transition only. Light only.
+**Shape and rhythm.** 16px radius on cards, 8px on controls, pill chips. Rows ~40px, cards compact, whitespace spent on grouping. Quiet keylines, one soft shadow level. Phosphor duotone icons. Motion: countdown ticks and a subtle band-change transition only. Light only.
 
 **Illustration (Phase 2 polish).** A custom two-tone truck mark can replace the Phosphor glyph without touching layout. "Cards shaped like trucks with a trailer" is an experiment to try once the board works, kept only if it costs no scanability.
 

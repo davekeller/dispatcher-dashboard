@@ -3,7 +3,7 @@ import type { DriverCard } from '../alerts/types'
 import { fmtAge, fmtClock } from '../lib/format'
 import { useStore } from '../store/store'
 import type { DriverView } from '../store/view'
-import Avatar from '../ui/Avatar'
+import DriverAvatar from '../ui/DriverAvatar'
 import Chip from '../ui/Chip'
 import CorrectionChip from '../ui/CorrectionChip'
 import Countdown from '../ui/Countdown'
@@ -23,7 +23,7 @@ export default function RecommendationCard({ view, card, pinned = false }: { vie
     <article className={`rounded-card border bg-panel p-3 shadow-card ${pinned ? 'border-lookout/50' : 'border-line'} ${card.snoozed ? 'opacity-60' : ''}`}>
       <header className="flex items-center gap-2">
         <span className={`h-2.5 w-2.5 rounded-full ${offline ? `border-2 border-dashed ${tone.border}` : tone.fill}`} aria-hidden="true" />
-        <Avatar initials={view.driver.initials} size="sm" />
+        <DriverAvatar driver={view.driver} size={24} />
         <Link to={`/routes/${view.driver.id}`} className="truncate text-[13px] font-semibold text-ink hover:underline">{view.driver.name}</Link>
         <span className="text-[11px] text-muted">{view.driver.region}</span>
         <Countdown minutes={view.minutesUntilLimit} stale={stale} className="ml-auto" />

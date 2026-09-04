@@ -3,7 +3,7 @@ import { BAND_LABEL } from '../../bands'
 import type { DutyStatus } from '../../data/types'
 import { fmtAge, fmtClock, fmtCountdown, fmtDrift, fmtHm } from '../../lib/format'
 import type { DriverView } from '../../store/view'
-import Avatar from '../../ui/Avatar'
+import DriverAvatar from '../../ui/DriverAvatar'
 import Card from '../../ui/Card'
 import Chip from '../../ui/Chip'
 import CorrectionChip from '../../ui/CorrectionChip'
@@ -29,7 +29,7 @@ export default function DriverCard({ view, card }: { view: DriverView; card: Ran
   return (
     <Card className="px-5 py-4">
       <div className="flex items-center gap-5">
-        <Avatar initials={view.driver.initials} size="lg" />
+        <DriverAvatar driver={view.driver} size={56} />
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-display text-2xl font-semibold tracking-tight">{view.driver.name}</h2>

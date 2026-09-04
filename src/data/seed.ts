@@ -17,6 +17,8 @@ const FIRST_NAMES = [
   'Esme', 'Rafael', 'Bo', 'Selin', 'Kai', 'Vera', 'Otis', 'Imani', 'Hugo', 'Luz',
 ]
 const LAST_INITIALS = 'ABCDEFGHJKLMNPRSTVW'
+// Gender for the placeholder avatar, by first name; the planted drivers share these names.
+const FEMALE = new Set(['Priya', 'Elena', 'Nadia', 'Ana', 'Lucia', 'Mei', 'Sofia', 'Grace', 'Hana', 'Ivy', 'Rosa', 'Yara', 'Nina', 'Zara', 'Tara', 'Maya', 'Wren', 'Noor', 'Aria', 'Esme', 'Selin', 'Vera', 'Imani', 'Luz'])
 const CUSTOMERS = [
   'Lakeside Grocers', 'Harbor Cafe', 'Prairie Market', 'Union Hardware', 'Bluebird Bakery', 'Northgate Pharmacy',
   'Ridge Auto Parts', 'Cedar Street Diner', 'Metro Print Co.', 'Oakline Furniture', 'Pine & Co. Florist', 'Summit Fitness',
@@ -115,7 +117,7 @@ function generateDriver(i: number, rng: Rng, anchor: number): Generated {
   segments.push({ status: 'driving', startedAt: actualT, endedAt: actualT + 20 * MIN })
   segments.push({ status: 'off_duty', startedAt: actualT + 20 * MIN })
 
-  const driver: Driver = { id, name: `${first} ${lastInitial}.`, initials: `${first[0]}${lastInitial}`, truckId, routeId, region, shiftStartedAt, segments, lastPingAt: anchor - 30_000 }
+  const driver: Driver = { id, name: `${first} ${lastInitial}.`, initials: `${first[0]}${lastInitial}`, gender: FEMALE.has(first) ? 'f' : 'm', truckId, routeId, region, shiftStartedAt, segments, lastPingAt: anchor - 30_000 }
   const truck: Truck = { id: truckId, plate: `IL ${rng.int(100, 999)} ${LAST_INITIALS[rng.int(0, 18)]}${LAST_INITIALS[rng.int(0, 18)]}${LAST_INITIALS[rng.int(0, 18)]}`, region, position, lastPingAt: driver.lastPingAt }
   const route: Route = { id: routeId, driverId: id, region, plannedStartAt, windowEnd: plannedT + 60 * MIN, stops }
   return { driver, truck, route, deliveries }

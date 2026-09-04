@@ -43,3 +43,6 @@ One line per meaningful choice or cut. Newest at the bottom.
 | 37 | Chat ships as three matched intents in Phase 1, not a model | The tab needed real content; the pattern is the point, and replies are the same cards |
 | 38 | Over-limit chips are solid dark red with white text | The one state that must never be missed |
 | 39 | Neutrals retinted from warm to blue-slate | The warm ramp read yellow; cool grays leave the coral and the bands as the only warmth |
+| 40 | Neutrals settle on the bento key: faint violet-gray canvas, hairline borders, 16px cards | Dave: "more like the bento theme" |
+| 41 | Route rail labels stack on two lines (customer, then stop and time); hour marks are ticks, not text | Horizontal room is short in the rail; vertical room is not |
+| 42 | Illustrated placeholder avatars, deterministic per driver, gender from the first name | Faces read faster than initials; real photos replace one component |

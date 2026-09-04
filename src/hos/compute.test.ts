@@ -9,7 +9,7 @@ import {
 const m = (n: number) => n * MIN
 
 function driver(segments: DutySegment[], lastPingAt: number, pingsSuspended = false): Driver {
-  return { id: 'drv-t', name: 'Test T.', initials: 'TT', truckId: 'trk-t', routeId: 'rt-t', region: 'North', shiftStartedAt: 0, segments, lastPingAt, pingsSuspended }
+  return { id: 'drv-t', name: 'Test T.', initials: 'TT', gender: 'm', truckId: 'trk-t', routeId: 'rt-t', region: 'North', shiftStartedAt: 0, segments, lastPingAt, pingsSuspended }
 }
 
 function stop(seq: number, drive: number, service: number, plannedEta: number, extra: Partial<Stop> = {}): Stop {

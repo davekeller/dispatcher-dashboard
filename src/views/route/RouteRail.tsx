@@ -9,7 +9,7 @@ import { MIN } from '../../time/clock'
 
 const FILL: Record<DutyStatus, string> = { driving: 'bg-ink', on_duty: 'bg-muted', on_break: 'bg-break-fill', off_duty: 'bg-offline-fill' }
 const TRACK_LEFT = 'left-3' // where the axis sits in the collapsed rail
-const LABEL_GAP_PX = 15 // labels closer than this to the previous one stay hidden
+const LABEL_GAP_PX = 26 // labels (two lines each) closer than this to the previous one stay hidden; hover still tells
 
 interface Node {
   stop: Stop
@@ -74,11 +74,9 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
   })
 
   const hourTicks: number[] = []
-  if (!collapsed) {
-    const first = new Date(start)
-    first.setMinutes(0, 0, 0)
-    for (let t = first.getTime() + 60 * MIN; t < end; t += 120 * MIN) if (t > start) hourTicks.push(t)
-  }
+  const firstHour = new Date(start)
+  firstHour.setMinutes(0, 0, 0)
+  for (let t = firstHour.getTime() + 60 * MIN; t < end; t += 60 * MIN) if (t > start) hourTicks.push(t)
   const jump = (id: string) => {
     setActive(id)
     document.getElementById(`stop-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -116,20 +114,20 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
               return <div key={i} className={`absolute inset-x-0 rounded-full ${FILL[s.status]} ${s.planned ? 'opacity-50' : ''}`} style={{ top: `${pct(s0)}%`, height: `${pct(s1) - pct(s0)}%`, ...(s.planned ? { backgroundImage: 'repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,0.7) 3px 5px)' } : {}) }} />
             })}
           </div>
-          {/* hour ticks */}
+          {/* hour ticks: marks on the track, no text; horizontal room is for the stops */}
           {hourTicks.map((t) => (
-            <span key={t} className="tnum absolute left-7 -translate-y-1/2 text-[9px] text-label" style={{ top: `${pct(t)}%` }}>{fmtClock(t).replace(':00', '')}</span>
+            <span key={t} className="absolute left-2 h-px w-2.5 bg-line" style={{ top: `${pct(t)}%` }} />
           ))}
           {/* now */}
           <div className="absolute left-1.5 -translate-y-1/2" style={{ top: `${pct(now)}%` }}>
             <span className="block h-0.5 w-4 bg-ink" />
-            {!collapsed && <span className="tnum absolute left-6 top-1/2 -translate-y-1/2 whitespace-nowrap text-[10px] font-semibold text-ink">now · {fmtClock(now)}</span>}
+            {!collapsed && <span className="tnum absolute left-6 top-1/2 z-10 -translate-y-1/2 whitespace-nowrap rounded bg-panel px-1 text-[10px] font-semibold text-ink">now · {fmtClock(now)}</span>}
           </div>
           {/* the limit */}
           {limitWithin && (
             <div className="absolute left-1.5 -translate-y-1/2" style={{ top: `${pct(over ? now : limitHitAt)}%` }}>
               <span className="block h-0.5 w-4 bg-act-now" />
-              {!collapsed && <span className="tnum absolute left-6 top-1/2 -translate-y-1/2 whitespace-nowrap text-[10px] font-semibold text-act-now">{over ? 'over the limit' : `limit · ${fmtClock(limitHitAt)}`}</span>}
+              {!collapsed && <span className="tnum absolute left-6 top-1/2 z-10 -translate-y-1/2 whitespace-nowrap rounded bg-panel px-1 text-[10px] font-semibold text-act-now">{over ? 'over the limit' : `limit · ${fmtClock(limitHitAt)}`}</span>}
             </div>
           )}
           {/* stops */}
@@ -153,8 +151,9 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
               >
                 <span className={`ml-[7px] block h-3 w-3 shrink-0 rounded-full transition ${dot} ${isActive ? 'ring-4 ring-lookout/30' : ''}`} />
                 {!collapsed && showLabel[i] && (
-                  <span className={`tnum whitespace-nowrap text-[10px] leading-none ${isActive ? 'font-semibold text-ink' : n.late ? 'text-watch' : s.status === 'done' ? 'text-muted' : 'text-ink'} group-hover:text-ink`}>
-                    {s.seq} · {customer.length > 14 ? customer.slice(0, 13) + '…' : customer} · {fmtClock(n.t)}
+                  <span className="flex min-w-0 flex-col items-start text-left leading-tight">
+                    <span className={`max-w-[9.5rem] truncate text-[10px] ${isActive ? 'font-semibold text-ink' : s.status === 'done' ? 'text-muted' : 'text-ink'} group-hover:text-ink`}>{customer}</span>
+                    <span className={`tnum text-[9px] ${n.late ? 'font-semibold text-watch' : 'text-label'}`}>{s.seq} · {fmtClock(n.t)}</span>
                   </span>
                 )}
               </button>

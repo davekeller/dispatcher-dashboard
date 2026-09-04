@@ -1,4 +1,3 @@
-import { Truck } from '@phosphor-icons/react'
 import { Link } from 'react-router'
 import type { DriverCard } from '../../alerts/types'
 import { LIMIT_MIN } from '../../hos/constants'
@@ -8,6 +7,7 @@ import type { DriverView } from '../../store/view'
 import Bar from '../../ui/Bar'
 import Chip from '../../ui/Chip'
 import CorrectionChip from '../../ui/CorrectionChip'
+import DriverAvatar from '../../ui/DriverAvatar'
 import Countdown from '../../ui/Countdown'
 import { BAND_TONE, LOOKOUT_TONE, STALENESS_TONE, severityTone } from '../../ui/tones'
 
@@ -26,7 +26,7 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
       <div className={`w-1.5 shrink-0 transition-colors duration-300 ${offline ? `border-l-[6px] border-dashed ${tone.border} bg-transparent` : tone.fill}`} aria-hidden="true" />
       <div className="flex min-w-0 flex-1 flex-col gap-2 px-3 py-2.5">
         <div className="flex items-center gap-2">
-          <Truck size={18} weight="duotone" className={quiet ? 'text-muted' : tone.text} />
+          <DriverAvatar driver={view.driver} size={22} className={quiet ? 'opacity-80' : ''} />
           <span className="truncate text-[13px] font-semibold text-ink" title={`${view.driver.name} · ${view.truck.plate}`}>{view.driver.name}</span>
           <Countdown minutes={view.minutesUntilLimit} stale={stale} className="ml-auto" />
         </div>

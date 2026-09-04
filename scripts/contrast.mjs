@@ -1,8 +1,8 @@
 // Validates the text tokens against the grounds they sit on. Run once at theme setup and
 // whenever a token moves; paste the table into docs/DECISIONS.md.
 const tokens = {
-  panel: '#ffffff', canvas: '#f3f4f6', well: '#e8ebef',
-  ink: '#161a20', muted: '#5b6472', label: '#67707e',
+  panel: '#ffffff', canvas: '#f4f4f6', well: '#ececf1',
+  ink: '#17171b', muted: '#63636c', label: '#6e6e76',
   'lookout-strong': '#a83a15', lookout: '#cf4620',
   'act-now': '#b3323f', watch: '#8f5f0e', clear: '#266b4c', offline: '#5b6370', break: '#3262a8',
   'act-now-soft': '#fbeaec', 'watch-soft': '#fbf3e3', 'clear-soft': '#e8f4ee', 'offline-soft': '#eef0f3', 'break-soft': '#e9f0fa', 'lookout-soft': '#ffe9e2',
