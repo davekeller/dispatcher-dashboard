@@ -1,14 +1,12 @@
-import { CaretRight, SquaresFour, TruckTrailer, Wrench } from '@phosphor-icons/react'
+import { CaretRight, SquaresFour, TruckTrailer } from '@phosphor-icons/react'
 import { Link, useLocation } from 'react-router'
-import { fmtClock } from '../lib/format'
 import { useDerived } from '../store/hooks'
-import { useStore } from '../store/store'
+import SimulatedShift from './SimulatedShift'
 
 /** The product bar. Dispatch is the product; the board is its home; a route file is one level in. */
 export default function Header() {
   const { pathname } = useLocation()
-  const { now, byId } = useDerived()
-  const toggleDev = useStore((s) => s.toggleDev)
+  const { byId } = useDerived()
   const routeMatch = pathname.match(/^\/routes\/(drv-\d+)$/)
   const focused = routeMatch ? byId.get(routeMatch[1]) : undefined
 
@@ -31,12 +29,7 @@ export default function Header() {
         </div>
       )}
       <div className="ml-auto flex items-center gap-3">
-        <span className="tnum text-[13px] text-muted" title="Simulated shift clock; it ticks in real time">
-          <span className="font-semibold text-ink">{fmtClock(now)}</span> · simulated shift
-        </span>
-        <button type="button" onClick={toggleDev} title="Dev controls (⌘.)" className="rounded-control p-1.5 text-muted hover:bg-well hover:text-ink" aria-label="Toggle dev controls">
-          <Wrench size={16} weight="duotone" />
-        </button>
+        <SimulatedShift />
       </div>
     </header>
   )

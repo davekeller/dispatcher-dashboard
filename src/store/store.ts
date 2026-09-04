@@ -52,6 +52,7 @@ export interface State {
   bringOnline: (driverId: string) => void
   undo: () => void
   scrub: (ms: number) => void
+  setScrubOffset: (ms: number) => void
   resetClock: () => void
   resetFleet: () => void
   setGroupBy: (id: GroupingId) => void
@@ -123,7 +124,11 @@ export const useStore = create<State>()((set, get) => {
       log('undo', undone ? `Undone: ${undone}` : 'Undone')
     },
     scrub: (ms) => {
-      set((s) => ({ scrubOffsetMs: s.scrubOffsetMs + ms }))
+      set((s) => ({ scrubOffsetMs: Math.max(0, s.scrubOffsetMs + ms) }))
+      get().advanceWorld()
+    },
+    setScrubOffset: (ms) => {
+      set({ scrubOffsetMs: Math.max(0, ms) })
       get().advanceWorld()
     },
     resetClock: () => {

@@ -37,6 +37,14 @@ describe('store', () => {
     expect(until - s.now()).toBeGreaterThan(9 * 60_000)
   })
 
+  it('the scrubber sets an absolute offset and never goes before the anchor', () => {
+    const t0 = useStore.getState().now()
+    useStore.getState().setScrubOffset(90 * 60_000)
+    expect(useStore.getState().now() - t0).toBeGreaterThanOrEqual(90 * 60_000)
+    useStore.getState().setScrubOffset(-5)
+    expect(useStore.getState().scrubOffsetMs).toBe(0)
+  })
+
   it('scrub moves the simulated clock', () => {
     const t0 = useStore.getState().now()
     useStore.getState().scrub(15 * 60_000)
