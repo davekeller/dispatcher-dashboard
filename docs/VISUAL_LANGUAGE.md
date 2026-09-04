@@ -77,7 +77,7 @@ The overall foundation should look warm white, not beige. The live board deliber
 
 Operational color always appears with a label, number, icon, or shape. Red is never used as a general brand accent.
 
-The board uses one intentionally vivid wash per status lane—Act now `#f8d6df`, Watch `#f5dfa7`, Offline `#dce3ed`, On break `#d8e5fb`, and Clear `#d3eedf`. These board-only grounds make column structure legible at a glance while the softer fills above remain available for inline alerts and receipts. The shift totals mirror the lane order; each label, dot, and value uses one corresponding saturated status hue rather than leaving the labels neutral. The throughput group remains on the same row but receives wider, evenly padded columns so its four values scan as a distinct block.
+The board uses one intentionally vivid wash per status lane—Act now `#f8d6df`, Watch `#f5dfa7`, Offline `#dce3ed`, On break `#d8e5fb`, and Clear `#d3eedf`. These board-only grounds make column structure legible at a glance while the softer fills above remain available for inline alerts and receipts. The shift totals mirror the lane order; each label, dot, and value uses an accessible light counterpart of its status hue on the darker hero rather than turning neutral. The throughput group remains on the same row but receives wider, evenly padded columns so its four values scan as a distinct block.
 
 ### Lookout and the AI spectrum
 
@@ -92,9 +92,11 @@ The board uses one intentionally vivid wash per status lane—Act now `#f8d6df`,
 | `ai-violet` | `#8259d6` | Cool bridge |
 | `ai-cool` | `#4f7cdd` | Decorative gradient end |
 
+The shift instrument uses dedicated medium-dark counterparts—`hero-warm` `#68423d`, `hero-gold` `#655033`, `hero-rose` `#603e55`, `hero-violet` `#4c3e67`, and `hero-cool` `#344f73`—with `hero-text` `#fffaf7` for throughput. Its status labels use separately contrast-tested light semantic hues; these do not replace the operational tokens on white surfaces.
+
 The spectrum may appear in:
 
-- the light shift-metrics wash;
+- the medium-dark shift-metrics field;
 - Lookout’s radial avatar field;
 - the AI ordering control and composer outline;
 - the thin active-tab indicator and softly washed recommendation header;
@@ -146,12 +148,12 @@ The original truck mark sits in a soft-orange outlined tile. Orange also marks t
 
 ### Shift instrument
 
-The hero is not a hero in the marketing sense. It is a light, two-sided instrument:
+The hero is not a hero in the marketing sense. It is a medium-dark, two-sided instrument:
 
 - **Left:** Act now, Watch, Offline, On break, and Clear—ordered by dispatch priority and matched exactly to the board lanes.
 - **Right:** Delivered, To deliver, Total stops, and Delivered percentage as four equally aligned facts in the same row.
 
-The soft warm-to-cool wash separates this instrument from the board without the visual weight of a dark block. Status figures remain interactive filter shortcuts.
+The deep warm-to-cool wash separates this instrument from both the board and Lookout's light recommendation wash without becoming near-black. Status labels and figures use accessible lighter variants of their matching operational hues; throughput metrics use warm white. Status figures remain interactive filter shortcuts.
 
 ### Board lanes
 

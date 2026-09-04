@@ -28,6 +28,19 @@
   --color-ai-violet: #8259d6;
   --color-ai-cool: #4f7cdd;
 
+  --color-hero-warm: #68423d;
+  --color-hero-gold: #655033;
+  --color-hero-rose: #603e55;
+  --color-hero-violet: #4c3e67;
+  --color-hero-cool: #344f73;
+  --color-hero-text: #fffaf7;
+  --color-hero-muted: #e5dce3;
+  --color-hero-act: #ffb3c2;
+  --color-hero-watch: #ffd48a;
+  --color-hero-break: #b5ceff;
+  --color-hero-offline: #d8deea;
+  --color-hero-clear: #a2e4c0;
+
   --color-act-now: #9f1f3b;
   --color-act-now-fill: #cb3453;
   --color-act-now-soft: #fff0f3;
@@ -67,8 +80,8 @@ body { @apply bg-canvas text-ink font-sans antialiased; }
 
 .iq-metrics-band {
   background:
-    radial-gradient(circle at 4% -45%, color-mix(in srgb, var(--color-ai-warm) 24%, transparent), transparent 26rem),
-    linear-gradient(108deg, color-mix(in srgb, var(--color-ai-warm) 7%, white) 0%, color-mix(in srgb, var(--color-ai-gold) 5%, white) 24%, color-mix(in srgb, var(--color-ai-rose) 7%, white) 50%, color-mix(in srgb, var(--color-ai-violet) 6%, white) 74%, color-mix(in srgb, var(--color-ai-cool) 8%, white) 100%);
+    radial-gradient(circle at 6% -50%, color-mix(in srgb, var(--color-hero-text) 11%, transparent), transparent 27rem),
+    linear-gradient(108deg, var(--color-hero-warm) 0%, var(--color-hero-gold) 24%, var(--color-hero-rose) 50%, var(--color-hero-violet) 74%, var(--color-hero-cool) 100%);
 }
 
 .iq-soft-surface {
@@ -118,7 +131,7 @@ body { @apply bg-canvas text-ink font-sans antialiased; }
   background: linear-gradient(90deg, var(--color-ai-warm), var(--color-ai-rose), var(--color-ai-violet), var(--color-ai-cool));
 }
 
-.iq-metric-active { box-shadow: inset 0 -2px 0 var(--color-lookout); }
+.iq-metric-active { box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--color-hero-text) 80%, transparent); }
 
 .route-history-progress {
   background: linear-gradient(to bottom, var(--color-route-done-start), var(--color-route-done-end));
