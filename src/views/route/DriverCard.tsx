@@ -8,7 +8,7 @@ import Card from '../../ui/Card'
 import Chip from '../../ui/Chip'
 import CorrectionChip from '../../ui/CorrectionChip'
 import Countdown from '../../ui/Countdown'
-import { BAND_TONE, STALENESS_TONE } from '../../ui/tones'
+import { BAND_TONE, CRITICAL_TONE, STALENESS_TONE } from '../../ui/tones'
 
 const STATUS_LABEL: Record<DutyStatus, string> = { driving: 'driving', on_duty: 'on duty at a stop', on_break: 'on break', off_duty: 'off duty' }
 
@@ -33,7 +33,7 @@ export default function DriverCard({ view, card }: { view: DriverView; card: Ran
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-display text-2xl font-semibold tracking-tight">{view.driver.name}</h2>
-            <Chip tone={tone} dashed={offline}>{card.severity === 'critical' ? 'Over limit' : BAND_LABEL[card.band]}</Chip>
+            <Chip tone={card.severity === 'critical' ? CRITICAL_TONE : tone} dashed={offline}>{card.severity === 'critical' ? 'Over limit' : BAND_LABEL[card.band]}</Chip>
             <Chip tone={view.driftMin > 5 ? BAND_TONE.watch : BAND_TONE.clear}>{fmtDrift(view.driftMin)}</Chip>
             <CorrectionChip driverId={view.driver.id} />
             {view.plannedResetAt !== undefined && <Chip tone={BAND_TONE.break}>reset at {fmtClock(view.plannedResetAt)}</Chip>}

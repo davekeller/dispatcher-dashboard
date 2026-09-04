@@ -2,20 +2,20 @@
 @import "@fontsource-variable/bricolage-grotesque";
 @import "@fontsource-variable/inter";
 
-/* Warm neutral ops palette. Rhymes with a warm, friendly product language without
-   borrowing anyone's brand. Text variants pass AA on panel; fills are for bars and
-   markers only. Lookout wears coral and nothing else does. */
+/* Blue-slate neutral ops palette: cool grays so the warm coral and the band colors are the
+   only warmth on screen. Text variants pass AA on panel; fills are for bars and markers
+   only. Lookout wears coral and nothing else does. */
 @theme {
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-display: "Bricolage Grotesque Variable", "Inter Variable", ui-sans-serif, sans-serif;
 
-  --color-canvas: #f4f3f0;
+  --color-canvas: #f3f4f6;
   --color-panel: #ffffff;
-  --color-well: #ebe9e4;
-  --color-line: #e2dfd8;
-  --color-ink: #1c1a17;
-  --color-muted: #6b665e;
-  --color-label: #7a746a;
+  --color-well: #e8ebef;
+  --color-line: #dde2e8;
+  --color-ink: #161a20;
+  --color-muted: #5b6472;
+  --color-label: #67707e;
   --color-on-accent: #ffffff;
 
   --color-lookout: #cf4620;
@@ -45,7 +45,7 @@
   --radius-card: 12px;
   --radius-control: 8px;
 
-  --shadow-card: 0 1px 2px rgba(28, 26, 23, 0.06), 0 1px 3px rgba(28, 26, 23, 0.08);
+  --shadow-card: 0 1px 2px rgba(22, 26, 32, 0.06), 0 1px 3px rgba(22, 26, 32, 0.08);
 }
 
 html, body, #root { height: 100%; }

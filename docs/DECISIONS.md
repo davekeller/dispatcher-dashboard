@@ -39,3 +39,7 @@ One line per meaningful choice or cut. Newest at the bottom.
 | 33 | Route file: one driver card, alerts, then stops on a vertical spine with the now and limit marks; the horizontal ribbon is gone | Attached to the stops, "where is he and can he make it" reads better than a proportional time axis |
 | 34 | Filter bar is dropdowns on one row with search at the right | Chip rows wrapped beside the open rail |
 | 35 | Route file gets a sticky left rail in the case-file pattern: a vertical, proportional duty timeline with the stops as nodes, now and limit marks, active node following scroll, click to jump; collapses to the bar and dots. Supersedes 33 | Dave's directive: a vertical combination of the Duty Today line and the stops line, in the same navigation pattern as the Meridian case file |
+| 36 | Lookout has a face, a one-line read of the shift, and two tabs, Alerts and Chat; Alerts shows the top three with the rest behind a count | The rail felt like a lot; the top few is what Lena reads |
+| 37 | Chat ships as three matched intents in Phase 1, not a model | The tab needed real content; the pattern is the point, and replies are the same cards |
+| 38 | Over-limit chips are solid dark red with white text | The one state that must never be missed |
+| 39 | Neutrals retinted from warm to blue-slate | The warm ramp read yellow; cool grays leave the coral and the bands as the only warmth |

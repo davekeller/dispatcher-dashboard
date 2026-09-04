@@ -334,7 +334,7 @@ Content, in reading order:
 
 ### Lookout rail
 
-Header with the name and a collapse control (avatar later). **Alert bar**: the top three, one line each, band-colored, live countdowns; click opens the route file. **Recommendation cards**: the full ranked list, one card per driver with every reason, 2–3 actions each, same handlers as the route file. On a route file the rail pins that driver's card at the top and lists the rest below. Chat arrives in Phase 2 as matched intents that render these same cards; the no-match reply lists what Lookout can do.
+Header: Lookout's face (a placeholder circle until Dave draws the real one), the name, and one line that reads the shift ("3 need you now. Start with Priya S."), with a collapse control. Two tabs. **Alerts**: the top three ranked cards, one card per driver with every reason and 2–3 actions, same handlers as the route file; the rest sit behind "Show N more" so the rail never feels like a list of fifty. On a route file the tab pins that driver's card first. **Chat**: a conversational way to the same cards. Intent matching is a lookup, not a model (`lookout/intents.ts`): near the limit, offline, and reassign by first name; the no-match reply lists what Lookout can do as tappable examples. Replies render the same cards, so the two tabs can never disagree.
 
 Lookout never has its own data. It reads `ranked` and nothing else.
 
@@ -376,19 +376,19 @@ Each is designed, not discovered. Where it shows up is as important as what happ
 
 ## 11. Visual system
 
-Neutral, dense, calm, warm. Ops software used mid-shift. Rhymes with the warmth of modern hospitality software and the proactive-feed pattern of an in-product assistant, without borrowing anyone's brand.
+Neutral, dense, calm, cool. Ops software used mid-shift. Rhymes with the warmth of modern hospitality software and the proactive-feed pattern of an in-product assistant, without borrowing anyone's brand.
 
 **Tokens** (Tailwind v4 `@theme`, all in `index.css`; components use tokens only, never raw hex):
 
 | Token | Value | Use |
 |---|---|---|
-| `--color-canvas` | `#f4f3f0` | Page ground |
+| `--color-canvas` | `#f3f4f6` | Page ground (blue-slate neutrals; the coral and the bands are the only warmth) |
 | `--color-panel` | `#ffffff` | Cards, rail |
-| `--color-well` | `#ebe9e4` | Inset grounds, column backgrounds |
-| `--color-line` | `#e2dfd8` | Keylines |
-| `--color-ink` | `#1c1a17` | Text, primary buttons |
-| `--color-muted` | `#6b665e` | Secondary text |
-| `--color-label` | `#7a746a` | Micro-labels on panel only |
+| `--color-well` | `#e8ebef` | Inset grounds, column backgrounds |
+| `--color-line` | `#dde2e8` | Keylines |
+| `--color-ink` | `#161a20` | Text, primary buttons |
+| `--color-muted` | `#5b6472` | Secondary text |
+| `--color-label` | `#67707e` | Micro-labels on panel only |
 | `--color-lookout` / `-strong` / `-soft` | `#cf4620` / `#a83a15` / `#ffe9e2` | Lookout, and only Lookout |
 | `--color-act-now` / `-fill` / `-soft` | `#b3323f` / `#c9414f` / `#fbeaec` | Act now and Over limit |
 | `--color-watch` / `-fill` / `-soft` | `#8f5f0e` / `#d19a2a` / `#fbf3e3` | Watch |
@@ -397,7 +397,7 @@ Neutral, dense, calm, warm. Ops software used mid-shift. Rhymes with the warmth 
 | `--color-break` / `-fill` / `-soft` | `#3262a8` / `#6f9bd6` / `#e9f0fa` | On break |
 | `--color-on-accent` | `#ffffff` | Text on saturated grounds |
 
-Text variants must pass AA on panel; fills are for bars and markers. Validate the pairs once during theme setup and note the results in `DECISIONS.md`. Watch's text color is deliberately darker than its fill so it clears AA while staying distinct from Lookout's coral.
+Over the limit is the one state that must never be missed: its chip is solid dark red with white text everywhere it appears. Text variants must pass AA on panel; fills are for bars and markers. Validate the pairs once during theme setup and note the results in `DECISIONS.md`. Watch's text color is deliberately darker than its fill so it clears AA while staying distinct from Lookout's coral.
 
 **Type.** Bricolage Grotesque Variable for display: page titles, the large countdown, metric numbers. Inter Variable for everything else, `font-variant-numeric: tabular-nums` on every countdown and duration so rows never jitter. Two faces, no serif.
 
