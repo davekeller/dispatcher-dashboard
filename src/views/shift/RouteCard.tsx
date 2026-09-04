@@ -8,19 +8,14 @@ import type { DriverView } from '../../store/view'
 import Chip from '../../ui/Chip'
 import CorrectionChip from '../../ui/CorrectionChip'
 import DriverAvatar from '../../ui/DriverAvatar'
-import Countdown from '../../ui/Countdown'
-import { BAND_TONE, LOOKOUT_TONE, severityTone } from '../../ui/tones'
+import RouteHeader, { PRIORITY_RULES } from '../../ui/RouteHeader'
+import { LOOKOUT_TONE, severityTone } from '../../ui/tones'
 import RouteTimelineMini from './RouteTimelineMini'
-
-const PRIORITY_RULES = new Set(['over_limit', 'limit_act_now', 'limit_watch', 'behind_schedule'])
 
 /** The route is the card's primary entity; its driver and truck are assignment metadata.
  * Color is attention, clear work stays quiet, and nothing drags because bands are derived. */
 export default function RouteCard({ view, card, pick = false }: { view: DriverView; card: DriverCard; pick?: boolean }) {
-  const tone = BAND_TONE[card.band]
   const quiet = card.band === 'clear' && !pick
-  const stale = view.staleness !== 'fresh'
-  const offline = view.staleness === 'offline'
   const surface = quiet ? 'border-line/70 bg-panel/80 opacity-80 hover:opacity-100' : 'border-line bg-panel shadow-card'
   const dim = card.snoozed ? 'opacity-60' : ''
   const hasCorrection = useStore((s) => Boolean(s.corrections[view.driver.id]))
@@ -28,20 +23,12 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
   const hosText = hos.tone === 'act_now' ? 'text-act-now' : hos.tone === 'watch' ? 'text-watch' : 'text-clear'
   const hosFill = hos.tone === 'act_now' ? 'bg-act-now-fill' : hos.tone === 'watch' ? 'bg-watch-fill' : 'bg-clear-fill'
   const pastLimitCount = stopsPastLimit(view).length
-  const priorityAlert = card.alerts.find((alert) => PRIORITY_RULES.has(alert.ruleId))
   const detailAlerts = card.alerts.filter((alert) => !PRIORITY_RULES.has(alert.ruleId))
   const riskValue = pastLimitCount > 0 ? `${pastLimitCount} past HOS` : view.lateStops.length > 0 ? `${view.lateStops.length} late` : 'Clear'
   const riskTone = pastLimitCount > 0 ? 'text-act-now' : view.lateStops.length > 0 ? 'text-watch' : 'text-clear'
   return (
     <Link to={`/routes/${view.driver.id}`} className={`group block shrink-0 overflow-hidden rounded-card border transition hover:-translate-y-px hover:border-ink/25 hover:shadow-md ${surface} ${dim}`}>
-      <div className="flex items-center gap-2 border-b border-line/70 py-1.5 pl-3 pr-2">
-        <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${offline ? `border-2 border-dashed ${tone.border}` : tone.fill}`} aria-hidden="true" />
-        <span className="shrink-0 whitespace-nowrap font-mono text-[12px] font-semibold tracking-tight text-ink" title={`Route ${view.route.id.toUpperCase()}`}>{view.route.id.toUpperCase()}</span>
-        <span className="ml-auto flex min-w-0 items-center gap-1.5">
-          {priorityAlert && <Chip tone={severityTone(priorityAlert.severity)} className="px-1.5 py-0 text-[9px] leading-4" title={priorityAlert.title}>{priorityAlert.label}</Chip>}
-          <Countdown minutes={view.minutesUntilLimit} stale={stale} />
-        </span>
-      </div>
+      <RouteHeader view={view} card={card} />
       <div className="flex min-h-[8.5rem]">
         <RouteTimelineMini view={view} />
         <div className="flex min-w-0 flex-1 flex-col">
