@@ -10,6 +10,7 @@ interface Metric {
   value: number
   preset: FilterState
   dot: string
+  tone: string
   detail?: string
 }
 
@@ -22,11 +23,11 @@ function sameFilters(a: FilterState, b: FilterState): boolean {
 export default function ShiftHero({ metrics, ranked, filters, onPreset }: { metrics: Metrics; ranked: DriverCard[]; filters: FilterState; onPreset: (filters: FilterState) => void }) {
   const count = (band: Band) => ranked.filter((card) => card.band === band).length
   const items: Metric[] = [
-    { id: 'act_now', label: BAND_LABEL.act_now, value: count('act_now'), preset: { ...EMPTY_FILTERS, band: ['act_now'] }, dot: 'bg-act-now-fill', detail: `${metrics.over} over limit` },
-    { id: 'watch', label: BAND_LABEL.watch, value: count('watch'), preset: { ...EMPTY_FILTERS, band: ['watch'] }, dot: 'bg-watch-fill' },
-    { id: 'break', label: BAND_LABEL.break, value: count('break'), preset: { ...EMPTY_FILTERS, band: ['break'] }, dot: 'bg-break-fill' },
-    { id: 'offline', label: BAND_LABEL.offline, value: count('offline'), preset: { ...EMPTY_FILTERS, band: ['offline'] }, dot: 'bg-offline-fill' },
-    { id: 'clear', label: BAND_LABEL.clear, value: count('clear'), preset: { ...EMPTY_FILTERS, band: ['clear'] }, dot: 'bg-clear-fill' },
+    { id: 'act_now', label: BAND_LABEL.act_now, value: count('act_now'), preset: { ...EMPTY_FILTERS, band: ['act_now'] }, dot: 'bg-act-now-board', tone: 'text-act-now-board', detail: `${metrics.over} over limit` },
+    { id: 'watch', label: BAND_LABEL.watch, value: count('watch'), preset: { ...EMPTY_FILTERS, band: ['watch'] }, dot: 'bg-watch-board', tone: 'text-watch-board' },
+    { id: 'break', label: BAND_LABEL.break, value: count('break'), preset: { ...EMPTY_FILTERS, band: ['break'] }, dot: 'bg-break-board', tone: 'text-break-board' },
+    { id: 'offline', label: BAND_LABEL.offline, value: count('offline'), preset: { ...EMPTY_FILTERS, band: ['offline'] }, dot: 'bg-offline-board', tone: 'text-offline-board' },
+    { id: 'clear', label: BAND_LABEL.clear, value: count('clear'), preset: { ...EMPTY_FILTERS, band: ['clear'] }, dot: 'bg-clear-board', tone: 'text-clear-board' },
   ]
   const toDeliver = metrics.stopsRemaining + metrics.needDriver
   const totalStops = metrics.stopsDelivered + toDeliver + metrics.stopsFailed
@@ -53,12 +54,12 @@ export default function ShiftHero({ metrics, ranked, filters, onPreset }: { metr
                 }}
                 className={`min-w-[5.75rem] cursor-pointer px-4 py-1 text-left outline-none transition first:pl-0 hover:bg-white/10 focus-visible:bg-white/15 ${active ? 'iq-metric-active bg-white/15' : ''}`}
               >
-                <dt className="flex items-center gap-1.5 whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.05em] text-white/75">
+                <dt className={`flex items-center gap-1.5 whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.05em] ${item.tone}`}>
                   <span className={`h-2 w-2 rounded-full ${item.dot}`} /> {item.label}
                 </dt>
                 <dd className="mt-1.5 flex items-baseline gap-2">
-                  <span className="tnum font-display text-[2rem] font-semibold leading-none tracking-[-0.045em] text-on-accent">{item.value}</span>
-                  {item.detail && <span className="whitespace-nowrap text-[10px] font-semibold text-white/70">{item.detail}</span>}
+                  <span className={`tnum font-display text-[2rem] font-semibold leading-none tracking-[-0.045em] ${item.tone}`}>{item.value}</span>
+                  {item.detail && <span className={`whitespace-nowrap text-[10px] font-semibold ${item.tone}`}>{item.detail}</span>}
                 </dd>
               </div>
             )

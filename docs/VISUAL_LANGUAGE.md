@@ -92,7 +92,7 @@ The board uses one intentionally vivid wash per status lane—Act now `#f8d6df`,
 | `ai-violet` | `#8259d6` | Cool bridge |
 | `ai-cool` | `#4f7cdd` | Decorative gradient end |
 
-The shift instrument is deliberately outside the AI spectrum. It uses a fully desaturated city photograph beneath a single 70%-opacity warm-black overlay, with white and translucent-white metrics above it. Only the small status dots retain operational color. This keeps the hero neutral and distinct from Lookout's decorative branding.
+The shift instrument is deliberately outside the AI spectrum. It uses a fully desaturated city photograph beneath a single 70%-opacity warm-black overlay. The five status readings reuse their board-header wash colors as high-contrast foregrounds; throughput remains white and translucent white. This keeps the hero neutral and distinct from Lookout's decorative branding while preserving the board-to-hero status mapping.
 
 The spectrum may appear in:
 
@@ -152,7 +152,7 @@ The hero is not a hero in the marketing sense. It is a compact, two-sided instru
 - **Left:** Act now, Watch, On break, Offline, and Clear—ordered by dispatch priority and matched exactly to the board lanes.
 - **Right:** Delivered, To deliver, Total stops, and Delivered percentage as four equally aligned facts in the same row.
 
-An original, brand-free photograph of a fictional Midwestern skyline and road network gives the instrument operational atmosphere. The photograph is completely desaturated before a warm near-black layer is applied at 70% opacity. Labels and figures are monochrome white; only the small dots retain semantic status color. Status figures remain interactive filter shortcuts.
+An original, brand-free photograph of a fictional Midwestern skyline and road network gives the instrument operational atmosphere. The photograph is completely desaturated before a warm near-black layer is applied at 70% opacity. Each status label, value, detail, and dot uses the same light color as its board-lane header background; the four throughput metrics remain white. Status figures remain interactive filter shortcuts.
 
 ### Board lanes
 
