@@ -67,6 +67,7 @@ export default function LookoutSidebar() {
           {(['chat', 'timeline'] as const).map((t) => (
             <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`-mb-px flex h-full items-center gap-1.5 border-b-2 px-3 text-[12px] font-semibold capitalize ${tab === t ? 'border-lookout text-ink' : 'border-transparent text-muted hover:text-ink'}`}>
               {t}
+              {t === 'chat' && urgentCards.length > 0 && <span className="tnum rounded-full bg-act-now px-1.5 text-[10px] font-semibold leading-4 text-on-accent" title={`${urgentCards.length} need action now`}>{urgentCards.length}</span>}
             </button>
           ))}
         </div>
@@ -81,7 +82,7 @@ export default function LookoutSidebar() {
       </header>
       {tab === 'chat' ? (
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <RecommendationsBar open={recOpen} onToggle={() => setRecOpen((o) => !o)} summary={summary} count={urgentCards.length}>
+          <RecommendationsBar open={recOpen} onToggle={() => setRecOpen((o) => !o)} summary={summary}>
             {pinned && (
               <>
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-label">{LOOKOUT.focusIntro(byId.get(pinned.driverId)!.driver.name)}</p>
