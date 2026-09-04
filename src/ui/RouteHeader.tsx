@@ -21,7 +21,7 @@ export default function RouteHeader({ view, card }: { view: DriverView; card: Dr
   return (
     <div className="flex min-h-10 items-center border-b border-line/70 pr-2">
       <span className="flex w-6 shrink-0 items-center justify-center" aria-hidden="true">
-        <span className={`h-3 w-3 rounded-full ${offline ? `border-2 border-dashed ${tone.border}` : tone.fill}`} />
+        <span className={`h-2 w-2 rounded-full ${offline ? `border border-dashed ${tone.border}` : tone.fill}`} />
       </span>
       <span className="shrink-0 whitespace-nowrap font-mono text-[13px] font-semibold tracking-tight text-ink" title={`Route ${view.route.id.toUpperCase()}`}>{view.route.id.toUpperCase()}</span>
       <span className="ml-auto flex min-w-0 items-center gap-1.5">

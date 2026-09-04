@@ -161,7 +161,7 @@ Lane headers use the status soft color as a wash. Cards remain white and use a r
 
 Completed paths and markers share one semantic progress gradient, moving from soft sage at the route start to dark clear-green at the current edge. These same endpoints are reserved for a future stop-map counterpart.
 
-Route cards use the same distinct title row as Lookout recommendations. A larger overall-route status dot leads the route id; the highest-priority badge—Over limit, Approaching limit, or Behind schedule—and countdown share the right edge. Directly below the dot, the stop spine continues down the left of the driver assignment and scan grid, turning the overall status marker into the visual head of route progress. Driver name and truck/region sit beside the avatar, with muted refresh age at the row's upper right:
+Route cards use the same distinct title row as Lookout recommendations. A compact overall-route status dot, matched to the board-lane header dots, leads the route id; the highest-priority badge—Over limit, Approaching limit, or Behind schedule—and countdown share the right edge. Directly below the dot, the stop spine continues down the left of the driver assignment and scan grid, turning the overall status marker into the visual head of route progress. Driver name and truck/region sit beside the avatar, with muted refresh age at the row's upper right:
 
 - green node: delivered;
 - gray circle: undelivered and still viable;
