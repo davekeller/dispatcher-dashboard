@@ -13,13 +13,13 @@ export default function TimelinePanel({ events }: { events: ShiftEvent[] }) {
       {rows.length <= 1 && <EmptyState title="Nothing has happened yet this session." body="Actions, snoozes, and reconnects land here as they happen." />}
       <ol className="flex flex-col">
         {rows.map((e, i) => (
-          <li key={e.seq} className="grid grid-cols-[4rem_1rem_1fr] gap-x-2">
-            <span className="tnum pt-0.5 text-right text-[11px] text-muted">{fmtClock(e.at)}</span>
+          <li key={e.seq} className="grid grid-cols-[3.5rem_0.75rem_1fr] gap-x-1.5">
+            <span className="tnum text-right text-[10px] leading-4 text-muted">{fmtClock(e.at)}</span>
             <span className="relative flex justify-center" aria-hidden="true">
-              {i < rows.length - 1 && <span className="absolute top-3 bottom-0 w-px bg-line" />}
-              <span className={`relative mt-1.5 h-2 w-2 rounded-full ${DOT[e.kind]}`} />
+              {i < rows.length - 1 && <span className="absolute top-2.5 bottom-0 w-px bg-line" />}
+              <span className={`relative mt-1 h-1.5 w-1.5 rounded-full ${DOT[e.kind]}`} />
             </span>
-            <p className="pb-3 text-[12px] leading-snug text-ink">{e.label}</p>
+            <p className="pb-2 text-[11px] leading-4 text-ink">{e.label}</p>
           </li>
         ))}
       </ol>
