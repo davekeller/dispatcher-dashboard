@@ -96,7 +96,7 @@ flowchart TD
 
 - **What keeps counting.** Drive time still accumulates while offline — the truck didn't stop because the radio did. The countdown continues from the last known segment. Label it as an estimate; don't freeze it and don't hide it.
 - **Two clocks.** `now − lastPingAt` is data age. `minutesUntilLimit` is legal exposure. They're independent and both shown. Never blend them into one "status."
-- **Tier constants.** 3 and 15 minutes are guesses. Put them in one place and say so in the walkthrough — real values come from how often the telematics actually pings.
+- **Tier constants.** 3 and 15 minutes are guesses. Put them in one place and say so — real values come from how often the telematics actually pings.
 - **Offline is its own band, not a modifier.** In the list, a driver is in the Offline band even if their HOS is clear — because Lena needs to know she's blind on them. But a driver offline *and* near limit needs to sort above a fresh driver at the same HOS. The ranking function handles this; the band is just where the row sits.
 - **Recovery.** When a ping comes back, the estimate may jump. Show the correction briefly ("updated — was ~40 min, now 33 min") rather than silently replacing it. Cheap to build, and it's the honest thing.
 - **Don't fake precision.** Stale rows show `~0:40` not `0:40:17`. Precision drops with age.
@@ -150,14 +150,14 @@ flowchart LR
 
 - **The alert bar is not a third list.** It's `alerts.slice(0, 3)`. If it needs its own logic, something's wrong upstream.
 - **Card actions must do exactly what drill-in actions do.** Same handlers, same confirm, same result. Duplicated action code is where behavior drifts.
-- **Intent matching is a lookup, not a model.** A small array of `{ patterns: RegExp[], handler }`. Phase 2. It exists to show the pattern, not to be clever. Say that plainly in the walkthrough.
+- **Intent matching is a lookup, not a model.** A small array of `{ patterns: RegExp[], handler }`. Phase 2. It exists to show the pattern, not to be clever. Say that plainly in the docs.
 - **The no-match path is the most-hit path.** Make it useful: list what the co-pilot can do, with tappable examples.
 - **Collapse behavior.** When the pane is collapsed to a rail, the badge shows the act-now count. The bar still exists — it's the rail.
 - **Naming.** The co-pilot has its own name and voice. It is a feature of this product, not a reference to anyone else's.
 
 ---
 
-## 6. Live change — adding a rule during the walkthrough
+## 6. Adding a rule live
 
 ```mermaid
 flowchart LR
@@ -172,6 +172,6 @@ flowchart LR
 
 - **The rule shape has to be obvious.** Someone reading `rules.ts` for the first time should be able to copy the last object and edit it. Type it tightly so a wrong shape fails at compile, not at demo.
 - **A planted driver should match.** The 30-minute break rule (8h cumulative driving, no 30-min break) needs a seed driver who trips it. Plant one now.
-- **The filter side.** If they ask for a filter instead of an alert, `src/filters.ts` has the same one-object shape. Plant nothing — filters are declarative.
+- **The filter side.** If the ask is a filter instead of an alert, `src/filters.ts` has the same one-object shape. Plant nothing — filters are declarative.
 - **HMR must be fast.** Keep the rules file free of heavy imports. Nothing in there but pure functions and copy.
 - **Rehearse it.** Add a rule, delete it, add it again. Under two minutes, narrating.

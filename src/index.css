@@ -2,7 +2,7 @@
 @import "@fontsource-variable/bricolage-grotesque";
 @import "@fontsource-variable/inter";
 
-/* Warm, hospitality-adjacent operations palette: paper-like neutrals, near-black type,
+/* Warm operations palette: paper-like neutrals, near-black type,
    and accessible orange for Lookout. Its ember-to-blue spectrum is reserved for subtle
    AI surfaces; operational status colors keep their own meaning. */
 @theme {
@@ -65,13 +65,13 @@ html, body, #root { height: 100%; }
 body { @apply bg-canvas text-ink font-sans antialiased; }
 .tnum { font-variant-numeric: tabular-nums; }
 
-.iq-metrics-band {
+.lookout-metrics-band {
   background:
     radial-gradient(circle at 4% -45%, color-mix(in srgb, var(--color-ai-warm) 24%, transparent), transparent 26rem),
     linear-gradient(108deg, color-mix(in srgb, var(--color-ai-warm) 7%, white) 0%, color-mix(in srgb, var(--color-ai-gold) 5%, white) 24%, color-mix(in srgb, var(--color-ai-rose) 7%, white) 50%, color-mix(in srgb, var(--color-ai-violet) 6%, white) 74%, color-mix(in srgb, var(--color-ai-cool) 8%, white) 100%);
 }
 
-.iq-soft-surface {
+.lookout-soft-surface {
   background: linear-gradient(105deg, #fff3eb 0%, #fff8e8 26%, #fff1f6 52%, #f7f1ff 76%, #edf5ff 100%);
 }
 
@@ -81,21 +81,21 @@ body { @apply bg-canvas text-ink font-sans antialiased; }
     linear-gradient(180deg, #ffffff 0%, #ffffff 62%, #fff9f5 100%);
 }
 
-.iq-card-ring {
+.lookout-card-ring {
   border-color: transparent;
   background:
     linear-gradient(#ffffff, #ffffff) padding-box,
     linear-gradient(120deg, var(--color-ai-warm), var(--color-ai-gold) 24%, var(--color-ai-rose) 50%, var(--color-ai-violet) 75%, var(--color-ai-cool)) border-box;
 }
 
-.iq-input-ring {
+.lookout-input-ring {
   border-color: transparent;
   background:
     linear-gradient(#ffffff, #ffffff) padding-box,
     linear-gradient(110deg, var(--color-ai-warm), var(--color-ai-gold) 24%, var(--color-ai-rose) 50%, var(--color-ai-violet) 75%, var(--color-ai-cool)) border-box;
 }
 
-.iq-composer-shell {
+.lookout-composer-shell {
   border-color: transparent;
   background:
     linear-gradient(#ffffff, #ffffff) padding-box,
@@ -104,11 +104,11 @@ body { @apply bg-canvas text-ink font-sans antialiased; }
   transition: box-shadow 160ms ease;
 }
 
-.iq-composer-shell:focus-within {
+.lookout-composer-shell:focus-within {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ai-cool) 14%, transparent), 0 7px 22px color-mix(in srgb, var(--color-ai-rose) 12%, transparent);
 }
 
-.iq-tab-active::after {
+.lookout-tab-active::after {
   position: absolute;
   right: .75rem;
   bottom: 0;
@@ -118,7 +118,7 @@ body { @apply bg-canvas text-ink font-sans antialiased; }
   background: linear-gradient(90deg, var(--color-ai-warm), var(--color-ai-rose), var(--color-ai-violet), var(--color-ai-cool));
 }
 
-.iq-metric-active { box-shadow: inset 0 -2px 0 var(--color-lookout); }
+.lookout-metric-active { box-shadow: inset 0 -2px 0 var(--color-lookout); }
 
 .route-history-progress {
   background: linear-gradient(to bottom, var(--color-route-done-start), var(--color-route-done-end));

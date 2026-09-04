@@ -25,7 +25,7 @@ Vite · React 19 · TypeScript · Tailwind v4 (via `@tailwindcss/vite`). Light t
 | Runtime dependency | Why |
 |---|---|
 | `react`, `react-dom` | UI |
-| `react-router` | Three real routes now, two more in Phase 2; drivers get URLs for the walkthrough |
+| `react-router` | Three real routes now, two more in Phase 2; drivers get URLs worth sharing |
 | `zustand` | One small store with actions and one-level undo; less ceremony than context + reducer |
 | `@phosphor-icons/react` | Interface icons in the duotone weight |
 | `@fontsource-variable/bricolage-grotesque`, `@fontsource-variable/inter` | Display and body faces, bundled, no CDN |
@@ -33,7 +33,7 @@ Vite · React 19 · TypeScript · Tailwind v4 (via `@tailwindcss/vite`). Light t
 
 Dev: `vite`, `typescript`, `vitest`, `oxlint`, `@vitejs/plugin-react`, `@types/*`.
 
-Reviewers read the package.json. Nothing else goes in without a one-line reason in `DECISIONS.md`.
+The dependency list is read as closely as the code. Nothing else goes in without a one-line reason in `DECISIONS.md`.
 
 ---
 
@@ -100,7 +100,7 @@ interface Truck {
   lastPingAt: number
 }
 
-interface Delivery {                        // the brief's "deliveries with attributes", by name
+interface Delivery {                        // deliveries with attributes, as a named entity
   id: string
   customer: string
   address: string
@@ -156,7 +156,7 @@ A route belongs to one driver for the day, so a card on the board is a route, a 
 | Priya S. | Over the limit by ~6 min, still driving | Violation state, different card and actions |
 | Dre W. | Offline 25 min; last-known ~40 min to limit; truth: went on break 5 min after the last ping | Unknown + high-stakes sorts up; recovery correction on reconnect |
 | Elena M. | On break, 20 min in, ~2h to limit | Segments understood; countdown paused |
-| Sam K. | 8h05m cumulative driving with no 30-min break | Trips the 30-minute-break rule added live during the panel |
+| Sam K. | 8h05m cumulative driving with no 30-min break | Trips the 30-minute-break rule, the worked example for adding a rule |
 | Nadia F. | Stale 4 min; ~130 min to limit, driving | The stale tier on its own: tilde, dropped seconds, age label, band unchanged. Eleven minutes into a demo she goes dark and becomes the Offline band's first member, still clear |
 | Tomas B. | 50 min behind schedule, 7 stops left, HOS clear | Every remaining stop misses its window; the schedule rule alone, without HOS |
 | Lucia B. | All 20 stops done, heading in | The "route complete" edge path has a live example |
@@ -172,7 +172,7 @@ Everyone else is comfortably clear so the board is not all red. Each planted day
 - `clock.ts`: `SCENARIO_ANCHOR` = today at 14:47:00 local. `now = anchor + (Date.now() − loadedAt) + scrubOffset`. The clock is live (it ticks), deterministic (same scenario every load), and scrubbable.
 - `useNow()`: one hook, ticks every `TICK_MS = 5000`, value rounded to the tick so memo keys are stable. Nothing else reads `Date.now()`.
 - **Simulated telematics.** Drivers without `pingsSuspended` are treated as pinging continuously: their effective `lastPingAt` is `now − jitter(driverId)` with jitter 0–90s. Planted stale/offline drivers keep their stored `lastPingAt`. This is derivation, not mutation, so the fleet does not go offline when the clock is scrubbed or a tab is left open.
-- **The world moves.** The generated fleet is a whole simulated day: every generated stop carries the time the driver will reach it and leave it, and `materialize(fleet, now)` (`src/data/simulate.ts`) sets stop statuses from the clock on every tick and every scrub. The planted scenarios carry no future times, so they hold still for the demo. Scrub an hour and the fleet has completed its next stops; leave a tab open through a panel and the board does not slowly fill with drivers who fell behind a frozen plan.
+- **The world moves.** The generated fleet is a whole simulated day: every generated stop carries the time the driver will reach it and leave it, and `materialize(fleet, now)` (`src/data/simulate.ts`) sets stop statuses from the clock on every tick and every scrub. The planted scenarios carry no future times, so they hold still for the demo. Scrub an hour and the fleet has completed its next stops; leave a tab open for an hour and the board does not slowly fill with drivers who fell behind a frozen plan.
 - **The simulated-shift control.** The clock in the product bar is a button, "2:47 PM · Simulated shift" with a clock icon, that opens a panel anchored under it (`⌘.` too). The panel says in plain words that this is a simulated day pinned to 2:47 PM and that the clock is live, offers a horizontal scrubber across four hours plus +15 min, +1 hour, and back-to-2:47 buttons, and explains each demo action in a sentence: bring Dre online (clears `pingsSuspended`; the estimate corrects out loud), advance Marcus a stop, undo, reset the shift. It exists so a reviewer finds it, understands it, and can fire any alert on demand.
 
 ---
@@ -228,7 +228,7 @@ interface Rule {
 export const RULES: Rule[] = [ /* one object per rule */ ]
 ```
 
-Fixed severity and a `when` predicate keeps the shape copy-pasteable in front of the panel. Rules that need two severities are two objects. Every rule but the two offline rules is gated on `visible` (not offline): the offline rules own dark drivers with one card. The limit rules (`limit_*`, `wont_finish`) also require driving or on duty, so a break pauses the clock and the alert resumes with the driver. Late means a customer's window is at risk, not merely behind the plan: the plan slips all day while the world stands still, and the window is the promise.
+Fixed severity and a `when` predicate keeps the shape copy-pasteable in a live demo. Rules that need two severities are two objects. Every rule but the two offline rules is gated on `visible` (not offline): the offline rules own dark drivers with one card. The limit rules (`limit_*`, `wont_finish`) also require driving or on duty, so a break pauses the clock and the alert resumes with the driver. Late means a customer's window is at risk, not merely behind the plan: the plan slips all day while the world stands still, and the window is the promise.
 
 | id | severity | fires when | actions |
 |---|---|---|---|
@@ -240,7 +240,7 @@ Fixed severity and a `when` predicate keeps the shape copy-pasteable in front of
 | `offline` | watch | offline and last-known `minutesUntilLimit > 90` | call_driver, acknowledge |
 | `behind_schedule` | watch | visible and a pending stop's projected ETA is past its delivery window | notify_customer, reassign |
 | `stops_unassigned` | info | visible and the route has unassigned stops | reassign |
-| `break_due` | watch | **added live during the panel**: ≥ 8h driving since last 30-min break | schedule_reset |
+| `break_due` | watch | **the worked example, added live in demos**: ≥ 8h driving since last 30-min break | schedule_reset |
 
 Copy is written in `message()` in Lookout's voice (`lookout/voice.ts` holds the name and shared phrases): "Marcus R. hits his limit in 18 min with 3 stops left." "Priya S. is over her limit by 6 min. She needs to stop now." "Dre W. hasn't pinged in 25 min. Last estimate: ~40 min to limit." Stale figures carry the tilde and the age.
 
@@ -294,7 +294,7 @@ Every action follows the same protocol: **preview → confirm → commit → rec
 
 The truck logo is an icon-only `ink` tile; the Dispatch wordmark remains separate dark text on the white product bar. Board is a lightweight dark text-and-icon navigation item without a resting fill, leaving the truck tile as the header's single industrial anchor.
 
-Two panes. The product bar reads **Dispatch**, then the active **Board** workspace, the shift clock, and the dev toggle; on a route file a breadcrumb continues with "RT-01 · Marcus R." There is no left nav: the board is the whole product for this exercise. The Status/Region lens lives with the board controls. Main outlet. Lookout sidebar mounted once at app level, reading derived state directly; pages set the focus driver through context. Collapsed, it becomes a rail with the act-now count as a badge.
+Two panes. The product bar reads **Dispatch**, then the active **Board** workspace, the shift clock, and the dev toggle; on a route file a breadcrumb continues with "RT-01 · Marcus R." There is no left nav: the board is the whole product for now. The Status/Region lens lives with the board controls. Main outlet. Lookout sidebar mounted once at app level, reading derived state directly; pages set the focus driver through context. Collapsed, it becomes a rail with the act-now count as a badge.
 
 | Route | View | Phase |
 |---|---|---|
@@ -383,7 +383,7 @@ Each is designed, not discovered. Where it shows up is as important as what happ
 
 ## 11. Visual system
 
-Warm, dense, calm, and direct. This is operations software used mid-shift, expressed with hospitality-adjacent paper neutrals, near-black type, and modest radii. Lookout's AI moments add a restrained ember-to-gold-to-rose-to-violet-to-blue spectrum; the gradient is never used for operational severity. The system rhymes with contemporary hospitality software without borrowing a logo, branded asset, layout, or exact palette.
+Warm, dense, calm, and direct. This is operations software used mid-shift, expressed with paper neutrals, near-black type, and modest radii. Lookout's AI moments add a restrained ember-to-gold-to-rose-to-violet-to-blue spectrum; the gradient is never used for operational severity. The system rhymes with contemporary product software without borrowing a logo, branded asset, layout, or exact palette.
 
 **Tokens** (Tailwind v4 `@theme`, all in `index.css`; components use tokens only, never raw hex):
 
@@ -420,7 +420,7 @@ Over the limit is the one state that must never be missed: its chip is solid dar
 
 ## 12. Testing
 
-Vitest, `*.test.ts` beside the module. No UI snapshot tests; the panel reads the derivation tests.
+Vitest, `*.test.ts` beside the module. No UI snapshot tests; the derivation tests are the ones worth reading.
 
 - `hos/compute.test.ts`: ongoing segment closes at now; break pauses accumulation; `segmentsKnownAt` hides post-ping segments; thresholds at exactly 30:00, 90:00, 0:00; staleness at 3 and 15; `limitHitAt` skips service time; drift sign.
 - `alerts/rank.test.ts`: one card per driver; severity then time then staleness; stable order across two ticks; snooze demotes but never removes act now.
@@ -433,7 +433,7 @@ Vitest, `*.test.ts` beside the module. No UI snapshot tests; the panel reads the
 
 ## 13. Phasing and budget
 
-**Phase 1, the submittable product.** Shell, routing, tokens · data, seed, clock, pings · compute, rules, rank, bands, tests · store, actions, undo · Active Shift with metrics, board, cards, filters · Lookout rail · route file with header, alert strip, metrics, ribbon, duty timeline, receipts · the three action dialogs · staleness, copy, empty states · deploy, README, DECISIONS.
+**Phase 1, the shippable product.** Shell, routing, tokens · data, seed, clock, pings · compute, rules, rank, bands, tests · store, actions, undo · Active Shift with metrics, board, cards, filters · Lookout rail · route file with header, alert strip, metrics, ribbon, duty timeline, receipts · the three action dialogs · staleness, copy, empty states · deploy, README, DECISIONS.
 
 | Block | Min |
 |---|---|
@@ -449,7 +449,7 @@ Vitest, `*.test.ts` beside the module. No UI snapshot tests; the panel reads the
 | Deploy + README + DECISIONS | 15 |
 | **Phase 1** | **~6.5h** |
 
-Minutes are focused build effort for a person directing tools; executed by an agent from the implementation plan, the wall-clock is shorter, and the README records the real elapsed time. Either way it is over the brief's 2–3 hour guidance. The answer when asked is the honest one: the core was scoped with discipline, and the extras are labeled as extras in `DECISIONS.md` and the README.
+Minutes are focused build effort for a person directing tools; executed by an agent from the implementation plan, the wall-clock is shorter. The core was scoped with discipline, and the extras are labeled as extras in `DECISIONS.md` and the README.
 
 If behind at the two-thirds mark: drop the notify dialog to a single confirm, collapse Clear cards to a count, keep the ribbon, the receipts, and the reassign flow.
 

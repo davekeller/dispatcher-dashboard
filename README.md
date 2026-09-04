@@ -29,13 +29,13 @@ Node 20+. No backend, no keys. The shift is simulated: the clock is pinned to 2:
 
 The visual system is documented separately in [`docs/VISUAL_LANGUAGE.md`](docs/VISUAL_LANGUAGE.md): warm operations, strict semantic status color, and a restrained orange-to-periwinkle signature for Lookout and AI entry points.
 
-## Scope, honestly
+## Scope
 
-The brief suggests 2–3 hours. This took roughly 3 hours of directing and reviewing, counting the design conversation, and it produced more than the brief asks for: the board, the route file with receipts and a schedule ribbon, and the Lookout rail. The core was scoped with discipline; the extras are labeled as extras in `docs/DECISIONS.md`. Not built: the driver's phone view, the map, routing, auth, dark mode, mobile layouts. Chat is three matched intents, not a model.
+Phase 1 is the board, the route file with receipts and a schedule ribbon, and the Lookout rail. The core was scoped with discipline; the extras are labeled as extras in `docs/DECISIONS.md`. Not built yet: the driver's phone view, the map, routing, auth, dark mode, mobile layouts. Chat is three matched intents, not a model.
 
-## The live change
+## Adding a rule
 
-Add the 30-minute-break rule by appending one object to `RULES` in `src/alerts/rules.ts`:
+The next rule up is the 30-minute break. It is one object appended to `RULES` in `src/alerts/rules.ts`:
 
 ```ts
 {
