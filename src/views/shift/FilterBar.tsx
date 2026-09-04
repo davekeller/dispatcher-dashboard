@@ -3,7 +3,7 @@ import { EMPTY_FILTERS, FILTERS, isFiltering, type FilterState } from '../../fil
 import { GROUPINGS, type GroupingId } from '../../groupBy'
 import Button from '../../ui/Button'
 import FiltersDropdown from './FiltersDropdown'
-import OrderDropdown from './OrderDropdown'
+import OrderDropdown, { BOARD_ORDERS } from './OrderDropdown'
 import type { BoardSort } from './boardSort'
 
 /** One sticky-feeling control band: order first, then scope, search, and the board lens.
@@ -12,7 +12,7 @@ export default function FilterBar({ filters, onChange, sort, onSortChange, group
   return (
     <nav aria-label="Board controls" className="relative z-20 shrink-0 border-b border-line bg-panel/95 px-5 py-3 shadow-sm backdrop-blur">
       <div className="flex flex-wrap items-center gap-2">
-        <OrderDropdown value={sort} onChange={onSortChange} />
+        <OrderDropdown value={sort} onChange={onSortChange} options={BOARD_ORDERS} />
         <FiltersDropdown value={filters} onChange={onChange} />
         {isFiltering(filters) && (
           <Button size="sm" variant="ghost" onClick={() => onChange(EMPTY_FILTERS)}>
