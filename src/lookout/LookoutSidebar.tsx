@@ -86,11 +86,11 @@ export default function LookoutSidebar() {
             {pinned && (
               <>
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-label">{LOOKOUT.focusIntro(byId.get(pinned.driverId)!.driver.name)}</p>
-                <RecommendationCard view={byId.get(pinned.driverId)!} card={pinned} pinned />
+                <RecommendationCard view={byId.get(pinned.driverId)!} card={pinned} pinned compact />
                 {rest.length > 0 && <p className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-label">Everyone else</p>}
               </>
             )}
-            {shown.map((c) => <RecommendationCard key={c.driverId} view={byId.get(c.driverId)!} card={c} />)}
+            {shown.map((c) => <RecommendationCard key={c.driverId} view={byId.get(c.driverId)!} card={c} compact />)}
             {hidden > 0 && <Button size="sm" variant="ghost" onClick={() => setShowAll(true)}>Show {hidden} more</Button>}
             {showAll && rest.length > TOP_N && <Button size="sm" variant="ghost" onClick={() => setShowAll(false)}>Show fewer</Button>}
             {withAlerts.length === 0 && <p className="text-[12px] text-muted">{LOOKOUT.allClear(d.metrics.onShift)}</p>}
