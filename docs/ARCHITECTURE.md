@@ -42,7 +42,7 @@ Reviewers read the package.json. Nothing else goes in without a one-line reason 
 ```
 src/
   main.tsx · App.tsx (routes) · index.css (tokens)
-  app/          Layout.tsx · LeftNav.tsx · DevPanel.tsx
+  app/          Layout.tsx · Header.tsx · DevPanel.tsx
   data/         types.ts · prng.ts · seed.ts · planted.ts · regions.ts
   time/         clock.ts · useNow.ts
   hos/          constants.ts · compute.ts · compute.test.ts
@@ -51,12 +51,12 @@ src/
   store/        store.ts · actions.ts · undo.ts · derive.ts
   lookout/      LookoutSidebar.tsx · LookoutPortal.tsx · AlertBar.tsx · RecommendationCard.tsx · ActionConfirm.tsx · voice.ts
   views/
-    shift/      ActiveShiftPage.tsx · MetricsRow.tsx · Board.tsx · RouteCard.tsx · Filters.tsx
-    route/      RouteFilePage.tsx · RouteHeader.tsx · AlertStrip.tsx · DayMetrics.tsx · RouteRibbon.tsx · DutyTimeline.tsx · StopReceipt.tsx
+    shift/      ActiveShiftPage.tsx · MetricsRow.tsx · Board.tsx · RouteCard.tsx · FilterBar.tsx
+    route/      RouteFilePage.tsx · DriverCard.tsx · DutyBar.tsx · StaleBanner.tsx · AlertStrip.tsx · StopTimeline.tsx · StopReceipt.tsx
     route/actions/  ReassignDialog.tsx · ResetDialog.tsx · NotifyDialog.tsx
     driver/     DriverPhoneView.tsx · PhoneFrame.tsx        (Phase 2)
     map/        MapView.tsx                                   (Phase 2, lazy)
-  ui/           Chip · Button · Card · Sheet · Countdown · Bar · Avatar · EmptyState
+  ui/           Chip · Button · Card · Dropdown · Modal · Toast · Countdown · Bar · Avatar · EmptyState · CorrectionChip
   lib/          format.ts (clock times, durations, tilde precision)
 ```
 
@@ -292,7 +292,7 @@ Every action follows the same protocol: **preview → confirm → commit → rec
 
 ## 8. Shell and routes
 
-Three panes. Left nav (Active Shift selected; Drivers, Routes, Reports as placeholders; collapses to icons). Main outlet. Lookout sidebar mounted once at app level; each page portals its rail content into it, Meridian's pattern. When Lookout is open the app shifts left to make room; collapsed, it becomes a rail with the act-now count as a badge.
+Two panes. The product bar reads **Dispatch**, then the Status/Region toggle, the shift clock, and the dev toggle; on a route file it reads "Dispatch / Marcus R." There is no left nav: the board is the whole product for this exercise. Main outlet. Lookout sidebar mounted once at app level, reading derived state directly; pages set the focus driver through context. Collapsed, it becomes a rail with the act-now count as a badge.
 
 | Route | View | Phase |
 |---|---|---|
@@ -301,7 +301,7 @@ Three panes. Left nav (Active Shift selected; Drivers, Routes, Reports as placeh
 | `/driver/:driverId` | Driver phone | 2 |
 | `/map` | Map | 2 |
 
-Header: view title, shift clock (labeled as simulated), group-by control, view toggle (Board now; Map in Phase 2), dev toggle.
+The board groups by **Status** by default, Act now leftmost, because that is where Lena acts; Region is one click away.
 
 ---
 
@@ -311,7 +311,7 @@ Header: view title, shift clock (labeled as simulated), group-by control, view t
 
 **Metrics row.** Drivers on shift · Approaching limit · Over limit · Offline · Stops done / remaining, and "Need a driver" when any stop is unassigned. Each card is a filter shortcut. Numbers derive from the same views the board uses.
 
-**Board.** Columns are regions by default (group-by can switch to bands). Within a column, cards sort by Lookout's rank, most urgent at the top, so the top row of the board is "the most urgent problem in each region." Each column scrolls independently. Clear cards stay in their column in a quiet tone. Filters sit above the board.
+**Board.** Columns are status bands by default (Act now, Watch, Offline, On break, Clear), switchable to regions. Within a column, cards sort by Lookout's rank, most urgent at the top. Each column scrolls independently. Clear cards stay in their column in a quiet tone. The filter bar above the board is one row: a dropdown per filter (Status, Data, Region, each a checkbox list with a count when active), a Clear button when anything is set, and search at the right end.
 
 **Route card.** Left marker strip in the band color (hollow/dashed for offline) · duotone truck glyph, colored only when the card has attention · driver name and truck plate · live countdown in tabular figures, tilde when stale · drive-time bar on an 11h scale · route progress `done/total` and next stop · data age chip · badge row, one badge per firing rule · Lookout pick marker on the board's overall top card. Click opens the route file. Nothing drags: a card's position is computed, not assigned.
 
@@ -319,16 +319,14 @@ Header: view title, shift clock (labeled as simulated), group-by control, view t
 
 ### Route file (`/routes/:driverId`)
 
-A page in the main pane; Lookout stays open and focuses on this driver. Breadcrumb back to Active Shift. Sections in reading order:
+A page in the main pane; Lookout stays open and focuses on this driver. Breadcrumb back to the board. Sections in reading order:
 
-1. **Header.** Avatar/initials, name, truck, region, band chip, large live countdown, data age, schedule status chip (On time / Behind 14 min / Ahead 5 min). If stale or offline, a banner: "Last ping 25 min ago. Figures are estimates."
-2. **Alert strip.** Only when alerts exist. One `AlertCard` per firing rule, copy and actions from the rule object, confirm inline. New rules render here with no new UI.
-3. **Day metrics.** Driving time · on duty since · break taken or "none yet" · stops done / remaining · remaining drive vs. time to limit, the pair that decides everything.
-4. **Route ribbon.** One time axis from route start to the latest of window end, limit, and the 14-hour mark. Stop ticks at projected ETAs (planned + drift) for pending stops and at actual departure for done ones; filled through the last completed stop. A now-line with the clock. The limit mark at `limitHitAt`. If the last tick sits past the limit mark, the span between is hatched in the act-now color, and `wont_finish` is the rule that fires, on the same math.
-5. **Duty timeline.** Today's segments on the same axis: driving, on duty, break, off, planned reset.
-6. **Stop receipts.** Vertical list, oldest first. Done: arrived, departed, dwell, items, signed by, outcome, any note. Next: highlighted, with ETA and window. Pending: projected ETA, window, priority, and a checkbox for partial reassign. Notified stops show the stamp. Unassigned stops show "needs a driver."
-7. **Actions.** Reassign, schedule reset, notify customer; each opens its dialog, previews, confirms, commits. Position-dependent actions are disabled with a reason when data is stale or offline.
-8. **Driver's phone** button (Phase 2) renders `DriverPhoneView` in a phone frame overlay, so the dispatcher's action and the driver's screen are visible together.
+1. **Driver card.** One card: avatar, name, band and drift chips, a scheduled-reset chip when one exists, plate, region, status, the large live countdown with data age; then the five day figures (driving today · on duty since · break taken or "none yet" · stops done / remaining · driving left vs. time to limit, the pair that decides everything); then a slim duty bar (driving, on duty, break, planned reset dashed) from the start of the shift to now.
+2. **Stale banner.** If stale or offline: "Last ping 25 min ago. Figures are estimates."
+3. **Alert strip.** Only when alerts exist. One row per firing rule, copy and actions from the rule object, confirm inline. New rules render here with no new UI.
+4. **Stop timeline.** The stops on a vertical spine, oldest first, one node per stop with its actual or projected time beside it. A "now" marker sits on the spine between the last stop reached and the next. The 11-hour limit is marked where it lands among the remaining stops (from the same walk `suggestResetStop` uses), and the spine turns red past it, so the won't-finish case is visible as red nodes below the line; over the limit, the mark sits at now. The spine is one row per stop, not proportional to time; the times on each node and the drift chip carry the behind-or-ahead read. Receipts: done stops show arrived, departed, dwell, items, signed by, outcome, any note; the next stop is highlighted; pending stops show projected ETA, window, priority, and a checkbox for partial reassign; notified stops show the stamp; unassigned stops show "needs a driver."
+5. **Actions.** Reassign, schedule reset, notify customer; each opens its dialog, previews, confirms, commits. Position-dependent actions are disabled with a reason when data is stale or offline; schedule reset is disabled once one is scheduled.
+6. **Driver's phone** button (Phase 2) renders `DriverPhoneView` in a phone frame overlay, so the dispatcher's action and the driver's screen are visible together.
 
 ### Lookout rail
 
@@ -355,8 +353,8 @@ Each is designed, not discovered. Where it shows up is as important as what happ
 | Stale (3–15 min) | Tilde, seconds dropped, age shown; band unchanged | Card, header, rail |
 | Offline (>15 min) | Hollow marker; projection continues the last-known segment; own band unless inside the watch window, then Act now | Board, rail, route file banner |
 | Ping recovers | Figures jump; "Updated: was ~40 min, now 33 min" shown for one tick rather than silently replaced | Card, route file |
-| Behind schedule | Status chip, ribbon gap, `behind_schedule` at watch, notify action | Route file, card badge |
-| Won't finish before limit | Ribbon hatch past the limit mark, `wont_finish` at act now, reassign pre-selects the stops past the limit | Route file, rail |
+| Behind schedule | Drift chip, amber node times on the spine, `behind_schedule` at watch when a window is missed, notify action | Route file, card badge |
+| Won't finish before limit | The limit mark on the spine with red nodes below it, `wont_finish` at act now, reassign pre-selects the stops past the limit | Route file, rail |
 | Already over the limit | Critical card with different copy and actions: stop now, who takes the stops | Rail, route file |
 | On break | Countdown paused; resumes when the break ends; `limit_*` rules skip on_break | Card, duty timeline |
 | Failed stop | Receipt shows the failure and note; remaining stops shift; drift recomputes | Route file |

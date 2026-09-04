@@ -34,3 +34,7 @@ One line per meaningful choice or cut. Newest at the bottom.
 | 28 | Late means a projected ETA past the delivery window, not past the plan | With the world frozen, plan drift made 40 of 50 drivers "behind" within an hour of demo time |
 | 29 | Drive time left is a quantity; the limit's clock time is a projection. The header shows one, the ribbon the other | They are different questions, and labeling them as such is more honest than forcing one number |
 | 30 | The generated fleet is a simulated day; `materialize` applies the clock each tick, and planted scenarios hold still | A frozen world made everyone late within an hour; now scrubbing an hour shows stops completing, and the heroes stay put for the walkthrough |
+| 31 | No left nav; the product bar reads Dispatch | The board is the whole product for this exercise; a nav to placeholder pages was ceremony |
+| 32 | Board groups by status by default, Act now leftmost | Lena acts on the left; region is one click away for "where are my problems" |
+| 33 | Route file: one driver card, alerts, then stops on a vertical spine with the now and limit marks; the horizontal ribbon is gone | Attached to the stops, "where is he and can he make it" reads better than a proportional time axis |
+| 34 | Filter bar is dropdowns on one row with search at the right | Chip rows wrapped beside the open rail |

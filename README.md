@@ -17,8 +17,8 @@ Node 20+. No backend, no keys. The shift is simulated: the clock is pinned to 2:
 
 ## What to look at
 
-1. **The board.** Columns are regions; rows are urgency. Only what needs attention carries color.
-2. **Marcus R.** Twelve minutes of drive time, three stops that need thirty-four. The route ribbon shows the last stop past the limit mark. Reassign from the card: the picker only offers drivers who won't become the next problem, and previews both drivers' new figures before you confirm.
+1. **The board.** Columns are status, Act now on the left; rows are urgency. Only what needs attention carries color. Region columns are one click away.
+2. **Marcus R.** Twelve minutes of drive time, three stops that need thirty-four. On his route file the 11-hour limit is marked on the stop timeline with two stops in red below it. Reassign from the card: the picker only offers drivers who won't become the next problem, and previews both drivers' new figures before you confirm.
 3. **Dre W.** Dark for 25 minutes with ~40 minutes left. Every figure carries a tilde and an age; position-dependent actions are disabled. Bring him online from the dev panel and watch the estimate correct itself, out loud.
 4. **Lookout**, the rail on the right, reads the same ranked list the board does. If they ever disagree, that is the bug.
 5. **`src/alerts/rules.ts`.** Every alert is one object. Adding a rule is appending one.
