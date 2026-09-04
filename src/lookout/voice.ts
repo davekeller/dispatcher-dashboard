@@ -6,7 +6,7 @@ export const LOOKOUT = {
   allClear: (onShift: number) => `All clear. ${onShift} drivers on shift, nothing needs you right now.`,
   /** The one line under the name: what needs Lena right now, and where to start. */
   summary: (urgent: number, first?: string) =>
-    urgent === 0 ? 'Nothing needs you right now.' : urgent === 1 ? `One needs you now${first ? `: ${first}` : ''}.` : `${urgent} need you now.${first ? ` Start with ${first}.` : ''}`,
+    urgent === 0 ? 'Nothing needs you right now.' : urgent === 1 ? (first ? `One needs you now: ${first}` : 'One needs you now.') : `${urgent} need you now.${first ? ` Start with ${first}` : ''}`,
   focusIntro: (name: string) => `What I see on ${name}`,
   snoozed: (until: string) => `Snoozed until ${until}`,
   called: (at: string) => `Called at ${at}`,

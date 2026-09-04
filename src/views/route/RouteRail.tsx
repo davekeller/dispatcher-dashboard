@@ -65,10 +65,13 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
     setHeight(el.clientHeight)
     return () => ro.disconnect()
   }, [])
+  const over = view.minutesUntilLimit <= 0
+  const limitWithin = limitHitAt > start && limitHitAt < end
+  const reserved = [(pct(now) / 100) * height, ...(limitWithin ? [(pct(over ? now : limitHitAt) / 100) * height] : [])]
   let lastLabelY = -Infinity
   const showLabel = nodes.map((n) => {
     const y = (pct(n.t) / 100) * height
-    const ok = y - lastLabelY >= LABEL_GAP_PX
+    const ok = y - lastLabelY >= LABEL_GAP_PX && reserved.every((r) => Math.abs(y - r) >= LABEL_GAP_PX * 0.6)
     if (ok) lastLabelY = y
     return ok
   })
@@ -81,8 +84,6 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
     setActive(id)
     document.getElementById(`stop-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
-  const over = view.minutesUntilLimit <= 0
-  const limitWithin = limitHitAt > start && limitHitAt < end
 
   return (
     <nav aria-label="Route" className={`sticky top-0 flex h-[calc(100vh-3.5rem-2.5rem)] shrink-0 flex-col rounded-card border border-line bg-panel shadow-card transition-[width] duration-200 ${collapsed ? 'w-14' : 'w-52'}`}>
