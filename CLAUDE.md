@@ -8,13 +8,13 @@ The primary **"Active Shift" dashboard** for a fleet dispatcher (Lena) managing 
 
 Two-pane shell: a product bar ("Dispatch") over the **main view** (shift directive hero + collapsible status-column route board, and the route file page) · **Lookout**, the co-pilot rail (recommendations + chat + shift timeline). The simulated shift is anchored at 2:47 PM and ticks live.
 
-## Hard constraints (from the brief)
+## Hard constraints
 
 - Real, running front-end code in the browser. Not a mockup.
 - Driven by a **real data model** (drivers / trucks / routes / deliveries with attributes).
 - **Time-until-reset is computed from the data against a live clock. Never hardcoded.**
-- Working interactions. Deployed link + source repo.
-- A small live change (a new alert type or filter) will be made during the panel.
+- Working interactions, deployed.
+- A new alert type or filter is a one-object change, small enough to add live in a demo.
 
 ## Architecture rules
 
@@ -34,7 +34,7 @@ Vite + React 19 + TypeScript + Tailwind v4. Zustand for the store. react-router.
 
 ## Build order
 
-**Phase 1 — submittable.** Shell · seed + clock + compute · rules + rank + bands · store + actions · Active Shift (metrics, board, cards, filters) · Lookout rail · route file (header, alert strip, metrics, ribbon, duty timeline, receipts) · action dialogs · staleness + copy + empty states · deploy + README + DECISIONS.
+**Phase 1 — shippable.** Shell · seed + clock + compute · rules + rank + bands · store + actions · Active Shift (metrics, board, cards, filters) · Lookout rail · route file (header, alert strip, metrics, ribbon, duty timeline, receipts) · action dialogs · staleness + copy + empty states · deploy + README + DECISIONS.
 
 **Phase 2 — only after Phase 1 is deployed.** Driver phone view · map · chat intents · scrubber polish · illustration.
 
@@ -46,7 +46,7 @@ Ship a thin vertical slice first (seed → compute → one rule → one card →
 - When a decision is a judgment call, leave a one-line comment saying why.
 - Log meaningful choices and cuts in `docs/DECISIONS.md` — one line each.
 - Tests live beside the module (`*.test.ts`) and cover derivation, not UI.
-- **Anything not meant to be viewable in the submitted repo goes in `private/`.** It is gitignored. Nothing in there is part of the build, and nothing committed may reference it.
+- **Anything not meant to be public goes in `private/`.** It is gitignored. Nothing in there is part of the build, and nothing committed may reference it.
 
 ## Not for this repo
 
@@ -56,7 +56,7 @@ Any third party's logo, product names, or exact brand palette. Rhyme with good p
 
 More than one model works on this app at once. The rules that keep that clean, in the order they come up:
 
-1. **One integration branch at a time.** Right now it is `phase-1`. `main` is the submission branch and only moves by merging the integration branch. A pass never targets `main`.
+1. **One integration branch at a time.** Right now it is `phase-1`. `main` is the release branch and only moves by merging the integration branch. A pass never targets `main`.
 2. **Your own worktree, your own branch.** Never edit in a checkout that another agent has open. From the repo root:
    ```bash
    git worktree add ../dispatcher-dashboard-<you> -b <area>/<topic> phase-1

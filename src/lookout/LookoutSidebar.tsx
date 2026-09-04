@@ -65,7 +65,7 @@ export default function LookoutSidebar() {
       <header className="flex h-14 shrink-0 items-center gap-2 border-b border-line bg-panel/90 pl-2 pr-1.5 backdrop-blur">
         <div className="flex h-full items-end" role="tablist" aria-label={`${LOOKOUT.name} views`}>
           {(['chat', 'timeline'] as const).map((t) => (
-            <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`relative -mb-px flex h-full items-center gap-1.5 px-3 text-[12px] font-semibold capitalize ${tab === t ? 'iq-tab-active text-ink' : 'border-b-2 border-transparent text-muted hover:text-ink'}`}>
+            <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`relative -mb-px flex h-full items-center gap-1.5 px-3 text-[12px] font-semibold capitalize ${tab === t ? 'lookout-tab-active text-ink' : 'border-b-2 border-transparent text-muted hover:text-ink'}`}>
               {t}
               {t === 'chat' && urgentCards.length > 0 && <span className="tnum rounded-full bg-act-now px-1.5 text-[10px] font-semibold leading-4 text-on-accent" title={`${urgentCards.length} need action now`}>{urgentCards.length}</span>}
             </button>

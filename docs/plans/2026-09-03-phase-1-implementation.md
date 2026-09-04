@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Ship the submittable Phase 1 product: the Active Shift board, the route file page, and the Lookout rail, driven by a deterministic seeded fleet and a live simulated clock, with HOS alerts computed from duty segments and every action confirming before it commits.
+**Goal:** Ship the Phase 1 product: the Active Shift board, the route file page, and the Lookout rail, driven by a deterministic seeded fleet and a live simulated clock, with HOS alerts computed from duty segments and every action confirming before it commits.
 
 **Architecture:** A pure derivation layer (`hos/compute.ts` → `store/derive.ts` → `alerts/rules.ts` → `alerts/rank.ts` → `bands.ts`) turns one seeded fleet plus one `now` into one ranked `DriverCard[]`. Every surface — metrics row, region-column board, route file, Lookout rail — reads that one array. Mutations go through pure transforms in `store/actions.ts`, wrapped by a Zustand store that snapshots for undo.
 
@@ -20,8 +20,8 @@
 - Rules are `{ id, label, severity, when, message, actions }` objects in `src/alerts/rules.ts`, fixed severity, one object per rule. Filters and groupings are config arrays too.
 - Lookout reads `ranked` and nothing else. `alertBar = ranked.slice(0, 3)` after dropping cards with no alerts.
 - Components use theme tokens only (`bg-panel`, `text-ink`, `text-act-now`, …). No raw hex in a `.tsx` file.
-- Copy is in Lookout's voice: a competent colleague, plain language, no system-log tone. The co-pilot is **Lookout**; the dispatcher persona is **Lena**. No Toast logo, product names, or exact brand palette anywhere in the repo.
-- Everything not meant to be viewable in the submitted repo lives in `private/` (gitignored). Nothing committed references it.
+- Copy is in Lookout's voice: a competent colleague, plain language, no system-log tone. The co-pilot is **Lookout**; the dispatcher persona is **Lena**. No third party's logo, product names, or exact brand palette anywhere in the repo.
+- Everything not meant to be public lives in `private/` (gitignored). Nothing committed references it.
 - Light theme only. Rows ~40px, cards compact. Motion limited to countdown ticks and band-change transitions.
 - Commit after every task with a message in the form `feat: …` / `test: …` / `chore: …`, ending with `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`.
 
@@ -673,7 +673,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 
 ```ts
 // Thresholds. Every one of these is a guess a real deployment would tune; the
-// point is that they live in one place and the walkthrough can say so.
+// point is that they live in one place and the docs can say so.
 export const LIMIT_MIN = 660 // 11 hours of driving
 export const ACT_NOW_MIN = 30
 export const WATCH_MIN = 90
@@ -1017,7 +1017,7 @@ export function limitHitAt(driver: Driver, route: Route, now: number): number {
 }
 
 /** Driving minutes since the last interruption of BREAK_MIN or more. Feeds the
- *  30-minute-break rule that gets added live during the walkthrough. */
+ *  30-minute-break rule that gets added live in demos. */
 export function drivingSinceBreak(driver: Driver, now: number): number {
   const segs = knownSegments(driver, now).slice().sort((a, b) => a.startedAt - b.startedAt)
   let total = 0
@@ -1545,7 +1545,7 @@ export type Severity = 'critical' | 'act_now' | 'watch' | 'info'
 export type ActionId = 'reassign' | 'schedule_reset' | 'notify_customer' | 'call_driver' | 'acknowledge'
 
 /** One object per rule. Fixed severity and a `when` predicate keep the shape
- *  copy-pasteable in front of a panel; a rule that needs two severities is two objects. */
+ *  copy-pasteable in a live demo; a rule that needs two severities is two objects. */
 export interface Rule {
   id: string
   label: string
@@ -2993,7 +2993,7 @@ import { useStore } from '../store/store'
 import Button from '../ui/Button'
 
 /** Hidden behind ⌘. and the wrench. Exists so any alert can be fired on demand during a
- *  walkthrough. The scrubber advances the clock, not the world: stops don't complete themselves. */
+ *  demo. The scrubber advances the clock, not the world: stops don't complete themselves. */
 export default function DevPanel() {
   const open = useStore((s) => s.devOpen)
   const toggle = useStore((s) => s.toggleDev)
@@ -3099,7 +3099,7 @@ import EmptyState from './ui/EmptyState'
 function Placeholder({ title }: { title: string }) {
   return (
     <div className="p-6">
-      <EmptyState title={`${title} isn't built for this exercise.`} body="Active Shift is the view a dispatcher lives in; this is here to show it sits inside a product." />
+      <EmptyState title={`${title} isn't built yet.`} body="Active Shift is the view a dispatcher lives in; this is here to show it sits inside a product." />
     </div>
   )
 }
@@ -3737,7 +3737,7 @@ import Chip from '../../ui/Chip'
 import { severityTone } from '../../ui/tones'
 
 /** One row per firing rule. Copy and actions come from the rule object, so a rule added
- *  live during the walkthrough renders here with no new UI. */
+ *  live in a demo renders here with no new UI. */
 export default function AlertStrip({ view, card }: { view: DriverView; card: DriverCard }) {
   const reason = view.staleness !== 'fresh' ? `Last ping ${fmtAge(view.pingAgeMin)}. Position-dependent actions are disabled until the truck reports in.` : undefined
   return (
@@ -4638,7 +4638,7 @@ Node 20+. No backend, no keys. The shift is simulated: the clock is pinned to 2:
 
 ## Scope, honestly
 
-The brief suggests 2–3 hours. This took roughly <hours> hours of directing and reviewing, counting the design conversation, and it produced more than the brief asks for: the board, the route file with receipts and a schedule ribbon, and the Lookout rail. The core was scoped with discipline; the extras are labeled as extras in `docs/DECISIONS.md`. Not built: the driver's phone view, the map, chat, routing, auth, dark mode, mobile layouts.
+Phase 1 is the board, the route file with receipts and a schedule ribbon, and the Lookout rail. The core was scoped with discipline; the extras are labeled as extras in `docs/DECISIONS.md`. Not built: the driver's phone view, the map, chat, routing, auth, dark mode, mobile layouts.
 
 ## The live change
 

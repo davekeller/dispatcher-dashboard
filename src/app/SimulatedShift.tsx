@@ -10,7 +10,7 @@ const SCRUB_MAX_MIN = 240
 const SCRUB_STEP_MIN = 5
 
 /** The simulated shift, as one button in the product bar. It opens a panel anchored under
- *  it that says plainly what this is, lets a reviewer scrub or fast-forward the day, and
+ *  it that says plainly what this is, lets anyone scrub or fast-forward the day, and
  *  explains each demo action in a sentence. ⌘. opens it too. */
 export default function SimulatedShift() {
   const open = useStore((s) => s.devOpen)
@@ -96,7 +96,7 @@ export default function SimulatedShift() {
               <Button size="sm" onClick={() => scrub(60 * MIN)}>+1 hour</Button>
               <Button size="sm" variant="ghost" onClick={resetClock} disabled={scrubOffsetMs === 0}><ArrowCounterClockwise size={12} /> Back to 2:47 PM</Button>
             </div>
-            <p className="mt-2 text-[11px] text-muted">The fleet keeps moving as the clock runs; the planted scenarios (Marcus, Priya, Dre and the others) hold still so the walkthrough always finds them.</p>
+            <p className="mt-2 text-[11px] text-muted">The fleet keeps moving as the clock runs; the planted scenarios (Marcus, Priya, Dre and the others) hold still so the demo always finds them.</p>
           </div>
 
           <div className="mt-4 border-t border-line pt-3">
