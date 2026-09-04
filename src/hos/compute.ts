@@ -179,7 +179,7 @@ export function limitHitAt(driver: Driver, route: Route, now: number): number {
 }
 
 /** Driving minutes since the last interruption of BREAK_MIN or more. Feeds the
- *  30-minute-break rule that gets added live during the walkthrough. */
+ *  30-minute-break rule that gets added live in demos. */
 export function drivingSinceBreak(driver: Driver, now: number): number {
   const segs = knownSegments(driver, now).slice().sort((a, b) => a.startedAt - b.startedAt)
   let total = 0

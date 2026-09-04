@@ -6,7 +6,7 @@ import Chip from '../../ui/Chip'
 import { severityTone } from '../../ui/tones'
 
 /** One row per firing rule. Copy and actions come from the rule object, so a rule added
- *  live during the walkthrough renders here with no new UI. */
+ *  live in a demo renders here with no new UI. */
 export default function AlertStrip({ view, card }: { view: DriverView; card: DriverCard }) {
   const reason = view.staleness !== 'fresh' ? `Last ping ${fmtAge(view.pingAgeMin)}. Position-dependent actions are disabled until the truck reports in.` : undefined
   return (
