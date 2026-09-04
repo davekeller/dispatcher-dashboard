@@ -3,14 +3,14 @@
 @import "@fontsource-variable/inter";
 
 /* Warm, hospitality-adjacent operations palette: paper-like neutrals, near-black type,
-   and accessible orange for Lookout. The peach-to-periwinkle spectrum is reserved for
-   subtle AI surfaces; operational status colors keep their own meaning. */
+   and accessible orange for Lookout. Its ember-to-blue spectrum is reserved for subtle
+   AI surfaces; operational status colors keep their own meaning. */
 @theme {
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-display: "Bricolage Grotesque Variable", "Inter Variable", ui-sans-serif, sans-serif;
 
   --color-canvas: #f8f6f3;
-  --color-board: #f7f8fa;
+  --color-board: #f1f3f6;
   --color-panel: #ffffff;
   --color-well: #f1ede9;
   --color-line: #e3ddd7;
@@ -23,35 +23,37 @@
   --color-lookout-strong: #a93817;
   --color-lookout-soft: #fff0e9;
   --color-ai-warm: #f45b2b;
+  --color-ai-gold: #e9ad48;
   --color-ai-rose: #d979aa;
-  --color-ai-cool: #6669ea;
+  --color-ai-violet: #8259d6;
+  --color-ai-cool: #4f7cdd;
 
-  --color-act-now: #942b38;
-  --color-act-now-fill: #b63846;
-  --color-act-now-soft: #fdf0f1;
-  --color-act-now-board: #f6dfe3;
+  --color-act-now: #9f1f3b;
+  --color-act-now-fill: #cb3453;
+  --color-act-now-soft: #fff0f3;
+  --color-act-now-board: #f8d6df;
 
-  --color-watch: #6f4a00;
-  --color-watch-fill: #ad7c1c;
-  --color-watch-soft: #fff7e7;
-  --color-watch-board: #f4e6c2;
+  --color-watch: #755000;
+  --color-watch-fill: #c88708;
+  --color-watch-soft: #fff6df;
+  --color-watch-board: #f5dfa7;
 
-  --color-clear: #1f593e;
-  --color-clear-fill: #4b8769;
-  --color-clear-soft: #edf7f1;
-  --color-clear-board: #dfeee5;
+  --color-clear: #165d3f;
+  --color-clear-fill: #2f9164;
+  --color-clear-soft: #eaf8f0;
+  --color-clear-board: #d3eedf;
   --color-route-done-start: #9bc5ae;
   --color-route-done-end: #276548;
 
-  --color-offline: #484d54;
-  --color-offline-fill: #7f858d;
-  --color-offline-soft: #f2f1f0;
-  --color-offline-board: #e7e8eb;
+  --color-offline: #424c60;
+  --color-offline-fill: #738099;
+  --color-offline-soft: #eff2f6;
+  --color-offline-board: #dce3ed;
 
-  --color-break: #2e518d;
-  --color-break-fill: #5f82c1;
-  --color-break-soft: #eef2fb;
-  --color-break-board: #e2e8f5;
+  --color-break: #28549a;
+  --color-break-fill: #477bd0;
+  --color-break-soft: #edf3ff;
+  --color-break-board: #d8e5fb;
 
   --radius-card: 14px;
   --radius-control: 8px;
@@ -66,29 +68,54 @@ body { @apply bg-canvas text-ink font-sans antialiased; }
 .iq-metrics-band {
   background:
     radial-gradient(circle at 4% -45%, color-mix(in srgb, var(--color-ai-warm) 24%, transparent), transparent 26rem),
-    linear-gradient(108deg, color-mix(in srgb, var(--color-ai-warm) 7%, white) 0%, color-mix(in srgb, var(--color-ai-rose) 7%, white) 48%, color-mix(in srgb, var(--color-ai-cool) 8%, white) 100%);
+    linear-gradient(108deg, color-mix(in srgb, var(--color-ai-warm) 7%, white) 0%, color-mix(in srgb, var(--color-ai-gold) 5%, white) 24%, color-mix(in srgb, var(--color-ai-rose) 7%, white) 50%, color-mix(in srgb, var(--color-ai-violet) 6%, white) 74%, color-mix(in srgb, var(--color-ai-cool) 8%, white) 100%);
 }
 
 .iq-soft-surface {
-  background: linear-gradient(105deg, #fff3eb 0%, #fff1f4 52%, #f1f2ff 100%);
+  background: linear-gradient(105deg, #fff3eb 0%, #fff8e8 26%, #fff1f6 52%, #f7f1ff 76%, #edf5ff 100%);
 }
 
 .lookout-panel {
-  background: linear-gradient(180deg, #ffffff 0%, #ffffff 62%, #fff9f5 100%);
+  background:
+    radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--color-ai-cool) 5%, transparent), transparent 24rem),
+    linear-gradient(180deg, #ffffff 0%, #ffffff 62%, #fff9f5 100%);
 }
 
 .iq-card-ring {
   border-color: transparent;
   background:
     linear-gradient(#ffffff, #ffffff) padding-box,
-    linear-gradient(120deg, color-mix(in srgb, var(--color-ai-warm) 72%, transparent), color-mix(in srgb, var(--color-ai-rose) 66%, transparent), color-mix(in srgb, var(--color-ai-cool) 66%, transparent)) border-box;
+    linear-gradient(120deg, var(--color-ai-warm), var(--color-ai-gold) 24%, var(--color-ai-rose) 50%, var(--color-ai-violet) 75%, var(--color-ai-cool)) border-box;
 }
 
 .iq-input-ring {
   border-color: transparent;
   background:
     linear-gradient(#ffffff, #ffffff) padding-box,
-    linear-gradient(110deg, color-mix(in srgb, var(--color-ai-warm) 70%, transparent), color-mix(in srgb, var(--color-ai-rose) 62%, transparent), color-mix(in srgb, var(--color-ai-cool) 72%, transparent)) border-box;
+    linear-gradient(110deg, var(--color-ai-warm), var(--color-ai-gold) 24%, var(--color-ai-rose) 50%, var(--color-ai-violet) 75%, var(--color-ai-cool)) border-box;
+}
+
+.iq-composer-shell {
+  border-color: transparent;
+  background:
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    linear-gradient(110deg, var(--color-ai-warm), var(--color-ai-gold) 24%, var(--color-ai-rose) 50%, var(--color-ai-violet) 75%, var(--color-ai-cool)) border-box;
+  box-shadow: 0 5px 18px color-mix(in srgb, var(--color-ai-cool) 9%, transparent);
+  transition: box-shadow 160ms ease;
+}
+
+.iq-composer-shell:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ai-cool) 14%, transparent), 0 7px 22px color-mix(in srgb, var(--color-ai-rose) 12%, transparent);
+}
+
+.iq-tab-active::after {
+  position: absolute;
+  right: .75rem;
+  bottom: 0;
+  left: .75rem;
+  height: 2px;
+  content: "";
+  background: linear-gradient(90deg, var(--color-ai-warm), var(--color-ai-rose), var(--color-ai-violet), var(--color-ai-cool));
 }
 
 .iq-metric-active { box-shadow: inset 0 -2px 0 var(--color-lookout); }

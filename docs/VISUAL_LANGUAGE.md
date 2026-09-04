@@ -14,7 +14,9 @@ Dispatch combines three layers:
 
 1. **A warm, quiet foundation.** Paper-like neutrals and near-black type make a high-density workspace feel human and legible.
 2. **Strict operational color.** Red, amber, green, slate, and blue describe route state. These colors carry meaning and never become decoration.
-3. **A distinct AI signature.** Lookout owns accessible orange plus a restrained peach → rose → periwinkle spectrum. The spectrum identifies AI entry points and focus, never risk.
+3. **A distinct AI signature.** Lookout owns accessible orange plus a restrained ember → gold → rose → violet → blue spectrum. The spectrum identifies AI entry points and focus, never risk.
+
+The product bar adds one industrial counterweight to those lighter surfaces: the truck logo is an icon-only warm near-black `ink` tile, followed by the Dispatch wordmark as dark text on the white bar. Board remains a lightweight dark text-and-icon navigation item with no resting fill, so it does not compete with the product mark.
 
 The result should read as hospitality-adjacent product software, not a marketing page placed around a dashboard.
 
@@ -52,7 +54,7 @@ All reusable colors are Tailwind theme tokens in `src/index.css`. Components use
 | Token | Value | Role |
 |---|---:|---|
 | `canvas` | `#f8f6f3` | Warm page ground |
-| `board` | `#f7f8fa` | Cool porcelain ground behind the live route board |
+| `board` | `#f1f3f6` | Cool porcelain ground behind the live route board; dark enough to separate white cards |
 | `panel` | `#ffffff` | Cards, rails, menus, inputs |
 | `well` | `#f1ede9` | Selected controls and inset areas |
 | `line` | `#e3ddd7` | Hairline separation |
@@ -66,16 +68,16 @@ The overall foundation should look warm white, not beige. The live board deliber
 
 | State | Strong / fill / soft | Meaning |
 |---|---|---|
-| Act now | `#942b38` / `#b63846` / `#fdf0f1` | Violation, immediate intervention, failed or past-due stop |
-| Watch | `#6f4a00` / `#ad7c1c` / `#fff7e7` | Approaching a threshold or behind schedule |
-| Clear | `#1f593e` / `#4b8769` / `#edf7f1` | Healthy, delivered, complete |
+| Act now | `#9f1f3b` / `#cb3453` / `#fff0f3` | Violation, immediate intervention, failed or past-due stop |
+| Watch | `#755000` / `#c88708` / `#fff6df` | Approaching a threshold or behind schedule |
+| Clear | `#165d3f` / `#2f9164` / `#eaf8f0` | Healthy, delivered, complete |
 | Route progress | `#9bc5ae` → `#276548` | Completed route path, light at the start and dark at the current edge |
-| Offline | `#484d54` / `#7f858d` / `#f2f1f0` | Unknown or stale telemetry |
-| On break | `#2e518d` / `#5f82c1` / `#eef2fb` | Paused HOS accumulation |
+| Offline | `#424c60` / `#738099` / `#eff2f6` | Unknown or stale telemetry |
+| On break | `#28549a` / `#477bd0` / `#edf3ff` | Paused HOS accumulation |
 
 Operational color always appears with a label, number, icon, or shape. Red is never used as a general brand accent.
 
-The board uses one intentionally deeper wash per status lane—Act now `#f6dfe3`, Watch `#f4e6c2`, Offline `#e7e8eb`, On break `#e2e8f5`, and Clear `#dfeee5`. These board-only grounds make column structure legible at a glance while the softer fills above remain available for inline alerts and receipts. The shift totals mirror the lane order and use the corresponding strong text hue for every value, not only urgent states.
+The board uses one intentionally vivid wash per status lane—Act now `#f8d6df`, Watch `#f5dfa7`, Offline `#dce3ed`, On break `#d8e5fb`, and Clear `#d3eedf`. These board-only grounds make column structure legible at a glance while the softer fills above remain available for inline alerts and receipts. The shift totals mirror the lane order; each label, dot, and value uses one corresponding saturated status hue rather than leaving the labels neutral. The throughput group remains on the same row but receives wider, evenly padded columns so its four values scan as a distinct block.
 
 ### Lookout and the AI spectrum
 
@@ -85,14 +87,17 @@ The board uses one intentionally deeper wash per status lane—Act now `#f6dfe3`
 | `lookout-strong` | `#a93817` | Orange text on light surfaces |
 | `lookout-soft` | `#fff0e9` | Warm AI wash |
 | `ai-warm` | `#f45b2b` | Decorative gradient start |
+| `ai-gold` | `#e9ad48` | Warm bridge |
 | `ai-rose` | `#d979aa` | Decorative gradient midpoint |
-| `ai-cool` | `#6669ea` | Decorative gradient end |
+| `ai-violet` | `#8259d6` | Cool bridge |
+| `ai-cool` | `#4f7cdd` | Decorative gradient end |
 
 The spectrum may appear in:
 
 - the light shift-metrics wash;
-- Lookout’s avatar ring;
+- Lookout’s radial avatar field;
 - the AI ordering control and composer outline;
+- the thin active-tab indicator and softly washed recommendation header;
 - the border of a pinned Lookout recommendation.
 
 Do not use it for status, charts, full card fills, body text, or routine controls. It should act like a signature, not wallpaper.
@@ -150,20 +155,20 @@ The soft warm-to-cool wash separates this instrument from the board without the 
 
 ### Board lanes
 
-Lane headers use the status soft color as a wash. Cards remain white. Act now receives width and position before extra saturation. Clear and On break may collapse because quiet work should consume less space than exceptions.
+Lane headers use the status soft color as a wash. Cards remain white and use a restrained 1.5px neutral keyline so they separate from the cool board ground without becoming outlined boxes. Act now receives width and position before extra saturation. Clear and On break may collapse because quiet work should consume less space than exceptions.
 
 ### Route cards
 
 Completed paths and markers share one semantic progress gradient, moving from soft sage at the route start to dark clear-green at the current edge. These same endpoints are reserved for a future stop-map counterpart.
 
-The card header pairs its highest-priority badge—Over limit, Approaching limit, or Behind schedule—with the countdown. The full-height stop spine runs down the left of the content area:
+Route cards use one combined assignment/status block instead of a separate header and driver row. On the left, route id sits directly above driver name and truck/region beside the avatar. On the right, the highest-priority badge—Over limit, Approaching limit, or Behind schedule—and countdown sit directly above the muted refresh age. The full-height stop spine runs down the left of this block and the scan grid:
 
 - green node: delivered;
 - gray circle: undelivered and still viable;
 - red circle: failed, past due, or beyond projected HOS;
 - red cross-tick: the HOS boundary.
 
-The spine stays narrow and its dots stay deliberately small so a 15–20-stop route reads as a sequence rather than a column of badges. Only when completed work already represents at least two-thirds of the route do its markers tighten, and then they still occupy roughly the first two-thirds of the usable timeline while remaining stops use the final third. Remaining markers are a uniform 1% larger—barely perceptible emphasis, not a fisheye. Routes below that completion threshold and fully completed routes remain evenly distributed. The remainder of the card is one flat structure: a vertically centered driver row followed by a full-bleed 2×2 grid for Stops, Next, HOS fit, and Route risk. The top row is deliberately terse and value-first: `12 / 15` over `Stops`, then `#13` over `Next`; it does not repeat completion percentage or “up next.” Ping age is quiet gray text at the top right of the driver row, never a badge. The grid uses only the card's own dividers—no inset box, extra background, or padded wrapper. Repetitive headings such as "Assigned driver" and "Route progress" are omitted. Lookout’s pick may add a small orange chip; it must not recolor the card.
+The spine stays narrow and every stop keeps one evenly spaced position on a single route scale, so a 15–20-stop route remains a literal sequence. Successfully completed deliveries recede into 5px green connective nodes; pending, failed, late, and post-HOS nodes use one fixed 6px size. There is no history compression, percentage-based allocation, or progressive magnification. Emphasis comes only from the small completed-versus-open size step and semantic color. The remainder of the card is one flat structure: a vertically centered driver row followed by a full-bleed 2×2 grid for Stops, Next, HOS fit, and Route risk. The top row is deliberately terse and value-first: `12 / 15 Stops` reads horizontally, followed by `#13` over `Next`; it does not repeat completion percentage or “up next.” Ping age is quiet gray text at the top right of the driver row, never a badge. The grid uses only the card's own dividers—no inset box, extra background, or padded wrapper. Repetitive headings such as "Assigned driver" and "Route progress" are omitted. Lookout’s pick may add a small orange chip; it must not recolor the card.
 
 ### Route file
 
@@ -185,12 +190,13 @@ All receipt sections center vertically across the row. Dispatcher notes are neut
 
 ### Lookout
 
-Lookout is visually related to the main product but clearly has a separate role:
+Lookout is visually related to the main product but clearly has a separate role. Its original mark layers five visible radial color fields—gold, orange, rose, violet, and blue—across the full disc behind one large and one small white line sparkle:
 
 - orange active tab and name;
-- gradient-ring avatar;
+- multi-radial five-color disc avatar with a centered two-sparkle white line foreground;
 - softly washed recommendation header;
-- gradient outline around the prompt and pinned recommendation;
+- one pill-shaped composer with the mark inset left, a five-stop gradient outline, and a dark circular send action;
+- gradient outline around a pinned recommendation and a thin spectral active-tab underline;
 - white recommendation cards with normal operational severity inside them;
 - the same flat route-card shell: route/status header, miniature stop spine, centered driver row, full-width explanation rows, and a divided action footer.
 

@@ -62,10 +62,10 @@ export default function LookoutSidebar() {
 
   return (
     <aside className="lookout-panel flex w-[26rem] shrink-0 flex-col border-l border-line" aria-label={`${LOOKOUT.name}, the shift co-pilot`}>
-      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-line bg-panel/90 pl-2 pr-3 backdrop-blur">
+      <header className="flex h-14 shrink-0 items-center gap-2 border-b border-line bg-panel/90 pl-2 pr-1.5 backdrop-blur">
         <div className="flex h-full items-end" role="tablist" aria-label={`${LOOKOUT.name} views`}>
           {(['chat', 'timeline'] as const).map((t) => (
-            <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`-mb-px flex h-full items-center gap-1.5 border-b-2 px-3 text-[12px] font-semibold capitalize ${tab === t ? 'border-lookout text-ink' : 'border-transparent text-muted hover:text-ink'}`}>
+            <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`relative -mb-px flex h-full items-center gap-1.5 px-3 text-[12px] font-semibold capitalize ${tab === t ? 'iq-tab-active text-ink' : 'border-b-2 border-transparent text-muted hover:text-ink'}`}>
               {t}
               {t === 'chat' && urgentCards.length > 0 && <span className="tnum rounded-full bg-act-now px-1.5 text-[10px] font-semibold leading-4 text-on-accent" title={`${urgentCards.length} need action now`}>{urgentCards.length}</span>}
             </button>
@@ -76,7 +76,7 @@ export default function LookoutSidebar() {
           <p className="text-[10px] leading-tight text-muted">{LOOKOUT.role}</p>
         </div>
         <LookoutAvatar size={30} className="shrink-0" />
-        <button type="button" onClick={() => setCollapsed(true)} className="rounded-control p-1 text-muted hover:bg-well hover:text-ink" aria-label={`Collapse ${LOOKOUT.name}`}>
+        <button type="button" onClick={() => setCollapsed(true)} className="rounded-control p-0.5 text-muted hover:bg-well hover:text-ink" aria-label={`Collapse ${LOOKOUT.name}`}>
           <CaretDoubleRight size={16} />
         </button>
       </header>

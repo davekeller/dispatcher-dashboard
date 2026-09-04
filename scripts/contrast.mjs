@@ -4,8 +4,8 @@ const tokens = {
   panel: '#ffffff', canvas: '#f8f6f3', well: '#f1ede9',
   ink: '#211e1c', muted: '#625d59', label: '#6d6661',
   'lookout-strong': '#a93817', lookout: '#cf4620',
-  'act-now': '#942b38', watch: '#6f4a00', clear: '#1f593e', offline: '#484d54', break: '#2e518d',
-  'act-now-soft': '#fdf0f1', 'watch-soft': '#fff7e7', 'clear-soft': '#edf7f1', 'offline-soft': '#f2f1f0', 'break-soft': '#eef2fb', 'lookout-soft': '#fff0e9',
+  'act-now': '#9f1f3b', watch: '#755000', clear: '#165d3f', offline: '#424c60', break: '#28549a',
+  'act-now-soft': '#fff0f3', 'watch-soft': '#fff6df', 'clear-soft': '#eaf8f0', 'offline-soft': '#eff2f6', 'break-soft': '#edf3ff', 'lookout-soft': '#fff0e9',
 }
 const lum = (hex) => {
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))

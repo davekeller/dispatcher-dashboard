@@ -12,13 +12,13 @@ export default function Header() {
 
   return (
     <header className="flex h-14 shrink-0 items-center gap-0.5 border-b border-line bg-panel px-5">
-      <Link to="/" aria-label="Open the Dispatch board" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] border border-lookout/35 bg-lookout-soft text-lookout-strong transition hover:bg-lookout hover:text-on-accent">
-        <TruckTrailer size={18} weight="fill" />
+      <Link to="/" aria-label="Open the Dispatch board" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control bg-ink text-on-accent shadow-sm transition hover:bg-ink/90">
+        <TruckTrailer size={17} weight="fill" />
       </Link>
       <Link to="/" className="ml-2 whitespace-nowrap font-display text-[17px] font-semibold tracking-[-0.02em] text-ink">Dispatch</Link>
       <span aria-hidden="true" className="ml-5 mr-3 h-5 w-px shrink-0 bg-line" />
-      <nav aria-label="Workspace navigation" className="flex h-full items-stretch">
-        <Link to="/" aria-current="page" className="flex items-center gap-1.5 border-t-[3px] border-lookout px-3 text-[13px] font-semibold text-ink">
+      <nav aria-label="Workspace navigation" className="flex items-center">
+        <Link to="/" aria-current="page" className="flex h-8 items-center gap-1.5 rounded-control px-3 text-[13px] font-semibold text-ink transition hover:bg-well">
           <SquaresFour size={15} weight="fill" /> Board
         </Link>
       </nav>

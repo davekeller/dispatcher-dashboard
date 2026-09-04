@@ -2,7 +2,7 @@ import { hosStatusOf } from '../hos/compute'
 import { fmtCountdown } from '../lib/format'
 import { BAND_TONE } from './tones'
 
-const SIZE = { sm: 'text-[13px]', md: 'text-lg', lg: 'font-display text-5xl leading-none tracking-tight' } as const
+const SIZE = { xs: 'text-[12px]', sm: 'text-[13px]', md: 'text-lg', lg: 'font-display text-5xl leading-none tracking-tight' } as const
 
 /** The number that matters. Tabular figures so it never jitters; tilde when it is an estimate. */
 export default function Countdown({ minutes, stale, size = 'sm', className = '' }: { minutes: number; stale: boolean; size?: keyof typeof SIZE; className?: string }) {

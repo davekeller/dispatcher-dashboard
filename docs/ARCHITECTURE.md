@@ -292,6 +292,8 @@ Every action follows the same protocol: **preview → confirm → commit → rec
 
 ## 8. Shell and routes
 
+The truck logo is an icon-only `ink` tile; the Dispatch wordmark remains separate dark text on the white product bar. Board is a lightweight dark text-and-icon navigation item without a resting fill, leaving the truck tile as the header's single industrial anchor.
+
 Two panes. The product bar reads **Dispatch**, then the active **Board** workspace, the shift clock, and the dev toggle; on a route file a breadcrumb continues with "RT-01 · Marcus R." There is no left nav: the board is the whole product for this exercise. The Status/Region lens lives with the board controls. Main outlet. Lookout sidebar mounted once at app level, reading derived state directly; pages set the focus driver through context. Collapsed, it becomes a rail with the act-now count as a badge.
 
 | Route | View | Phase |
@@ -315,7 +317,7 @@ The miniature card timeline uses shared route-completion endpoints, grading comp
 
 **Board.** Columns are status bands by default (Act now, Watch, On break, Offline, Clear), switchable to regions. Every column can collapse to a 40px count rail; Offline and Clear start collapsed so intervention work gets the width. Offline sits after On break and starts collapsed because that band only holds dark-but-clear drivers (a dark driver near the limit is in Act now), and its count stays visible on the rail. Open tracks divide the remaining space by weight and resolve to pixels so collapse/expand animates smoothly. Cards never flex-shrink inside a lane; high-count columns scroll instead. The first control is the board-order dropdown: Lookout's rank is the default, with closest-to-limit, most-stops, and oldest-data alternatives that change sequence only. A single route-filter dropdown groups the data-driven Status, Data, and Region filters, followed by route search and the Status/Region lens.
 
-**Route card.** The card leads with the route id and pairs its highest-priority Over limit, Approaching limit, or Behind schedule badge directly with the live HOS countdown at top right. Beneath that header, a miniature version of the route-file spine occupies a narrow full-height strip: every stop remains a node. Only routes at least two-thirds complete tighten their completed history, which still occupies about the first two-thirds of the usable spine; remaining stops use the final third and are only 1% larger. Other routes stay evenly distributed. Completed work grades from light sage to dark clear-green, viable undelivered work is gray, and failed, past-due, or post-HOS work is red. The route-file timeline keeps one literal labeled row per stop, with only delivered rows tightened. Driver identity appears once in a vertically centered row without a redundant "Assigned driver" label; ping age is muted text at that row's top right, not a chip. A full-bleed 2×2 scan grid then shows Stops, Next, HOS fit, and Route risk using only shared card dividers, not an inset bordered panel; secondary alert reasons render as plain text and Lookout's first-pick marker follows only when present. Clear cards stay quiet but keep their full height and readable identity in narrow lanes. Click opens the route file. Nothing drags: a card's position is computed, not assigned.
+**Route card.** One combined assignment/status block replaces the separate route header and driver row. Beside the avatar, the left stack reads route id, driver name, then truck/region; the right stack pairs the highest-priority Over limit, Approaching limit, or Behind schedule badge with the live HOS countdown, then places muted ping age directly beneath. A miniature version of the route-file spine occupies a narrow full-height strip beside this block and the scan grid: every stop remains a node in one evenly spaced route scale. Successfully delivered stops use smaller 5px connective nodes; unresolved, failed, late, and post-HOS work uses a fixed 6px node. Nothing compresses or magnifies by progress percentage. Completed work grades from light sage to dark clear-green, viable undelivered work is gray, and failed, past-due, or post-HOS work is red. The route-file timeline keeps one literal labeled row per stop, with only delivered rows tightened. A full-bleed 2×2 scan grid shows Stops, Next, HOS fit, and Route risk using only shared card dividers, not an inset bordered panel; its stop count reads horizontally as value then label (`14 / 16 Stops`). Secondary alert reasons render as plain text and Lookout's first-pick marker follows only when present. Clear cards stay quiet but keep their full height and readable identity in narrow lanes. Click opens the route file. Nothing drags: a card's position is computed, not assigned.
 
 **Empty states.** Nothing needs attention: "All clear. 46 drivers on shift, next check-in in 5s." A filter that matches nothing: say which filter, offer to clear it. A region with no trucks: the column says so.
 
@@ -381,14 +383,14 @@ Each is designed, not discovered. Where it shows up is as important as what happ
 
 ## 11. Visual system
 
-Warm, dense, calm, and direct. This is operations software used mid-shift, expressed with hospitality-adjacent paper neutrals, near-black type, and modest radii. Lookout's AI moments add a restrained peach-to-rose-to-periwinkle spectrum; the gradient is never used for operational severity. The system rhymes with contemporary hospitality software without borrowing a logo, branded asset, layout, or exact palette.
+Warm, dense, calm, and direct. This is operations software used mid-shift, expressed with hospitality-adjacent paper neutrals, near-black type, and modest radii. Lookout's AI moments add a restrained ember-to-gold-to-rose-to-violet-to-blue spectrum; the gradient is never used for operational severity. The system rhymes with contemporary hospitality software without borrowing a logo, branded asset, layout, or exact palette.
 
 **Tokens** (Tailwind v4 `@theme`, all in `index.css`; components use tokens only, never raw hex):
 
 | Token | Value | Use |
 |---|---|---|
 | `--color-canvas` | `#f8f6f3` | Warm paper page ground |
-| `--color-board` | `#f7f8fa` | Cool porcelain ground for the live board only |
+| `--color-board` | `#f1f3f6` | Cool porcelain ground for the live board, with visible separation from white cards |
 | `--color-panel` | `#ffffff` | Cards, rail |
 | `--color-well` | `#f1ede9` | Inset grounds, column backgrounds |
 | `--color-line` | `#e3ddd7` | Keylines |
@@ -396,14 +398,14 @@ Warm, dense, calm, and direct. This is operations software used mid-shift, expre
 | `--color-muted` | `#625d59` | Secondary text |
 | `--color-label` | `#6d6661` | Micro-labels on panel only |
 | `--color-lookout` / `-strong` / `-soft` | `#cf4620` / `#a93817` / `#fff0e9` | Accessible orange for Lookout |
-| `--color-ai-warm` / `-rose` / `-cool` | `#f45b2b` / `#d979aa` / `#6669ea` | Decorative AI rings and soft washes only |
-| `--color-act-now` / `-fill` / `-soft` | `#942b38` / `#b63846` / `#fdf0f1` | Act now and Over limit |
-| `--color-watch` / `-fill` / `-soft` | `#6f4a00` / `#ad7c1c` / `#fff7e7` | Watch |
-| `--color-clear` / `-fill` / `-soft` | `#1f593e` / `#4b8769` / `#edf7f1` | Clear (muted) |
+| `--color-ai-warm` / `-gold` / `-rose` / `-violet` / `-cool` | `#f45b2b` / `#e9ad48` / `#d979aa` / `#8259d6` / `#4f7cdd` | Decorative AI rings and soft washes only |
+| `--color-act-now` / `-fill` / `-soft` | `#9f1f3b` / `#cb3453` / `#fff0f3` | Act now and Over limit |
+| `--color-watch` / `-fill` / `-soft` | `#755000` / `#c88708` / `#fff6df` | Watch |
+| `--color-clear` / `-fill` / `-soft` | `#165d3f` / `#2f9164` / `#eaf8f0` | Clear (muted) |
 | `--color-route-done-start` / `-end` | `#9bc5ae` / `#276548` | Completed route path from route origin to current progress edge; reusable by the future map |
-| `--color-offline` / `-fill` / `-soft` | `#484d54` / `#7f858d` / `#f2f1f0` | Offline, dashed/hollow |
-| `--color-break` / `-fill` / `-soft` | `#2e518d` / `#5f82c1` / `#eef2fb` | On break |
-| `--color-*-board` | `#f6dfe3` / `#f4e6c2` / `#e7e8eb` / `#e2e8f5` / `#dfeee5` | Deeper Act now → Clear lane washes, in board order |
+| `--color-offline` / `-fill` / `-soft` | `#424c60` / `#738099` / `#eff2f6` | Offline, dashed/hollow |
+| `--color-break` / `-fill` / `-soft` | `#28549a` / `#477bd0` / `#edf3ff` | On break |
+| `--color-*-board` | `#f8d6df` / `#f5dfa7` / `#dce3ed` / `#d8e5fb` / `#d3eedf` | Vivid Act now → Clear lane washes, in board order |
 | `--color-on-accent` | `#ffffff` | Text on saturated grounds |
 
 Over the limit is the one state that must never be missed: its chip is solid dark red with white text everywhere it appears. Text variants must pass AA on panel; fills are for bars and markers. The AI spectrum is decorative and never carries meaning or body copy. Validate the semantic pairs whenever tokens move. Watch's text color is deliberately darker than its fill so it clears AA while staying distinct from Lookout's orange.

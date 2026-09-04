@@ -24,11 +24,11 @@ function sameFilters(a: FilterState, b: FilterState): boolean {
 export default function ShiftHero({ metrics, ranked, filters, onPreset }: { metrics: Metrics; ranked: DriverCard[]; filters: FilterState; onPreset: (filters: FilterState) => void }) {
   const count = (band: Band) => ranked.filter((card) => card.band === band).length
   const items: Metric[] = [
-    { id: 'act_now', label: 'Act now', value: count('act_now'), preset: { ...EMPTY_FILTERS, band: ['act_now'] }, dot: 'bg-act-now-fill', tone: 'text-act-now', detail: `${metrics.over} over limit`, detailTone: 'text-act-now' },
-    { id: 'watch', label: 'Watch', value: count('watch'), preset: { ...EMPTY_FILTERS, band: ['watch'] }, dot: 'bg-watch-fill', tone: 'text-watch' },
-    { id: 'break', label: 'On break', value: count('break'), preset: { ...EMPTY_FILTERS, band: ['break'] }, dot: 'bg-break-fill', tone: 'text-break' },
-    { id: 'offline', label: 'Offline', value: count('offline'), preset: { ...EMPTY_FILTERS, band: ['offline'] }, dot: 'bg-offline-fill', tone: 'text-offline' },
-    { id: 'clear', label: 'Clear', value: count('clear'), preset: { ...EMPTY_FILTERS, band: ['clear'] }, dot: 'bg-clear-fill', tone: 'text-clear' },
+    { id: 'act_now', label: 'Act now', value: count('act_now'), preset: { ...EMPTY_FILTERS, band: ['act_now'] }, dot: 'bg-act-now', tone: 'text-act-now', detail: `${metrics.over} over limit`, detailTone: 'text-act-now' },
+    { id: 'watch', label: 'Watch', value: count('watch'), preset: { ...EMPTY_FILTERS, band: ['watch'] }, dot: 'bg-watch', tone: 'text-watch' },
+    { id: 'break', label: 'On break', value: count('break'), preset: { ...EMPTY_FILTERS, band: ['break'] }, dot: 'bg-break', tone: 'text-break' },
+    { id: 'offline', label: 'Offline', value: count('offline'), preset: { ...EMPTY_FILTERS, band: ['offline'] }, dot: 'bg-offline', tone: 'text-offline' },
+    { id: 'clear', label: 'Clear', value: count('clear'), preset: { ...EMPTY_FILTERS, band: ['clear'] }, dot: 'bg-clear', tone: 'text-clear' },
   ]
   const toDeliver = metrics.stopsRemaining + metrics.needDriver
   const totalStops = metrics.stopsDelivered + toDeliver + metrics.stopsFailed
@@ -53,9 +53,9 @@ export default function ShiftHero({ metrics, ranked, filters, onPreset }: { metr
                     onPreset(active ? EMPTY_FILTERS : item.preset)
                   }
                 }}
-                className={`min-w-[6.25rem] cursor-pointer px-4 py-1 text-left outline-none transition first:pl-0 hover:bg-panel/45 focus-visible:bg-panel/70 ${active ? 'iq-metric-active bg-panel/60' : ''}`}
+                className={`min-w-[5.75rem] cursor-pointer px-4 py-1 text-left outline-none transition first:pl-0 hover:bg-panel/45 focus-visible:bg-panel/70 ${active ? 'iq-metric-active bg-panel/60' : ''}`}
               >
-                <dt className="flex items-center gap-1.5 whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.05em] text-label">
+                <dt className={`flex items-center gap-1.5 whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.05em] ${item.tone ?? 'text-label'}`}>
                   <span className={`h-2 w-2 rounded-full ${item.dot}`} /> {item.label}
                 </dt>
                 <dd className="mt-1.5 flex items-baseline gap-2">
@@ -67,20 +67,20 @@ export default function ShiftHero({ metrics, ranked, filters, onPreset }: { metr
           })}
         </dl>
 
-        <dl className="ml-5 grid w-72 shrink-0 grid-cols-4 divide-x divide-ink/10 border-l border-ink/10" aria-label={`${metrics.stopsDelivered} delivered today, ${toDeliver} to deliver, ${totalStops} total stops, ${deliveredPercent}% delivered`}>
-          <div className="flex min-w-0 flex-col justify-center px-2">
+        <dl className="ml-4 grid w-80 shrink-0 grid-cols-4 divide-x divide-ink/10 border-l border-ink/10" aria-label={`${metrics.stopsDelivered} delivered today, ${toDeliver} to deliver, ${totalStops} total stops, ${deliveredPercent}% delivered`}>
+          <div className="flex min-w-0 flex-col justify-center px-3">
             <dt className="whitespace-nowrap text-[8px] font-semibold uppercase tracking-[0.04em] text-label">Delivered</dt>
             <dd className="tnum mt-1.5 font-display text-[1.65rem] font-semibold leading-none tracking-[-0.04em] text-ink">{metrics.stopsDelivered}</dd>
           </div>
-          <div className="flex min-w-0 flex-col justify-center px-2">
+          <div className="flex min-w-0 flex-col justify-center px-3">
             <dt className="whitespace-nowrap text-[8px] font-semibold uppercase tracking-[0.04em] text-label">To deliver</dt>
             <dd className="tnum mt-1.5 font-display text-[1.65rem] font-semibold leading-none tracking-[-0.04em] text-ink">{toDeliver}</dd>
           </div>
-          <div className="flex min-w-0 flex-col justify-center px-2">
+          <div className="flex min-w-0 flex-col justify-center px-3">
             <dt className="whitespace-nowrap text-[8px] font-semibold uppercase tracking-[0.04em] text-label">Total stops</dt>
             <dd className="tnum mt-1.5 font-display text-[1.65rem] font-semibold leading-none tracking-[-0.04em] text-ink">{totalStops}</dd>
           </div>
-          <div className="flex min-w-0 flex-col justify-center pl-2">
+          <div className="flex min-w-0 flex-col justify-center px-3">
             <dt className="whitespace-nowrap text-[8px] font-semibold uppercase tracking-[0.04em] text-label">Delivered</dt>
             <dd className="tnum mt-1.5 font-display text-[1.65rem] font-semibold leading-none tracking-[-0.04em] text-ink">{deliveredPercent}%</dd>
           </div>

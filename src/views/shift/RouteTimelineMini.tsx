@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import { completedStopLightWeight, miniTimelineLayout, type MiniTimelineLayout } from '../../lib/routeTimeline'
+import { completedStopLightWeight, miniTimelineLayout } from '../../lib/routeTimeline'
 import { stopsPastLimit } from '../../store/actions'
 import type { DriverView } from '../../store/view'
 
@@ -11,14 +11,13 @@ function nodeTone(status: string, needsAttention: boolean): string {
   return 'border border-muted/70 bg-panel'
 }
 
-function nodeSize(index: number, layout: MiniTimelineLayout): string {
-  if (layout.firstRemainingIndex >= 0 && index >= layout.firstRemainingIndex) return 'h-[6.06px] w-[6.06px]'
-  return 'h-1.5 w-1.5'
+function nodeSize(status: string): string {
+  return status === 'done' ? 'h-[5px] w-[5px]' : 'h-1.5 w-1.5'
 }
 
 /** The route-detail stop spine reduced to its visual essentials. It occupies the full
- * left edge of a board card. Dominant completed histories use the first two-thirds,
- * leaving the final third to remaining work with only one-percent marker emphasis. */
+ * left edge of a board card. Stops keep one uniform route scale; completed deliveries
+ * recede into smaller connective nodes while unresolved and exceptional stops stay larger. */
 export default function RouteTimelineMini({ view }: { view: DriverView }) {
   const stops = view.route.stops
   const layout = miniTimelineLayout(stops.map((stop) => stop.status))
@@ -39,7 +38,7 @@ export default function RouteTimelineMini({ view }: { view: DriverView }) {
       {stops.map((stop, index) => (
         <span
           key={stop.id}
-          className={`absolute left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:transition-[width,height] motion-safe:duration-150 ${nodeSize(index, layout)} ${nodeTone(stop.status, pastLimitIds.has(stop.id) || lateIds.has(stop.id))}`}
+          className={`absolute left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rounded-full ${nodeSize(stop.status)} ${nodeTone(stop.status, pastLimitIds.has(stop.id) || lateIds.has(stop.id))}`}
           style={{
             top: `${position(index)}%`,
             ...(stop.status === 'done' ? { '--route-history-light': `${completedStopLightWeight(index, lastCompleteIndex)}%` } : {}),
