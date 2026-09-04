@@ -92,11 +92,10 @@ The board uses one intentionally vivid wash per status lane—Act now `#f8d6df`,
 | `ai-violet` | `#8259d6` | Cool bridge |
 | `ai-cool` | `#4f7cdd` | Decorative gradient end |
 
-The shift instrument uses dedicated saturated pastel counterparts—`hero-warm` `#f2d8d0`, `hero-gold` `#eee1bf`, `hero-rose` `#ebd6e4`, `hero-violet` `#ddd7ec`, and `hero-cool` `#d3e0ef`. Its status labels reuse the dark operational hues and its throughput metrics use `ink`; all pairings are contrast-tested.
+The shift instrument is deliberately outside the AI spectrum. It reuses the five strong operational hues as a dark translucent gradient over a fully desaturated city photograph, with the matching status soft tones and white throughput metrics above it. This keeps the hero tied to the board's actual state rather than borrowing Lookout's decorative branding.
 
 The spectrum may appear in:
 
-- the translucent spectrum over the shift instrument's city photograph;
 - Lookout’s radial avatar field;
 - the AI ordering control and composer outline;
 - the thin active-tab indicator and softly washed recommendation header;
@@ -148,12 +147,12 @@ The original truck mark sits in a soft-orange outlined tile. Orange also marks t
 
 ### Shift instrument
 
-The hero is not a hero in the marketing sense. It is a light, two-sided instrument:
+The hero is not a hero in the marketing sense. It is a compact, two-sided instrument:
 
-- **Left:** Act now, Watch, Offline, On break, and Clear—ordered by dispatch priority and matched exactly to the board lanes.
+- **Left:** Act now, Watch, On break, Offline, and Clear—ordered by dispatch priority and matched exactly to the board lanes.
 - **Right:** Delivered, To deliver, Total stops, and Delivered percentage as four equally aligned facts in the same row.
 
-An original, brand-free photograph of a fictional Midwestern skyline and road network gives the instrument operational atmosphere. A light scrim and translucent saturated-pastel warm-to-cool wash keep the image subordinate, separating the hero from both the board and Lookout's much lighter recommendation wash. Status labels and figures use their dark matching operational hues; throughput metrics use near-black. Status figures remain interactive filter shortcuts.
+An original, brand-free photograph of a fictional Midwestern skyline and road network gives the instrument operational atmosphere. The photograph is completely desaturated before a dark translucent Act now → Watch → On break → Offline → Clear gradient is applied. This separation keeps the image neutral and makes all hue semantic. Status labels and figures use their light matching soft tones; throughput metrics use white. Status figures remain interactive filter shortcuts.
 
 ### Board lanes
 

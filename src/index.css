@@ -28,12 +28,6 @@
   --color-ai-violet: #8259d6;
   --color-ai-cool: #4f7cdd;
 
-  --color-hero-warm: #f2d8d0;
-  --color-hero-gold: #eee1bf;
-  --color-hero-rose: #ebd6e4;
-  --color-hero-violet: #ddd7ec;
-  --color-hero-cool: #d3e0ef;
-
   --color-act-now: #9f1f3b;
   --color-act-now-fill: #cb3453;
   --color-act-now-soft: #fff0f3;
@@ -72,19 +66,42 @@ body { @apply bg-canvas text-ink font-sans antialiased; }
 .tnum { font-variant-numeric: tabular-nums; }
 
 .iq-metrics-band {
-  background-image:
-    radial-gradient(circle at 6% -50%, color-mix(in srgb, white 28%, transparent), transparent 27rem),
-    linear-gradient(108deg,
-      color-mix(in srgb, var(--color-hero-warm) 64%, transparent) 0%,
-      color-mix(in srgb, var(--color-hero-gold) 64%, transparent) 24%,
-      color-mix(in srgb, var(--color-hero-rose) 64%, transparent) 50%,
-      color-mix(in srgb, var(--color-hero-violet) 64%, transparent) 74%,
-      color-mix(in srgb, var(--color-hero-cool) 64%, transparent) 100%),
-    linear-gradient(color-mix(in srgb, white 42%, transparent), color-mix(in srgb, white 42%, transparent)),
-    url('/images/dispatch-city-hero.webp');
-  background-position: center, center, center, center 56%;
-  background-repeat: no-repeat;
-  background-size: cover;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #272526;
+}
+
+.iq-metrics-band::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: 0;
+  pointer-events: none;
+  background: url('/images/dispatch-city-hero.webp') center 56% / cover no-repeat;
+  filter: grayscale(1) saturate(0) contrast(1.12) brightness(.72);
+}
+
+.iq-metrics-band::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(28, 25, 25, .12), rgba(28, 25, 25, .34)),
+    linear-gradient(106deg,
+      color-mix(in srgb, var(--color-act-now) 84%, transparent) 0%,
+      color-mix(in srgb, var(--color-watch) 82%, transparent) 23%,
+      color-mix(in srgb, var(--color-break) 84%, transparent) 44%,
+      color-mix(in srgb, var(--color-offline) 84%, transparent) 61%,
+      color-mix(in srgb, var(--color-clear) 86%, transparent) 82%,
+      color-mix(in srgb, var(--color-clear) 78%, transparent) 100%);
+}
+
+.iq-metrics-band > * {
+  position: relative;
+  z-index: 1;
 }
 
 .iq-soft-surface {
