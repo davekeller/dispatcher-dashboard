@@ -43,6 +43,8 @@ export interface State {
   reassignStops: (fromDriverId: string, toDriverId: string, stopIds: string[]) => void
   scheduleReset: (driverId: string, afterStopId: string | null) => void
   notifyCustomer: (stopIds: string[]) => void
+  updateStopNote: (stopId: string, note: string) => void
+  cancelStop: (stopId: string) => void
   callDriver: (driverId: string) => void
   acknowledge: (alertId: string) => void
   markArrived: (stopId: string) => void
@@ -60,6 +62,11 @@ export interface State {
 
 export const useStore = create<State>()((set, get) => {
   const name = (driverId: string) => get().fleet.drivers.find((d) => d.id === driverId)?.name ?? driverId
+  const stopContext = (stopId: string) => {
+    const route = get().fleet.routes.find((candidate) => candidate.stops.some((stop) => stop.id === stopId))
+    const stop = route?.stops.find((candidate) => candidate.id === stopId)
+    return { label: stop ? `Stop ${stop.seq}` : 'Stop', driverId: route?.driverId }
+  }
   /** Snapshot, apply, record. Every consequential action goes through here so undo is uniform. */
   const log = (kind: ShiftEvent['kind'], label: string, driverId?: string) =>
     set((s) => ({ events: [...s.events, { seq: s.events.length + 1, at: s.now(), kind, label, driverId }] }))
@@ -82,6 +89,14 @@ export const useStore = create<State>()((set, get) => {
       commit(`${name(from)}'s stops reassigned to ${name(to)}`, (f, now) => A.reassignStops(f, from, to, stopIds, now), from),
     scheduleReset: (driverId, after) => commit(`Reset scheduled for ${name(driverId)}`, (f, now) => A.scheduleReset(f, driverId, after, now), driverId),
     notifyCustomer: (stopIds) => commit(`${stopIds.length} customer${stopIds.length === 1 ? '' : 's'} notified`, (f, now) => A.notifyCustomer(f, stopIds, now)),
+    updateStopNote: (stopId, note) => {
+      const context = stopContext(stopId)
+      commit(`${context.label} note updated`, (f) => A.updateStopNote(f, stopId, note), context.driverId)
+    },
+    cancelStop: (stopId) => {
+      const context = stopContext(stopId)
+      commit(`${context.label} canceled`, (f) => A.cancelStop(f, stopId), context.driverId)
+    },
     callDriver: (driverId) => commit(`Call to ${name(driverId)} logged`, (f, now) => A.callDriver(f, driverId, now), driverId),
     acknowledge: (alertId) => {
       const driverId = alertId.split(':')[1]

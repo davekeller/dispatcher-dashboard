@@ -7,20 +7,23 @@ import Button from '../../ui/Button'
 import EmptyState from '../../ui/EmptyState'
 import Board from './Board'
 import FilterBar from './FilterBar'
-import MetricsRow from './MetricsRow'
+import ShiftHero from './ShiftHero'
+import { orderBoardCards, type BoardSort } from './boardSort'
 
 export default function ActiveShiftPage() {
   const d = useDerived()
   const groupBy = useStore((s) => s.groupBy)
+  const setGroupBy = useStore((s) => s.setGroupBy)
   const [filters, setFilters] = useState<FilterState>(EMPTY_FILTERS)
-  const visible = applyFilters(d.ranked, d.byId, filters)
-  const pick = d.ranked.find((c) => c.alerts.length > 0 && !c.snoozed) ?? null
+  const [sort, setSort] = useState<BoardSort>('lookout')
+  const visible = orderBoardCards(applyFilters(d.ranked, d.byId, filters), d.byId, sort)
+  const pick = sort === 'lookout' ? d.ranked.find((c) => c.alerts.length > 0 && !c.snoozed) ?? null : null
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4 p-5">
-      <MetricsRow metrics={d.metrics} filters={filters} onPreset={setFilters} />
-      <FilterBar filters={filters} onChange={setFilters} />
-      <div className="min-h-0 flex-1">
+    <div className="flex h-full min-h-0 flex-col">
+      <ShiftHero metrics={d.metrics} ranked={d.ranked} filters={filters} onPreset={setFilters} />
+      <FilterBar filters={filters} onChange={setFilters} sort={sort} onSortChange={setSort} groupBy={groupBy} onGroupByChange={setGroupBy} />
+      <div className="min-h-0 flex-1 bg-board px-5 pb-5 pt-4">
         {visible.length === 0 && isFiltering(filters) ? (
           <EmptyState title="Nothing matches those filters." body="Every driver is hidden by the current status, data, region, or search filter." action={<Button size="sm" onClick={() => setFilters(EMPTY_FILTERS)}>Clear filters</Button>} />
         ) : (

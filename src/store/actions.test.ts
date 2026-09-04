@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { makeFleet } from '../data/seed'
 import { minutesUntilLimit, plannedReset, remainingDriveMinutes, remainingStops, unassignedStops } from '../hos/compute'
 import { MIN } from '../time/clock'
-import { bringOnline, markArrived, markDeparted, notifyCustomer, reassignCandidates, reassignStops, scheduleReset, stopsPastLimit, suggestResetStop } from './actions'
+import { bringOnline, cancelStop, markArrived, markDeparted, notifyCustomer, reassignCandidates, reassignStops, scheduleReset, stopsPastLimit, suggestResetStop, updateStopNote } from './actions'
 import { buildView, buildViews } from './view'
 
 const anchor = new Date(2026, 8, 3, 12, 47, 0, 0).getTime()
@@ -106,5 +106,26 @@ describe('notify, call, arrive, depart, reconnect', () => {
     const after = next.drivers.find((d) => d.id === 'drv-03')!
     expect(after.pingsSuspended).toBe(false)
     expect(minutesUntilLimit(after, anchor)).toBeGreaterThan(before)
+  })
+})
+
+describe('stop maintenance', () => {
+  it('adds, replaces, and clears a stop note immutably', () => {
+    const stopId = marcusStops[0]
+    const noted = updateStopNote(fleet, stopId, 'Call receiving before arrival.')
+    expect(noted).not.toBe(fleet)
+    expect(routeOf(noted, 'drv-01').stops.find((stop) => stop.id === stopId)?.note).toBe('Call receiving before arrival.')
+    expect(routeOf(fleet, 'drv-01').stops.find((stop) => stop.id === stopId)?.note).toBeUndefined()
+    expect(routeOf(updateStopNote(noted, stopId, '   '), 'drv-01').stops.find((stop) => stop.id === stopId)?.note).toBeUndefined()
+  })
+
+  it('cancels unresolved stops, resequences the route, and leaves completed work intact', () => {
+    const stopId = marcusStops[1]
+    const canceled = cancelStop(fleet, stopId)
+    const route = routeOf(canceled, 'drv-01')
+    expect(route.stops.some((stop) => stop.id === stopId)).toBe(false)
+    expect(route.stops.map((stop) => stop.seq)).toEqual(route.stops.map((_, index) => index + 1))
+    const done = routeOf(fleet, 'drv-01').stops.find((stop) => stop.status === 'done')!
+    expect(cancelStop(fleet, done.id)).toBe(fleet)
   })
 })

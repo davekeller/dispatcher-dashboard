@@ -6,7 +6,7 @@ Read `docs/ARCHITECTURE.md` before substantial work; it is the source of truth f
 
 The primary **"Active Shift" dashboard** for a fleet dispatcher (Lena) managing ~50 heavy-duty trucks and 1,000+ deliveries a day, with **one exception flow: Hours of Service (HOS)** — drivers have a legal 11-hour driving limit and must take a mandatory reset. Surface who's approaching it, and the drill-in from that alert.
 
-Two-pane shell: a product bar ("Dispatch") over the **main view** (metrics row + status-column board, and the route file page) · **Lookout**, the co-pilot rail (alert bar + recommendation cards). The simulated shift is anchored at 2:47 PM and ticks live.
+Two-pane shell: a product bar ("Dispatch") over the **main view** (shift directive hero + collapsible status-column route board, and the route file page) · **Lookout**, the co-pilot rail (recommendations + chat + shift timeline). The simulated shift is anchored at 2:47 PM and ticks live.
 
 ## Hard constraints (from the brief)
 
@@ -26,7 +26,7 @@ Two-pane shell: a product bar ("Dispatch") over the **main view** (metrics row +
 6. **Stale data is a state.** Staleness tiers are derived and visible; projections on stale data carry a tilde and an age; offline drivers stop pinging, everyone else pings with the clock.
 7. **Actions confirm before they commit.** Preview → confirm → commit → recompute → result → undo. One implementation in `src/store/actions.ts`, called by the rail and the route file alike.
 8. **Lookout reads `ranked` and nothing else.** The alert bar is `ranked.slice(0, 3)`. If a card and a board tile ever disagree, that's the bug to find first.
-9. **Color is attention.** Only things needing attention carry saturated color. Lookout wears coral and nothing else does. Components use tokens, never raw hex.
+9. **Color is attention.** Only things needing attention carry saturated color. Lookout owns the accessible orange and the subtle peach-to-periwinkle AI spectrum. Components use tokens, never raw hex.
 
 ## Stack
 

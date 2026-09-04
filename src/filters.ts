@@ -22,7 +22,7 @@ export const FILTERS: FilterDef[] = [
   { id: 'band', label: 'Status', kind: 'multi', options: BAND_ORDER.map((b) => ({ value: b, label: BAND_LABEL[b] })), apply: (_v, c, value) => multi(value).length === 0 || multi(value).includes(c.band) },
   { id: 'freshness', label: 'Data', kind: 'multi', options: [{ value: 'fresh', label: 'Fresh' }, { value: 'stale', label: 'Stale' }, { value: 'offline', label: 'Offline' }], apply: (v, _c, value) => multi(value).length === 0 || multi(value).includes(v.staleness) },
   { id: 'region', label: 'Region', kind: 'multi', options: REGIONS.map((r) => ({ value: r, label: r })), apply: (v, _c, value) => multi(value).length === 0 || multi(value).includes(v.driver.region) },
-  { id: 'search', label: 'Find a driver or plate', kind: 'text', apply: (v, _c, value) => { const q = text(value); return q === '' || v.driver.name.toLowerCase().includes(q) || v.truck.plate.toLowerCase().includes(q) } },
+  { id: 'search', label: 'Search routes, drivers, or trucks', kind: 'text', apply: (v, _c, value) => { const q = text(value); return q === '' || v.route.id.toLowerCase().includes(q) || v.driver.name.toLowerCase().includes(q) || v.truck.plate.toLowerCase().includes(q) } },
 ]
 
 export const EMPTY_FILTERS: FilterState = Object.fromEntries(FILTERS.map((f) => [f.id, f.kind === 'multi' ? [] : '']))

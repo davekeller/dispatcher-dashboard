@@ -23,5 +23,7 @@ describe('derive', () => {
     expect(d.metrics.approaching).toBe(d.views.filter((v) => v.hos === 'act_now' || v.hos === 'watch').length)
     expect(d.metrics.onShift).toBeGreaterThanOrEqual(48)
     expect(d.metrics.needDriver).toBe(0)
+    expect(d.metrics.stopsDelivered).toBe(d.views.reduce((total, view) => total + view.route.stops.filter((stop) => stop.status === 'done').length, 0))
+    expect(d.metrics.stopsFailed).toBe(d.views.reduce((total, view) => total + view.route.stops.filter((stop) => stop.status === 'failed').length, 0))
   })
 })

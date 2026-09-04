@@ -5,9 +5,34 @@ import type { DriverView } from '../../store/view'
 import { MIN } from '../../time/clock'
 import Chip from '../../ui/Chip'
 import { BAND_TONE } from '../../ui/tones'
+import StopActionsMenu from './StopActionsMenu'
 
-/** The receipt of what happened at a stop, or what is planned to. Pending and unassigned
- *  stops carry a checkbox, so a partial reassign is just selecting cards. */
+interface StopEvent {
+  label: string
+  value: string
+  tone: 'clear' | 'critical' | 'muted'
+}
+
+interface StopFact {
+  label: string
+  value: string
+  tone?: string
+}
+
+function eventDot(tone: StopEvent['tone']): string {
+  if (tone === 'clear') return 'border-clear-fill bg-clear-fill'
+  if (tone === 'critical') return 'border-act-now-fill bg-act-now-fill'
+  return 'border-muted/55 bg-panel'
+}
+
+function stopOutcome(stop: Stop): string {
+  if (stop.status === 'failed' || stop.outcome === 'failed') return 'Failed'
+  if (stop.outcome === 'partial') return 'Partial'
+  return 'Delivered'
+}
+
+/** A receipt follows the same file pattern as the surrounding route: identity first,
+ * a small horizontal event track second, then a compact one-row fact grid. */
 export default function StopReceipt({ stop, delivery, view, selected, onToggle, pastLimit = false }: { stop: Stop; delivery: Delivery | undefined; view: DriverView; selected: boolean; onToggle: () => void; pastLimit?: boolean }) {
   const isNext = view.next?.id === stop.id
   const pending = stop.status === 'pending'
@@ -16,46 +41,84 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
   const statusTone = stop.status === 'failed' ? BAND_TONE.act_now : stop.status === 'unassigned' ? BAND_TONE.offline : isNext ? BAND_TONE.break : undefined
   const statusLabel = stop.status === 'failed' ? 'failed' : stop.status === 'unassigned' ? 'needs a driver' : isNext ? 'next' : undefined
   const selectable = pending || stop.status === 'unassigned'
+  const complete = stop.status === 'done' || stop.status === 'failed'
+  const dwell = stop.arrivedAt !== undefined && stop.departedAt !== undefined ? fmtMinutes((stop.departedAt - stop.arrivedAt) / MIN) : '—'
+  const liveDwell = stop.status === 'in_progress' && stop.arrivedAt !== undefined ? fmtMinutes((view.now - stop.arrivedAt) / MIN) : '—'
+  const outcome = stopOutcome(stop)
+
+  const events: StopEvent[] = complete ? [
+    ...(stop.arrivedAt !== undefined ? [{ label: 'Arrived', value: fmtClock(stop.arrivedAt), tone: 'clear' as const }] : []),
+    ...(stop.departedAt !== undefined ? [{ label: 'Left', value: fmtClock(stop.departedAt), tone: stop.status === 'failed' ? 'critical' as const : 'clear' as const }] : []),
+    { label: stop.signedBy ? 'Signed' : 'Result', value: stop.signedBy ?? outcome, tone: stop.status === 'failed' ? 'critical' : 'clear' },
+  ] : stop.status === 'in_progress' ? [
+    ...(stop.arrivedAt !== undefined ? [{ label: 'Arrived', value: fmtClock(stop.arrivedAt), tone: 'clear' as const }] : []),
+    { label: 'Status', value: 'At the dock', tone: 'muted' },
+    ...(delivery ? [{ label: 'Window', value: `until ${fmtClock(delivery.window.end)}`, tone: 'muted' as const }] : []),
+  ] : [
+    { label: 'Planned', value: fmtClock(stop.plannedEta), tone: 'muted' },
+    ...(eta !== undefined && eta !== stop.plannedEta ? [{ label: 'Projected', value: fmtClock(eta), tone: pastWindow ? 'critical' as const : 'muted' as const }] : []),
+    ...(delivery ? [{ label: 'Window', value: `until ${fmtClock(delivery.window.end)}`, tone: pastWindow ? 'critical' as const : 'muted' as const }] : []),
+  ]
+
+  const facts: StopFact[] = complete ? [
+    { label: 'On site', value: dwell },
+    { label: 'Outcome', value: outcome, tone: stop.status === 'failed' ? 'text-act-now' : stop.outcome === 'partial' ? 'text-watch' : 'text-clear' },
+    { label: 'Load', value: delivery?.items.join(', ') ?? '—' },
+    { label: 'Priority', value: delivery?.priority === 'priority' ? 'Priority' : 'Standard' },
+  ] : stop.status === 'in_progress' ? [
+    { label: 'On site', value: liveDwell },
+    { label: 'Status', value: 'At the dock' },
+    { label: 'Window', value: delivery ? fmtClock(delivery.window.end) : '—', tone: pastWindow ? 'text-act-now' : undefined },
+    { label: 'Load', value: delivery?.items.join(', ') ?? '—' },
+  ] : [
+    { label: eta !== undefined && eta !== stop.plannedEta ? 'Projected' : 'ETA', value: fmtClock(eta ?? stop.plannedEta), tone: pastWindow ? 'text-act-now' : undefined },
+    { label: 'Window', value: delivery ? fmtClock(delivery.window.end) : '—', tone: pastWindow ? 'text-act-now' : undefined },
+    { label: 'Drive in', value: `${stop.driveMinutesFromPrev} min` },
+    { label: stop.status === 'unassigned' ? 'Assignment' : 'Load', value: stop.status === 'unassigned' ? 'Needs driver' : delivery?.items.join(', ') ?? '—', tone: stop.status === 'unassigned' ? 'text-offline' : undefined },
+  ]
+
   return (
-    <div className={`flex gap-3 rounded-card border bg-panel px-3 py-2.5 ${isNext ? 'border-break shadow-card' : pastLimit ? 'border-act-now/50' : 'border-line'} ${stop.status === 'done' ? 'opacity-80' : ''} ${stop.status === 'unassigned' ? 'border-dashed' : ''}`}>
-      {selectable ? (
-        <input type="checkbox" checked={selected} onChange={onToggle} aria-label={`Select stop ${stop.seq} to reassign`} className="mt-1 accent-ink" />
-      ) : (
-        <span className="w-[13px] shrink-0" aria-hidden="true" />
-      )}
-      <span className="tnum w-5 shrink-0 pt-px text-[12px] font-semibold text-muted">{stop.seq}</span>
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2 text-[13px]">
-          <span className="font-semibold text-ink">{delivery?.customer ?? stop.deliveryId}</span>
-          {delivery?.priority === 'priority' && <Chip tone={BAND_TONE.watch}>priority</Chip>}
-          {statusTone && statusLabel && <Chip tone={statusTone} dashed={stop.status === 'unassigned'}>{statusLabel}</Chip>}
-          {pastLimit && stop.status !== 'unassigned' && <Chip tone={BAND_TONE.act_now}>past the limit</Chip>}
-          {stop.notifiedAt !== undefined && <Chip>customer notified {fmtClock(stop.notifiedAt)}</Chip>}
-          {pastWindow && <Chip tone={BAND_TONE.act_now}>past window</Chip>}
+    <article className={`grid overflow-hidden rounded-card border bg-panel shadow-card lg:grid-cols-[minmax(8rem,0.8fr)_minmax(10rem,1fr)_minmax(14rem,1.2fr)_2rem] ${isNext ? 'border-break' : pastLimit || pastWindow ? 'border-act-now/50' : 'border-line'} ${stop.status === 'unassigned' ? 'border-dashed' : ''}`}>
+      <div className="flex min-w-0 flex-col justify-center p-3">
+        <div className="flex min-w-0 items-start gap-2">
+          <span className="tnum shrink-0 font-display text-[1.65rem] font-semibold leading-none tracking-[-0.05em] text-ink/80">#{stop.seq}</span>
+          {selectable && <input type="checkbox" checked={selected} onChange={onToggle} aria-label={`Select stop ${stop.seq} to reassign`} className="ml-auto mt-1 shrink-0 accent-ink" />}
         </div>
-        <p className="truncate text-[12px] text-muted">
-          {delivery?.address} · {delivery?.items.join(', ')}
-          {delivery?.instructions ? ` · ${delivery.instructions}` : ''}
-        </p>
-        <p className="tnum mt-0.5 text-[11px] text-muted">
-          {(stop.status === 'done' || stop.status === 'failed') && stop.arrivedAt !== undefined && stop.departedAt !== undefined && (
-            <>
-              arrived {fmtClock(stop.arrivedAt)} · left {fmtClock(stop.departedAt)} · {fmtMinutes((stop.departedAt - stop.arrivedAt) / MIN)} on site
-              {stop.signedBy ? ` · signed ${stop.signedBy}` : ''}
-              {stop.outcome === 'partial' ? ' · partial delivery' : ''}
-              {stop.note ? ` · ${stop.note}` : ''}
-            </>
-          )}
-          {stop.status === 'in_progress' && stop.arrivedAt !== undefined && <>arrived {fmtClock(stop.arrivedAt)} · at the dock</>}
-          {(pending || stop.status === 'unassigned') && (
-            <>
-              planned {fmtClock(stop.plannedEta)}
-              {eta !== undefined && eta !== stop.plannedEta ? ` · projected ${fmtClock(eta)}` : ''}
-              {delivery ? ` · window until ${fmtClock(delivery.window.end)}` : ''} · {stop.driveMinutesFromPrev} min drive
-            </>
-          )}
-        </p>
+        <h3 className="mt-1 truncate text-[12px] font-semibold text-ink" title={delivery?.customer ?? stop.deliveryId}>{delivery?.customer ?? stop.deliveryId}</h3>
+        <p className="mt-0.5 truncate text-[10px] text-muted" title={delivery?.address}>{delivery?.address ?? 'Address unavailable'}</p>
+        <div className="mt-1 flex min-w-0 flex-wrap items-center gap-1">
+          {delivery?.priority === 'priority' && <Chip tone={BAND_TONE.watch} className="px-1.5 py-0 text-[9px]">priority</Chip>}
+          {statusTone && statusLabel && <Chip tone={statusTone} dashed={stop.status === 'unassigned'} className="px-1.5 py-0 text-[9px]">{statusLabel}</Chip>}
+          {pastLimit && stop.status !== 'unassigned' && <Chip tone={BAND_TONE.act_now} className="px-1.5 py-0 text-[9px]">past the limit</Chip>}
+          {pastWindow && <Chip tone={BAND_TONE.act_now} className="px-1.5 py-0 text-[9px]">past window</Chip>}
+        </div>
+        {delivery?.instructions && <p className="mt-1 line-clamp-2 text-[9px] leading-3.5 text-muted">{delivery.instructions}</p>}
+        {stop.note && <p className="mt-1 line-clamp-2 text-[9px] font-medium leading-3.5 text-ink/75"><span className="font-semibold uppercase tracking-[0.04em] text-label">Note · </span>{stop.note}</p>}
+        {stop.notifiedAt !== undefined && <p className="mt-1 text-[9px] font-semibold text-muted">Customer notified {fmtClock(stop.notifiedAt)}</p>}
       </div>
-    </div>
+
+      <div className="flex min-w-0 items-center border-t border-line px-3 py-2.5 lg:border-l lg:border-t-0">
+        <ol className="relative grid w-full items-start" style={{ gridTemplateColumns: `repeat(${events.length}, minmax(0, 1fr))` }} aria-label={`Stop ${stop.seq} events`}>
+          <span className="absolute top-[0.2rem] h-px bg-line" style={{ left: `${100 / (events.length * 2)}%`, right: `${100 / (events.length * 2)}%` }} aria-hidden="true" />
+          {events.map((event) => (
+            <li key={`${event.label}:${event.value}`} className="relative flex min-w-0 flex-col items-center px-0.5 text-center">
+              <span className={`relative z-10 h-1.5 w-1.5 rounded-full border ${eventDot(event.tone)}`} aria-hidden="true" />
+              <span className={`mt-1.5 block w-full truncate text-[7px] font-semibold uppercase tracking-[0.04em] ${event.tone === 'critical' ? 'text-act-now' : 'text-label'}`}>{event.label}</span>
+              <span className={`tnum mt-0.5 block w-full min-w-0 truncate text-[10px] font-semibold ${event.tone === 'critical' ? 'text-act-now' : 'text-ink'}`} title={event.value}>{event.value}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <dl className="grid grid-cols-4 border-t border-line bg-canvas/20 lg:border-l lg:border-t-0">
+        {facts.map((fact, index) => (
+          <div key={fact.label} className={`flex min-w-0 flex-col justify-center px-1 py-2.5 ${index < facts.length - 1 ? 'border-r border-line' : ''}`}>
+            <dt className="truncate text-[7px] font-semibold uppercase tracking-[0.04em] text-label" title={fact.label}>{fact.label}</dt>
+            <dd className={`tnum mt-0.5 truncate text-[11px] font-semibold leading-tight ${fact.tone ?? 'text-ink'}`} title={fact.value}>{fact.value}</dd>
+          </div>
+        ))}
+      </dl>
+      <StopActionsMenu stop={stop} view={view} customer={delivery?.customer ?? stop.deliveryId} />
+    </article>
   )
 }

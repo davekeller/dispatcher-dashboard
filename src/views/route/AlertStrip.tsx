@@ -14,13 +14,17 @@ export default function AlertStrip({ view, card }: { view: DriverView; card: Dri
       {card.alerts.map((a) => {
         const tone = severityTone(a.severity)
         return (
-          <li key={a.id} className={`flex items-start gap-3 rounded-card border border-line border-l-4 bg-panel px-4 py-3 shadow-card ${tone.border}`}>
-            <Chip tone={tone} className="mt-0.5">{a.label}</Chip>
-            <div className="min-w-0 flex-1">
-              <p className="text-[13px] font-semibold text-ink">{a.title}</p>
-              <p className="text-[12px] text-muted">{a.body}</p>
+          <li key={a.id} className={`rounded-card border border-line border-l-4 bg-panel px-4 py-3 shadow-card ${tone.border}`}>
+            <div className="flex items-start gap-3">
+              <Chip tone={tone} className="mt-0.5">{a.label}</Chip>
+              <div className="min-w-0 flex-1">
+                <p className="text-[13px] font-semibold text-ink">{a.title}</p>
+                <p className="text-[12px] text-muted">{a.body}</p>
+              </div>
             </div>
-            <AlertActions driverId={view.driver.id} actions={a.actions} alertIds={[a.id]} positionDependentDisabled={reason} resetScheduledAt={view.plannedResetAt} />
+            <div className="mt-2 flex justify-end border-t border-line/70 pt-2">
+              <AlertActions driverId={view.driver.id} actions={a.actions} alertIds={[a.id]} positionDependentDisabled={reason} resetScheduledAt={view.plannedResetAt} />
+            </div>
           </li>
         )
       })}

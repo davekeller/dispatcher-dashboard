@@ -1,0 +1,103 @@
+import type { CSSProperties } from 'react'
+import { stopsPastLimit } from '../../store/actions'
+import type { DriverView } from '../../store/view'
+
+function nodeTone(status: string, needsAttention: boolean): string {
+  if (status === 'failed') return 'bg-act-now-fill'
+  if (status === 'done') return 'route-history-node'
+  if (status === 'unassigned') return 'border border-dashed border-offline bg-panel'
+  if (needsAttention) return 'border border-act-now bg-panel'
+  return 'border border-muted/70 bg-panel'
+}
+
+type TimelineLayout = {
+  positions: number[]
+  firstRemainingIndex: number
+  historyCompressed: boolean
+}
+
+const isHistory = (status: string) => status === 'done' || status === 'failed'
+
+/** A small fisheye layout: long completed prefixes overlap while the handoff into
+ * remaining work gets the visual room. Short histories stay evenly distributed. */
+export function miniTimelineLayout(statuses: readonly string[]): TimelineLayout {
+  if (statuses.length === 0) return { positions: [], firstRemainingIndex: -1, historyCompressed: false }
+  if (statuses.length === 1) return { positions: [50], firstRemainingIndex: isHistory(statuses[0]) ? -1 : 0, historyCompressed: false }
+
+  const unresolvedIndex = statuses.findIndex((status) => !isHistory(status))
+  const completedPrefixCount = unresolvedIndex < 0 ? statuses.length : unresolvedIndex
+  const historyCompressed = completedPrefixCount >= 6 && completedPrefixCount < statuses.length
+
+  if (!historyCompressed) {
+    return {
+      positions: statuses.map((_, index) => 5 + (index / (statuses.length - 1)) * 90),
+      firstRemainingIndex: unresolvedIndex,
+      historyCompressed,
+    }
+  }
+
+  const gapWeights = statuses.slice(1).map((_, gapIndex) => {
+    if (gapIndex < unresolvedIndex - 1) return 0.14
+    if (gapIndex === unresolvedIndex - 1) return 1.35
+    const distanceFromFocus = gapIndex - unresolvedIndex
+    return [1.2, 1.1, 1.05][distanceFromFocus] ?? 1
+  })
+  const totalWeight = gapWeights.reduce((sum, weight) => sum + weight, 0)
+  let elapsedWeight = 0
+  const positions = [5]
+  gapWeights.forEach((weight) => {
+    elapsedWeight += weight
+    positions.push(5 + (elapsedWeight / totalWeight) * 90)
+  })
+
+  return { positions, firstRemainingIndex: unresolvedIndex, historyCompressed }
+}
+
+export function completedStopLightWeight(index: number, lastCompleteIndex: number): number {
+  if (lastCompleteIndex <= 0) return 50
+  const depth = Math.max(0, Math.min(1, index / lastCompleteIndex))
+  return Math.round((1 - depth) * 100)
+}
+
+function nodeSize(index: number, layout: TimelineLayout): string {
+  if (!layout.historyCompressed) return 'h-1.5 w-1.5'
+  if (index < layout.firstRemainingIndex - 1) return 'h-1 w-1'
+  if (index === layout.firstRemainingIndex) return 'h-2 w-2'
+  if (index === layout.firstRemainingIndex + 1) return 'h-[7px] w-[7px]'
+  return 'h-1.5 w-1.5'
+}
+
+/** The route-detail stop spine reduced to its visual essentials. It occupies the full
+ * left edge of a board card. Long completed histories compress so remaining work is
+ * magnified, while every stop and the same HOS crossing as the rail remain visible. */
+export default function RouteTimelineMini({ view }: { view: DriverView }) {
+  const stops = view.route.stops
+  const layout = miniTimelineLayout(stops.map((stop) => stop.status))
+  const pastLimitIds = new Set(stopsPastLimit(view))
+  const lateIds = new Set(view.lateStops.map((stop) => stop.id))
+  const firstPastIndex = stops.findIndex((stop) => pastLimitIds.has(stop.id))
+  const lastCompleteIndex = stops.reduce((last, stop, index) => stop.status === 'done' || stop.status === 'failed' ? index : last, -1)
+  const position = (index: number) => layout.positions[index] ?? 50
+  const completeThrough = lastCompleteIndex < 0 ? 5 : position(lastCompleteIndex)
+  const pastLimitFrom = firstPastIndex < 0 ? 100 : position(firstPastIndex)
+
+  return (
+    <div className="relative isolate w-6 shrink-0 self-stretch border-r border-line/70 bg-canvas/50" aria-label={`Route timeline: ${view.done} of ${view.total} stops complete${pastLimitIds.size > 0 ? `, ${pastLimitIds.size} stops past HOS` : ''}.`}>
+      <span className="absolute bottom-[5%] left-1/2 top-[5%] w-px -translate-x-1/2 bg-line" aria-hidden="true" />
+      {lastCompleteIndex >= 0 && <span className="route-history-progress absolute left-1/2 top-[5%] w-px -translate-x-1/2" style={{ height: `${Math.max(0, completeThrough - 5)}%` }} aria-hidden="true" />}
+      {firstPastIndex >= 0 && <span className="absolute bottom-[5%] left-1/2 w-px -translate-x-1/2 bg-act-now-fill/70" style={{ top: `${pastLimitFrom}%` }} aria-hidden="true" />}
+      {firstPastIndex >= 0 && <span className="absolute left-1/2 z-10 h-px w-4 -translate-x-1/2 bg-act-now-fill" style={{ top: `${pastLimitFrom}%` }} aria-hidden="true" />}
+      {stops.map((stop, index) => (
+        <span
+          key={stop.id}
+          className={`absolute left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rounded-full motion-safe:transition-[width,height] motion-safe:duration-150 ${nodeSize(index, layout)} ${nodeTone(stop.status, pastLimitIds.has(stop.id) || lateIds.has(stop.id))}`}
+          style={{
+            top: `${position(index)}%`,
+            ...(stop.status === 'done' ? { '--route-history-light': `${completedStopLightWeight(index, lastCompleteIndex)}%` } : {}),
+          } as CSSProperties}
+          aria-hidden="true"
+        />
+      ))}
+    </div>
+  )
+}

@@ -1,11 +1,11 @@
 // Validates the text tokens against the grounds they sit on. Run once at theme setup and
 // whenever a token moves; paste the table into docs/DECISIONS.md.
 const tokens = {
-  panel: '#ffffff', canvas: '#f4f4f6', well: '#ececf1',
-  ink: '#17171b', muted: '#63636c', label: '#6e6e76',
-  'lookout-strong': '#a83a15', lookout: '#cf4620',
-  'act-now': '#b3323f', watch: '#8f5f0e', clear: '#266b4c', offline: '#5b6370', break: '#3262a8',
-  'act-now-soft': '#fbeaec', 'watch-soft': '#fbf3e3', 'clear-soft': '#e8f4ee', 'offline-soft': '#eef0f3', 'break-soft': '#e9f0fa', 'lookout-soft': '#ffe9e2',
+  panel: '#ffffff', canvas: '#f8f6f3', well: '#f1ede9',
+  ink: '#211e1c', muted: '#625d59', label: '#6d6661',
+  'lookout-strong': '#a93817', lookout: '#cf4620',
+  'act-now': '#a9333e', watch: '#805706', clear: '#276548', offline: '#5b5f66', break: '#3a5f9f',
+  'act-now-soft': '#fdf0f1', 'watch-soft': '#fff7e7', 'clear-soft': '#edf7f1', 'offline-soft': '#f2f1f0', 'break-soft': '#eef2fb', 'lookout-soft': '#fff0e9',
 }
 const lum = (hex) => {
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))

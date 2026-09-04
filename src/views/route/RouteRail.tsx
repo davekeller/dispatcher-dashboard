@@ -1,170 +1,270 @@
-import { ArrowLeft, SidebarSimple } from '@phosphor-icons/react'
+import { ArrowLeft, CaretDown, Check, SidebarSimple } from '@phosphor-icons/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router'
-import type { Delivery, DutyStatus, Stop } from '../../data/types'
-import { knownSegments, projectedEta } from '../../hos/compute'
-import { fmtClock } from '../../lib/format'
+import type { Delivery, Stop } from '../../data/types'
+import { projectedEta } from '../../hos/compute'
+import { fmtAge, fmtClock } from '../../lib/format'
+import { routeHosSignal, routeScheduleSignal, type RouteSignalTone } from '../../lib/routeProgress'
 import type { DriverView } from '../../store/view'
-import { MIN } from '../../time/clock'
-
-const FILL: Record<DutyStatus, string> = { driving: 'bg-ink', on_duty: 'bg-muted', on_break: 'bg-break-fill', off_duty: 'bg-offline-fill' }
-const TRACK_LEFT = 'left-3' // where the axis sits in the collapsed rail
-const LABEL_GAP_PX = 26 // labels (two lines each) closer than this to the previous one stay hidden; hover still tells
 
 interface Node {
   stop: Stop
   t: number
+  customer: string
   late: boolean
 }
 
-/** The route file's left rail, in the case-file navigation pattern. A vertical time axis from
- *  the start of the shift through the projected finish: the duty timeline up to now, a dashed
- *  projection after it, every stop as a node at its actual or projected time, the now marker,
- *  and the limit mark with the axis red past it. The node whose receipt is in view is lit;
- *  clicking a node scrolls to its receipt. Collapse is controlled by the page. */
-export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed, onCollapsedChange }: { view: DriverView; deliveryById: Map<string, Delivery>; pastLimitIds: Set<string>; collapsed: boolean; onCollapsedChange: (c: boolean) => void }) {
-  const { route, now, limitHitAt } = view
-  const start = view.driver.shiftStartedAt
-  const end = Math.max(view.projectedFinishAt ?? now, limitHitAt, (view.plannedResetAt ?? 0) + 20 * MIN, now + 20 * MIN) + 10 * MIN
-  const pct = (t: number) => Math.max(0, Math.min(100, ((t - start) / (end - start)) * 100))
-  const segments = knownSegments(view.driver, now)
-  const nodes = useMemo<Node[]>(() => {
-    return route.stops
-      .map((s) => {
-        const t = s.status === 'done' || s.status === 'failed' ? (s.departedAt ?? s.plannedEta) : s.status === 'in_progress' ? (s.arrivedAt ?? now) : projectedEta(s, view.driftMin)
-        const win = deliveryById.get(s.deliveryId)?.window.end
-        return { stop: s, t, late: s.status === 'pending' && win !== undefined && t > win }
-      })
-      .sort((a, b) => a.t - b.t)
-  }, [route.stops, now, view.driftMin, deliveryById])
+const DOT: Record<RouteSignalTone, string> = {
+  clear: 'bg-clear-fill',
+  watch: 'bg-watch-fill',
+  act_now: 'bg-act-now-fill',
+  offline: 'bg-offline-fill',
+}
 
-  // The lit node follows the receipt in view, the way the case-file nav follows its sections.
-  const [active, setActive] = useState<string | null>(null)
+const SIGNAL_TEXT: Record<RouteSignalTone, string> = {
+  clear: 'text-clear',
+  watch: 'text-watch',
+  act_now: 'text-act-now',
+  offline: 'text-offline',
+}
+
+const TIMELINE_COLUMNS = { gridTemplateColumns: '1.25rem minmax(0, 1fr)' }
+
+function stopTone(node: Node, pastLimitIds: Set<string>): string {
+  const { stop } = node
+  if (stop.status === 'failed') return 'bg-act-now-fill text-on-accent'
+  if (stop.status === 'done') return 'bg-clear-fill text-on-accent'
+  if (stop.status === 'unassigned') return 'border-2 border-dashed border-offline bg-panel text-offline'
+  if (pastLimitIds.has(stop.id) || node.late) return 'border-2 border-act-now bg-panel text-act-now'
+  return 'border-2 border-muted/70 bg-panel text-muted'
+}
+
+function rowTone(node: Node, pastLimitIds: Set<string>): string {
+  if (pastLimitIds.has(node.stop.id) || node.late) return 'bg-act-now-soft/65 hover:bg-act-now-soft'
+  return 'hover:bg-canvas'
+}
+
+function stopState(node: Node, nextId: string | undefined, pastLimitIds: Set<string>): string {
+  const { stop } = node
+  if (stop.status === 'failed') return 'failed'
+  if (stop.status === 'done') return 'delivered'
+  if (stop.status === 'unassigned') return 'unassigned'
+  if (pastLimitIds.has(stop.id)) return 'past HOS'
+  if (node.late) return 'past due'
+  if (stop.id === nextId || stop.status === 'in_progress') return 'current stop'
+  return 'undelivered'
+}
+
+/** A route-first progress rail. The summary answers "where are we?" and "does it fit?"
+ * before the stop sequence supplies detail. Stop spacing follows route order rather than
+ * elapsed time so completed, current, upcoming, and post-limit work remain scannable. */
+export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed, onCollapsedChange }: { view: DriverView; deliveryById: Map<string, Delivery>; pastLimitIds: Set<string>; collapsed: boolean; onCollapsedChange: (c: boolean) => void }) {
+  const { route, now } = view
+  const schedule = routeScheduleSignal(view)
+  const hos = routeHosSignal(view)
+  const nextId = view.next?.id
+  const progress = view.total === 0 ? 1 : view.done / view.total
+  const [active, setActive] = useState<string | null>(route.stops[0]?.id ?? null)
+  const [summaryOpen, setSummaryOpen] = useState(true)
+  const [timelineOpen, setTimelineOpen] = useState(true)
+  const timelineRef = useRef<HTMLDivElement>(null)
+  const nodeRefs = useRef(new Map<string, HTMLButtonElement>())
+
+  const nodes = useMemo<Node[]>(() => route.stops.map((stop) => {
+    const t = stop.status === 'done' || stop.status === 'failed'
+      ? (stop.departedAt ?? stop.plannedEta)
+      : stop.status === 'in_progress'
+        ? (stop.arrivedAt ?? now)
+        : projectedEta(stop, view.driftMin)
+    const windowEnd = deliveryById.get(stop.deliveryId)?.window.end
+    return {
+      stop,
+      t,
+      customer: deliveryById.get(stop.deliveryId)?.customer ?? stop.deliveryId,
+      late: stop.status === 'pending' && windowEnd !== undefined && t > windowEnd,
+    }
+  }), [deliveryById, now, route.stops, view.driftMin])
+
+  const firstPastLimitId = nodes.find((node) => pastLimitIds.has(node.stop.id))?.stop.id
+
   useEffect(() => {
-    const els = route.stops.map((s) => document.getElementById(`stop-${s.id}`)).filter((n): n is HTMLElement => Boolean(n))
-    if (els.length === 0) return
+    setActive(route.stops[0]?.id ?? null)
+  }, [route.id, route.stops])
+
+  useEffect(() => {
+    setSummaryOpen(true)
+    setTimelineOpen(true)
+  }, [route.id])
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      const container = timelineRef.current
+      const node = active ? nodeRefs.current.get(active) : undefined
+      if (!container || !node) return
+      const top = node.offsetTop
+      const bottom = top + node.offsetHeight
+      if (top < container.scrollTop || bottom > container.scrollTop + container.clientHeight) {
+        container.scrollTop = Math.max(0, top - container.clientHeight * 0.35)
+      }
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [active, collapsed, route.id])
+
+  // The selected timeline node still follows the receipt currently being read.
+  useEffect(() => {
+    const elements = route.stops.map((stop) => document.getElementById(`stop-${stop.id}`)).filter((node): node is HTMLElement => Boolean(node))
+    if (elements.length === 0) return
     const observer = new IntersectionObserver(
       (entries) => {
-        const top = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0]
+        const top = entries.filter((entry) => entry.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0]
         if (top) setActive(top.target.id.replace('stop-', ''))
       },
       { rootMargin: '-15% 0px -65% 0px', threshold: [0, 0.5] },
     )
-    els.forEach((el) => observer.observe(el))
+    elements.forEach((element) => observer.observe(element))
     return () => observer.disconnect()
   }, [route.stops])
 
-  // Label collision: with the axis proportional to time, two quick stops can sit a few pixels apart.
-  const axisRef = useRef<HTMLDivElement>(null)
-  const [height, setHeight] = useState(600)
-  useEffect(() => {
-    const el = axisRef.current
-    if (!el) return
-    const ro = new ResizeObserver(() => setHeight(el.clientHeight))
-    ro.observe(el)
-    setHeight(el.clientHeight)
-    return () => ro.disconnect()
-  }, [])
-  const over = view.minutesUntilLimit <= 0
-  const limitWithin = limitHitAt > start && limitHitAt < end
-  const reserved = [(pct(now) / 100) * height, ...(limitWithin ? [(pct(over ? now : limitHitAt) / 100) * height] : [])]
-  let lastLabelY = -Infinity
-  const showLabel = nodes.map((n) => {
-    const y = (pct(n.t) / 100) * height
-    const ok = y - lastLabelY >= LABEL_GAP_PX && reserved.every((r) => Math.abs(y - r) >= LABEL_GAP_PX * 0.6)
-    if (ok) lastLabelY = y
-    return ok
-  })
-
-  const hourTicks: number[] = []
-  const firstHour = new Date(start)
-  firstHour.setMinutes(0, 0, 0)
-  for (let t = firstHour.getTime() + 60 * MIN; t < end; t += 60 * MIN) if (t > start) hourTicks.push(t)
   const jump = (id: string) => {
     setActive(id)
     document.getElementById(`stop-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 
   return (
-    <nav aria-label="Route" className={`sticky top-0 flex h-[calc(100vh-3.5rem-2.5rem)] shrink-0 flex-col rounded-card border border-line bg-panel shadow-card transition-[width] duration-200 ${collapsed ? 'w-14' : 'w-44'}`}>
-      <div className={`flex items-center border-b border-line px-2 py-2 ${collapsed ? 'flex-col gap-1' : 'gap-2'}`}>
-        <Link to="/" title="Back to the board" aria-label="Back to the board" className="flex h-7 w-7 items-center justify-center rounded-control text-muted hover:bg-well hover:text-ink">
+    <nav aria-label="Route" className={`sticky top-0 flex h-[calc(100vh-3.5rem-2.5rem)] shrink-0 flex-col overflow-hidden rounded-card border border-line bg-panel shadow-card transition-[width] duration-200 ${collapsed ? 'w-16' : 'w-64'}`}>
+      <div className={`flex shrink-0 items-center border-b border-line px-2 py-2 ${collapsed ? 'flex-col gap-1' : 'gap-2'}`}>
+        <Link to="/" title="Back to the board" aria-label="Back to the board" className="flex h-7 w-7 shrink-0 items-center justify-center rounded-control text-muted transition hover:bg-well hover:text-ink">
           <ArrowLeft size={16} />
         </Link>
-        {!collapsed && <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-ink">{view.driver.name} · {view.truck.plate}</span>}
-        <button type="button" onClick={() => onCollapsedChange(!collapsed)} aria-expanded={!collapsed} aria-label={collapsed ? 'Expand the route rail' : 'Collapse the route rail'} title={collapsed ? 'Expand' : 'Collapse'} className="flex h-7 w-7 items-center justify-center rounded-control text-muted hover:bg-well hover:text-ink">
+        {!collapsed && (
+          <div className="min-w-0 flex-1">
+            <p className="text-[8px] font-semibold uppercase tracking-[0.08em] text-label">Route</p>
+            <p className="truncate font-mono text-[12px] font-semibold text-ink">{route.id.toUpperCase()}</p>
+          </div>
+        )}
+        <button type="button" onClick={() => onCollapsedChange(!collapsed)} aria-expanded={!collapsed} aria-label={collapsed ? 'Expand the route rail' : 'Collapse the route rail'} title={collapsed ? 'Expand' : 'Collapse'} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-control text-muted transition hover:bg-well hover:text-ink">
           <SidebarSimple size={16} className={collapsed ? '-scale-x-100' : ''} />
         </button>
       </div>
 
-      <div ref={axisRef} className="relative min-h-0 flex-1 overflow-hidden px-2 py-3">
-        {/* the axis: past = duty, future = projection */}
-        <div className={`absolute ${TRACK_LEFT} top-3 bottom-3 w-1.5 rounded-full bg-well`} aria-hidden="true" />
-        <div className={`absolute ${TRACK_LEFT} w-1.5 border-l-2 border-dashed ${over ? 'border-act-now/60' : 'border-line'}`} style={{ top: `calc(0.75rem + ${pct(now)}% * (1 - 1.5rem / 100%))` }} aria-hidden="true" />
-        <div className="absolute inset-x-0 top-3 bottom-3" aria-hidden="true">
-          <div className={`absolute ${TRACK_LEFT} top-0 bottom-0 w-1.5`}>
-            {/* future projection, red past the limit */}
-            <div className="absolute inset-x-0 border-l-2 border-dashed border-line" style={{ top: `${pct(now)}%`, bottom: 0, left: 2 }} />
-            {limitWithin && !over && <div className="absolute border-l-2 border-dashed border-act-now" style={{ top: `${pct(limitHitAt)}%`, bottom: 0, left: 2 }} />}
-            {over && <div className="absolute border-l-2 border-dashed border-act-now" style={{ top: `${pct(now)}%`, bottom: 0, left: 2 }} />}
-            {/* duty segments up to now; planned ones dashed */}
-            {segments.map((s, i) => {
-              const s0 = Math.max(s.startedAt, start)
-              const s1 = Math.min(s.endedAt ?? now, end)
-              if (s1 <= s0) return null
-              return <div key={i} className={`absolute inset-x-0 rounded-full ${FILL[s.status]} ${s.planned ? 'opacity-50' : ''}`} style={{ top: `${pct(s0)}%`, height: `${pct(s1) - pct(s0)}%`, ...(s.planned ? { backgroundImage: 'repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,0.7) 3px 5px)' } : {}) }} />
-            })}
-          </div>
-          {/* hour ticks: marks on the track, no text; horizontal room is for the stops */}
-          {hourTicks.map((t) => (
-            <span key={t} className="absolute left-2 h-px w-2.5 bg-line" style={{ top: `${pct(t)}%` }} />
-          ))}
-          {/* now */}
-          <div className="absolute left-1.5 -translate-y-1/2" style={{ top: `${pct(now)}%` }}>
-            <span className="block h-0.5 w-4 bg-ink" />
-            {!collapsed && <span className="tnum absolute left-6 top-1/2 z-10 -translate-y-1/2 whitespace-nowrap rounded bg-panel px-1 text-[10px] font-semibold text-ink">now · {fmtClock(now)}</span>}
-          </div>
-          {/* the limit */}
-          {limitWithin && (
-            <div className="absolute left-1.5 -translate-y-1/2" style={{ top: `${pct(over ? now : limitHitAt)}%` }}>
-              <span className="block h-0.5 w-4 bg-act-now" />
-              {!collapsed && <span className="tnum absolute left-6 top-1/2 z-10 -translate-y-1/2 whitespace-nowrap rounded bg-panel px-1 text-[10px] font-semibold text-act-now">{over ? 'over the limit' : `limit · ${fmtClock(limitHitAt)}`}</span>}
+      <section aria-label={`Route progress: ${view.done} of ${view.total} stops complete`} className="shrink-0 border-b border-line">
+        {collapsed ? (
+          <div className="px-1.5 py-3">
+            <p className="tnum text-center font-display text-lg font-semibold leading-none text-ink">{Math.round(progress * 100)}%</p>
+            <p className="tnum mt-1 text-center text-[8px] text-muted">{view.done}/{view.total}</p>
+            <div className="mt-2 flex justify-center gap-1.5">
+              <span title={`${schedule.label}: ${schedule.value}`} className={`h-2 w-2 rounded-full ${DOT[schedule.tone]}`} />
+              <span title={`${hos.label}: ${hos.value}`} className={`h-2 w-2 rounded-full ${DOT[hos.tone]}`} />
             </div>
-          )}
-          {/* stops */}
-          {nodes.map((n, i) => {
-            const s = n.stop
-            const isActive = active === s.id
-            const isNext = view.next?.id === s.id
-            const past = pastLimitIds.has(s.id)
-            const dot =
-              s.status === 'done' ? 'bg-ink' : s.status === 'failed' ? 'bg-act-now' : isNext || s.status === 'in_progress' ? 'border-2 border-break bg-panel' : s.status === 'unassigned' ? 'border-2 border-dashed border-offline bg-panel' : past ? 'border-2 border-act-now bg-panel' : 'border-2 border-muted bg-panel'
-            const customer = deliveryById.get(s.deliveryId)?.customer ?? s.deliveryId
+          </div>
+        ) : (
+          <>
+            <button type="button" onClick={() => setSummaryOpen((open) => !open)} aria-expanded={summaryOpen} className="flex w-full items-center gap-2 px-3 py-2 text-left transition hover:bg-canvas">
+              <span className="text-[9px] font-semibold uppercase tracking-[0.08em] text-label">Route status</span>
+              <span className="ml-auto text-[9px] text-muted">4 metrics</span>
+              <CaretDown size={12} className={`shrink-0 text-muted transition-transform ${summaryOpen ? '' : '-rotate-90'}`} />
+            </button>
+            {summaryOpen && (
+              <dl className="grid grid-cols-2 border-t border-line bg-canvas/20">
+                <div className="min-w-0 border-b border-r border-line px-3 py-2.5">
+                  <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">Progress</dt>
+                  <dd className="tnum mt-1 font-display text-[1.35rem] font-semibold leading-none tracking-[-0.035em] text-ink">{view.done} <span className="text-[11px] font-medium tracking-normal text-muted">of {view.total}</span></dd>
+                  <dd className="tnum mt-1 text-[9px] text-muted">{Math.round(progress * 100)}% complete</dd>
+                </div>
+                <div className="min-w-0 border-b border-line px-3 py-2.5">
+                  <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">Remaining</dt>
+                  <dd className="tnum mt-1 font-display text-[1.35rem] font-semibold leading-none tracking-[-0.035em] text-ink">{view.remaining.length}</dd>
+                  <dd className="mt-1 truncate text-[9px] text-muted" title={`Updated ${fmtAge(view.pingAgeMin)}`}>updated {fmtAge(view.pingAgeMin)}</dd>
+                </div>
+                {[schedule, hos].map((signal, index) => (
+                  <div key={signal.label} className={`min-w-0 px-3 py-2.5 ${index === 0 ? 'border-r border-line' : ''}`}>
+                    <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">{signal.label}</dt>
+                    <dd className={`mt-1 flex min-w-0 items-center gap-1.5 text-[10px] font-semibold ${SIGNAL_TEXT[signal.tone]}`}>
+                      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${DOT[signal.tone]}`} />
+                      <span className="truncate" title={signal.value}>{signal.value}</span>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+          </>
+        )}
+      </section>
+
+      {!collapsed && (
+        <button type="button" onClick={() => setTimelineOpen((open) => !open)} aria-expanded={timelineOpen} className="flex w-full shrink-0 items-center gap-2 px-3 py-2 text-left transition hover:bg-canvas">
+          <h2 className="text-[9px] font-semibold uppercase tracking-[0.08em] text-label">Route timeline</h2>
+          <span className="ml-auto text-[9px] text-muted">Stop order</span>
+          <CaretDown size={12} className={`shrink-0 text-muted transition-transform ${timelineOpen ? '' : '-rotate-90'}`} />
+        </button>
+      )}
+
+      {(collapsed || timelineOpen) && <div ref={timelineRef} data-collapsed={collapsed} className={`route-timeline-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain ${collapsed ? 'px-1 py-2' : 'px-2 pb-2'}`}>
+        <ol>
+          {nodes.map((node) => {
+            const { stop } = node
+            const isActive = active === stop.id
+            const isFirstPast = stop.id === firstPastLimitId
+            const state = stopState(node, nextId, pastLimitIds)
+            const isRed = stop.status === 'failed' || pastLimitIds.has(stop.id) || node.late
+            const timePrefix = view.staleness !== 'fresh' && stop.status === 'pending' ? '~' : ''
             return (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => jump(s.id)}
-                aria-current={isActive ? 'location' : undefined}
-                title={`${s.seq} · ${customer} · ${fmtClock(n.t)}`}
-                className="group absolute left-0 flex -translate-y-1/2 items-center gap-2"
-                style={{ top: `${pct(n.t)}%` }}
-              >
-                <span className={`ml-[7px] block h-3 w-3 shrink-0 rounded-full transition ${dot} ${isActive ? 'ring-4 ring-lookout/30' : ''}`} />
-                {!collapsed && showLabel[i] && (
-                  <span className="flex min-w-0 flex-col items-start text-left leading-tight">
-                    <span className={`max-w-[7.5rem] truncate text-[10px] ${isActive ? 'font-semibold text-ink' : s.status === 'done' ? 'text-muted' : 'text-ink'} group-hover:text-ink`}>{customer}</span>
-                    <span className={`tnum text-[9px] ${n.late ? 'font-semibold text-watch' : 'text-label'}`}>{s.seq} · {fmtClock(n.t)}</span>
-                  </span>
+              <li key={stop.id}>
+                {isFirstPast && (
+                  <div style={collapsed ? undefined : TIMELINE_COLUMNS} className={`${collapsed ? 'my-1 flex justify-center' : 'grid h-6 items-center'}`} title="The remaining route crosses the driver's 11-hour HOS limit here">
+                    {collapsed ? (
+                      <span className="h-px w-7 bg-act-now-fill" />
+                    ) : (
+                      <>
+                        <span className="relative flex h-6 items-center justify-center"><span className="absolute inset-y-0 w-px bg-act-now-fill" /><span className="relative h-px w-4 bg-act-now-fill" /></span>
+                        <span className="pl-2 text-[8px] font-semibold uppercase tracking-[0.05em] text-act-now">HOS limit</span>
+                      </>
+                    )}
+                  </div>
                 )}
-              </button>
+                <button
+                  ref={(element) => {
+                    if (element) nodeRefs.current.set(stop.id, element)
+                    else nodeRefs.current.delete(stop.id)
+                  }}
+                  type="button"
+                  onClick={() => jump(stop.id)}
+                  aria-current={isActive ? 'location' : undefined}
+                  aria-label={`Stop ${stop.seq}, ${node.customer}, ${fmtClock(node.t)}, ${state}`}
+                  title={`${stop.seq} · ${node.customer} · ${fmtClock(node.t)} · ${state}`}
+                  style={collapsed ? undefined : TIMELINE_COLUMNS}
+                  className={`${collapsed ? 'flex h-7 w-full items-center justify-center rounded-control hover:bg-canvas' : `grid min-h-10 w-full items-stretch rounded-control text-left transition ${rowTone(node, pastLimitIds)}`}`}
+                >
+                  <span className={`relative flex ${collapsed ? 'h-7' : 'h-full min-h-9'} items-center justify-center`}>
+                    <span className={`absolute left-1/2 top-0 h-1/2 w-px -translate-x-1/2 ${stop.status === 'done' ? 'bg-clear-fill' : isRed ? 'bg-act-now-fill/70' : 'bg-line'}`} />
+                    <span className={`absolute bottom-0 left-1/2 h-1/2 w-px -translate-x-1/2 ${stop.status === 'done' ? 'bg-clear-fill' : isRed ? 'bg-act-now-fill/70' : 'bg-line'}`} />
+                    <span className={`relative z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full transition ${stopTone(node, pastLimitIds)} ${isActive ? 'ring-4 ring-ink/10' : ''}`}>
+                      {stop.status === 'done' && <Check size={9} weight="bold" />}
+                    </span>
+                  </span>
+                  {!collapsed && (
+                    <span className="min-w-0 py-1 pl-2 pr-2">
+                      <span className={`tnum block text-[8px] ${isRed ? 'font-semibold text-act-now' : 'text-label'}`}>{timePrefix}{fmtClock(node.t)}</span>
+                      <span className="mt-0.5 flex min-w-0 items-baseline gap-1.5">
+                        <span className={`tnum shrink-0 text-[9px] font-semibold ${isRed ? 'text-act-now' : 'text-muted'}`}>{stop.seq}</span>
+                        <span className={`truncate text-[10px] ${isActive ? 'font-semibold text-ink' : isRed ? 'font-semibold text-act-now' : stop.status === 'done' ? 'text-muted' : 'text-ink'}`}>{node.customer}</span>
+                      </span>
+                    </span>
+                  )}
+                </button>
+              </li>
             )
           })}
-        </div>
-      </div>
-      {!collapsed && (
-        <div className="border-t border-line px-3 py-2 text-[9px] leading-4 text-label">
-          <span className="mr-2 inline-block h-2 w-2 rounded-sm bg-ink align-middle" />driving <span className="mx-1.5 inline-block h-2 w-2 rounded-sm bg-muted align-middle" />on duty <span className="mx-1.5 inline-block h-2 w-2 rounded-sm bg-break-fill align-middle" />break
+        </ol>
+      </div>}
+
+      {!collapsed && !timelineOpen && <div className="min-h-0 flex-1 border-t border-line bg-canvas/20" />}
+
+      {!collapsed && timelineOpen && (
+        <div className="flex shrink-0 items-center gap-3 border-t border-line px-3 py-2 text-[8px] text-label">
+          <span className="flex items-center gap-1"><span className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-clear-fill text-on-accent"><Check size={7} weight="bold" /></span> delivered</span>
+          <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full border-2 border-muted/70" /> undelivered</span>
+          <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full border-2 border-act-now" /> late / HOS</span>
         </div>
       )}
     </nav>

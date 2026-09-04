@@ -14,7 +14,7 @@ The co-pilot is named **Lookout**. The dispatcher is **Lena**. The simulated shi
 4. **Insight → action, with a confirm.** Every action confirms, then commits to local state, then the derived layer recomputes. Nothing mutates silently.
 5. **Rules as data.** Alerts, filters, and column grouping are config arrays. Adding one is a one-object edit.
 6. **One clock, one source of truth.** A single `now`. One `alerts` array feeds the board, the route file, and Lookout. If two surfaces disagree, that is the bug to find first.
-7. **Color is attention.** Only things that need attention carry saturated color. Everything else is subdued. Lookout wears coral and nothing else does.
+7. **Color is attention.** Only things that need attention carry saturated color. Everything else is subdued. Lookout owns the accessible orange and the subtle warm-to-cool AI spectrum.
 
 ---
 
@@ -51,12 +51,12 @@ src/
   store/        store.ts · actions.ts · undo.ts · derive.ts
   lookout/      LookoutSidebar.tsx · LookoutPortal.tsx · AlertBar.tsx · RecommendationCard.tsx · ActionConfirm.tsx · voice.ts
   views/
-    shift/      ActiveShiftPage.tsx · MetricsRow.tsx · Board.tsx · RouteCard.tsx · FilterBar.tsx
+    shift/      ActiveShiftPage.tsx · ShiftHero.tsx · FilterBar.tsx · OrderDropdown.tsx · FiltersDropdown.tsx · Board.tsx · RouteCard.tsx · RouteTimelineMini.tsx · boardSort.ts · useColumnTracks.ts
     route/      RouteFilePage.tsx · RouteRail.tsx · DriverCard.tsx · StaleBanner.tsx · AlertStrip.tsx · StopReceipt.tsx
     route/actions/  ReassignDialog.tsx · ResetDialog.tsx · NotifyDialog.tsx
     driver/     DriverPhoneView.tsx · PhoneFrame.tsx        (Phase 2)
     map/        MapView.tsx                                   (Phase 2, lazy)
-  ui/           Chip · Button · Card · Dropdown · Modal · Toast · Countdown · Bar · Avatar · EmptyState · CorrectionChip
+  ui/           Chip · Button · Card · Modal · Toast · Countdown · Bar · Avatar · EmptyState · CorrectionChip
   lib/          format.ts (clock times, durations, tilde precision)
 ```
 
@@ -292,7 +292,7 @@ Every action follows the same protocol: **preview → confirm → commit → rec
 
 ## 8. Shell and routes
 
-Two panes. The product bar reads **Dispatch**, then the Status/Region toggle, the shift clock, and the dev toggle; on a route file it reads "Dispatch / Marcus R." There is no left nav: the board is the whole product for this exercise. Main outlet. Lookout sidebar mounted once at app level, reading derived state directly; pages set the focus driver through context. Collapsed, it becomes a rail with the act-now count as a badge.
+Two panes. The product bar reads **Dispatch**, then the active **Board** workspace, the shift clock, and the dev toggle; on a route file a breadcrumb continues with "RT-01 · Marcus R." There is no left nav: the board is the whole product for this exercise. The Status/Region lens lives with the board controls. Main outlet. Lookout sidebar mounted once at app level, reading derived state directly; pages set the focus driver through context. Collapsed, it becomes a rail with the act-now count as a badge.
 
 | Route | View | Phase |
 |---|---|---|
@@ -309,11 +309,13 @@ The board groups by **Status** by default, Act now leftmost, because that is whe
 
 ### Active Shift
 
-**Metrics row.** Drivers on shift · Approaching limit · Over limit · Offline · Stops done / remaining, and "Need a driver" when any stop is unassigned. Each card is a filter shortcut. Numbers derive from the same views the board uses.
+The miniature card timeline uses shared route-completion endpoints, grading completed paths and markers from light sage at the route origin to dark clear-green at the current progress edge. A future map view should reuse these endpoints for its completed stops and route segment rather than introduce a second progress palette.
 
-**Board.** Columns are status bands by default (Act now, Watch, Offline, On break, Clear), switchable to regions. Within a column, cards sort by Lookout's rank, most urgent at the top. Each column scrolls independently. Clear cards stay in their column in a quiet tone. The filter bar above the board is one row: a dropdown per filter (Status, Data, Region, each a checkbox list with a count when active), a Clear button when anything is set, and search at the right end.
+**Shift status band.** A compact, light metric instrument leads the page without promotional copy. Its paper-white peach-to-periwinkle wash identifies the top-level instrument without competing with status color. The left side follows dispatcher priority — Act now (with the over-limit count attached), Watch, Offline, On break, then Clear — and mirrors the board lanes exactly; each is also a filter shortcut. The right side continues the same single-row metric grammar with four equally aligned facts: Delivered, To deliver, Total stops, and Delivered percentage. It has no nested header, progress bar, or secondary footer.
 
-**Route card.** Left marker strip in the band color (hollow/dashed for offline) · the driver's avatar (an illustrated placeholder, deterministic per driver, gender from the name; real photos replace one component) · driver name · live countdown in tabular figures, tilde when stale · drive-time bar on an 11h scale · route progress `done/total` and next stop · data age chip · badge row, one badge per firing rule · Lookout pick marker on the board's overall top card. Click opens the route file. Nothing drags: a card's position is computed, not assigned.
+**Board.** Columns are status bands by default (Act now, Watch, Offline, On break, Clear), switchable to regions. Every column can collapse to a 40px count rail; On break and Clear start collapsed so intervention work gets the width. Open tracks divide the remaining space by weight and resolve to pixels so collapse/expand animates smoothly. Cards never flex-shrink inside a lane; high-count columns scroll instead. The first control is the board-order dropdown: Lookout's rank is the default, with closest-to-limit, most-stops, and oldest-data alternatives that change sequence only. A single route-filter dropdown groups the data-driven Status, Data, and Region filters, followed by route search and the Status/Region lens.
+
+**Route card.** The card leads with the route id and pairs its highest-priority Over limit, Approaching limit, or Behind schedule badge directly with the live HOS countdown at top right. Beneath that header, a miniature version of the route-file spine occupies a narrow full-height strip: every stop remains a node, but six or more leading completed stops compress into an overlapping history cluster while the next and following stops receive subtly larger markers and slightly more vertical room. Completed work is green, viable undelivered work is gray, and failed, past-due, or post-HOS work is red. Completed routes and short histories stay evenly distributed; the route-file timeline itself always remains literal and uncompressed. Driver identity appears once in a vertically centered row without a redundant "Assigned driver" label; ping age is muted text at that row's top right, not a chip. A full-bleed 2×2 scan grid then shows Stops, Next, HOS fit, and Route risk using only shared card dividers, not an inset bordered panel; secondary alert reasons render as plain text and Lookout's first-pick marker follows only when present. Clear cards stay quiet but keep their full height and readable identity in narrow lanes. Click opens the route file. Nothing drags: a card's position is computed, not assigned.
 
 **Empty states.** Nothing needs attention: "All clear. 46 drivers on shift, next check-in in 5s." A filter that matches nothing: say which filter, offer to clear it. A region with no trucks: the column says so.
 
@@ -321,20 +323,20 @@ The board groups by **Status** by default, Act now leftmost, because that is whe
 
 A page in the main pane; Lookout stays open and focuses on this driver. It has the shape of a case file: a **route rail** down the left, the content to its right.
 
-**Route rail.** Sticky, in the case-file navigation pattern: a back link and a collapse toggle at the top, then a vertical time axis from the start of the shift through the projected finish. Up to now it is the duty timeline turned vertical (driving, on duty, break, and a planned reset dashed); after now it is a dashed projection. Every stop is a node on the axis at its actual time (done, at the dock) or its projected time (pending), so the rail shows at a glance where the driver is and what is done. A now marker sits at the current time, the 11-hour limit is marked where it lands, and the axis turns red past it. Expanded (11rem) each node carries two short lines, the customer and then the stop number and time, with hour ticks along the axis; collapsed (3.5rem) it is the bar and the dots. The node whose receipt is in view is highlighted, and clicking a node scrolls to its receipt.
+**Route rail.** Sticky, in the case-file navigation pattern: a back link and whole-rail collapse toggle at the top, then two independent disclosures. Route status opens to a flat 2×2 divider grid for Progress, Remaining, Schedule, and HOS fit; Route timeline opens to one continuous vertical route-order timeline with one distinct node for every stop shown in the main content area. Both default open and neither uses an inset card or dark background. Each timeline row leads with the marker, then shows time above stop number and customer name. A green check means delivered, a neutral gray circle means viable undelivered work, and red means failed, past due, or projected beyond HOS. The exact point where the route crosses the 11-hour limit is labeled on the spine. The node whose receipt is in view is highlighted and kept visible as the dispatcher scrolls, and clicking a node scrolls to its matching receipt. Collapsed, the whole rail retains completion percentage, schedule/HOS signal dots, and the same one-node-per-stop spine on the light surface.
 
 Content, in reading order:
 
 1. **Driver card.** One card: avatar, name, band and drift chips, a scheduled-reset chip when one exists, plate, region, status, the large live countdown with data age; then the five day figures (driving today · on duty since · break taken or "none yet" · stops done / remaining · driving left vs. time to limit, the pair that decides everything).
 2. **Stale banner.** If stale or offline: "Last ping 25 min ago. Figures are estimates."
 3. **Alert strip.** Only when alerts exist. One row per firing rule, copy and actions from the rule object, confirm inline. New rules render here with no new UI.
-4. **Stop receipts.** Oldest first, each the scroll target of its rail node. Done stops show arrived, departed, dwell, items, signed by, outcome, any note; the next stop is highlighted; pending stops show projected ETA, window, priority, and a checkbox for partial reassign; stops past the limit carry a chip; notified stops show the stamp; unassigned stops show "needs a driver."
-5. **Actions.** Reassign, schedule reset, notify customer; each opens its dialog, previews, confirms, commits. Position-dependent actions are disabled with a reason when data is stale or offline; schedule reset is disabled once one is scheduled.
+4. **Stop receipts.** Oldest first, each the scroll target of its rail node. Every receipt uses a vertically centered case-file row: a first column beginning with the large `#N`, then customer, address, status, instructions, and neutral dispatcher note; a second column with a small horizontal event track; a compact single-row grid of four facts across the remaining right side; and a narrow ellipsis-action cell. Completed stops read Arrived → Left → Signed and surface On site, Outcome, Load, and Priority. Pending stops read Planned → Projected → Window and surface Projected ETA, Window, Drive in, and Load. Fact values are slightly larger than event metadata. The next stop is highlighted; stops past the limit carry a chip; notified stops show the stamp; unassigned stops show "needs a driver."
+5. **Actions.** Route-level Reassign, schedule reset, and notify customer actions open their dialogs, preview, confirm, and commit. Every receipt's ellipsis opens stop-level Reassign, Add/edit note, and Cancel. Reassign preselects only that unresolved stop. Notes persist with a reassigned stop. Cancel is confirmed, removes only pending or unassigned work from the active route, resequences the remainder, logs the event, and is undoable; completed and in-progress stops disable Reassign and Cancel with a reason. Position-dependent actions are disabled when data is stale or offline; schedule reset is disabled once one is scheduled.
 6. **Driver's phone** button (Phase 2) renders `DriverPhoneView` in a phone frame overlay, so the dispatcher's action and the driver's screen are visible together.
 
 ### Lookout rail
 
-One bar, the height of the app header: the tabs on the left, and on the right the name over "AI Agent", Lookout's face (a placeholder circle until Dave draws the real one), and the collapse control. **Chat** is the first tab. A sticky "✦ Lookout recommends" bar sits over the conversation, expanded by default and collapsible to just the bar, carrying one line that reads the shift ("3 need you now. Start with Priya S.") and the top three ranked cards, one per driver with every reason and 2–3 actions, the same handlers as the route file; the rest sit behind "Show N more." On a route file that driver's card is pinned first. The conversation runs underneath. Intent matching is a lookup, not a model (`lookout/intents.ts`): near the limit, offline, and reassign by first name; the no-match reply lists what Lookout can do as tappable examples, and replies render the same cards, so the bar and the thread can never disagree. **Timeline** is the second tab: what happened this shift, newest first, from the store's append-only event log (`ShiftEvent`: actions, snoozes, reconnects, undos, and the opening entry); nothing there is invented. The composer sits at the bottom of both tabs; sending from the timeline lands in the chat.
+One bar, the height of the app header: the tabs on the left, and on the right the name over "AI Agent", Lookout's face (a placeholder circle until Dave draws the real one), and the collapse control. **Chat** is the first tab. A sticky "✦ Lookout recommends" bar sits over the conversation, expanded by default and collapsible to just the bar, carrying one line that reads the shift ("3 need you now. Start with Priya S.") and the top three ranked cards, one per driver with every reason and 2–3 actions, the same handlers as the route file; the rest sit behind "Show N more." Recommendation cards reuse the board card's flat shell—route/status header, miniature stop spine, centered driver row, and edge-to-edge dividers—but replace its scan metrics with Lookout's evidence rows and action footer. On a route file that driver's card is pinned first. The conversation runs underneath. Intent matching is a lookup, not a model (`lookout/intents.ts`): near the limit, offline, and reassign by first name; the no-match reply lists what Lookout can do as tappable examples, and replies render the same cards, so the bar and the thread can never disagree. **Timeline** is the second tab: what happened this shift, newest first, from the store's append-only event log (`ShiftEvent`: actions, snoozes, reconnects, undos, and the opening entry); nothing there is invented. The composer sits at the bottom of both tabs; sending from the timeline lands in the chat.
 
 Lookout never has its own data. It reads `ranked` and nothing else.
 
@@ -376,32 +378,35 @@ Each is designed, not discovered. Where it shows up is as important as what happ
 
 ## 11. Visual system
 
-Neutral, dense, calm, cool. Ops software used mid-shift. Rhymes with the warmth of modern hospitality software and the proactive-feed pattern of an in-product assistant, without borrowing anyone's brand.
+Warm, dense, calm, and direct. This is operations software used mid-shift, expressed with hospitality-adjacent paper neutrals, near-black type, and modest radii. Lookout's AI moments add a restrained peach-to-rose-to-periwinkle spectrum; the gradient is never used for operational severity. The system rhymes with contemporary hospitality software without borrowing a logo, branded asset, layout, or exact palette.
 
 **Tokens** (Tailwind v4 `@theme`, all in `index.css`; components use tokens only, never raw hex):
 
 | Token | Value | Use |
 |---|---|---|
-| `--color-canvas` | `#f4f4f6` | Page ground (blue-slate neutrals; the coral and the bands are the only warmth) |
+| `--color-canvas` | `#f8f6f3` | Warm paper page ground |
+| `--color-board` | `#f7f8fa` | Cool porcelain ground for the live board only |
 | `--color-panel` | `#ffffff` | Cards, rail |
-| `--color-well` | `#ececf1` | Inset grounds, column backgrounds |
-| `--color-line` | `#e3e3ea` | Keylines |
-| `--color-ink` | `#17171b` | Text, primary buttons |
-| `--color-muted` | `#63636c` | Secondary text |
-| `--color-label` | `#6e6e76` | Micro-labels on panel only |
-| `--color-lookout` / `-strong` / `-soft` | `#cf4620` / `#a83a15` / `#ffe9e2` | Lookout, and only Lookout |
-| `--color-act-now` / `-fill` / `-soft` | `#b3323f` / `#c9414f` / `#fbeaec` | Act now and Over limit |
-| `--color-watch` / `-fill` / `-soft` | `#8f5f0e` / `#d19a2a` / `#fbf3e3` | Watch |
-| `--color-clear` / `-fill` / `-soft` | `#266b4c` / `#5aa37f` / `#e8f4ee` | Clear (muted) |
-| `--color-offline` / `-fill` / `-soft` | `#5b6370` / `#9aa0ab` / `#eef0f3` | Offline, dashed/hollow |
-| `--color-break` / `-fill` / `-soft` | `#3262a8` / `#6f9bd6` / `#e9f0fa` | On break |
+| `--color-well` | `#f1ede9` | Inset grounds, column backgrounds |
+| `--color-line` | `#e3ddd7` | Keylines |
+| `--color-ink` | `#211e1c` | Text, primary buttons |
+| `--color-muted` | `#625d59` | Secondary text |
+| `--color-label` | `#6d6661` | Micro-labels on panel only |
+| `--color-lookout` / `-strong` / `-soft` | `#cf4620` / `#a93817` / `#fff0e9` | Accessible orange for Lookout |
+| `--color-ai-warm` / `-rose` / `-cool` | `#f45b2b` / `#d979aa` / `#6669ea` | Decorative AI rings and soft washes only |
+| `--color-act-now` / `-fill` / `-soft` | `#a9333e` / `#c43f4d` / `#fdf0f1` | Act now and Over limit |
+| `--color-watch` / `-fill` / `-soft` | `#805706` / `#c89528` / `#fff7e7` | Watch |
+| `--color-clear` / `-fill` / `-soft` | `#276548` / `#5d9a78` / `#edf7f1` | Clear (muted) |
+| `--color-route-done-start` / `-end` | `#9bc5ae` / `#276548` | Completed route path from route origin to current progress edge; reusable by the future map |
+| `--color-offline` / `-fill` / `-soft` | `#5b5f66` / `#999ba2` / `#f2f1f0` | Offline, dashed/hollow |
+| `--color-break` / `-fill` / `-soft` | `#3a5f9f` / `#7798d2` / `#eef2fb` | On break |
 | `--color-on-accent` | `#ffffff` | Text on saturated grounds |
 
-Over the limit is the one state that must never be missed: its chip is solid dark red with white text everywhere it appears. Text variants must pass AA on panel; fills are for bars and markers. Validate the pairs once during theme setup and note the results in `DECISIONS.md`. Watch's text color is deliberately darker than its fill so it clears AA while staying distinct from Lookout's coral.
+Over the limit is the one state that must never be missed: its chip is solid dark red with white text everywhere it appears. Text variants must pass AA on panel; fills are for bars and markers. The AI spectrum is decorative and never carries meaning or body copy. Validate the semantic pairs whenever tokens move. Watch's text color is deliberately darker than its fill so it clears AA while staying distinct from Lookout's orange.
 
 **Type.** Bricolage Grotesque Variable for display: page titles, the large countdown, metric numbers. Inter Variable for everything else, `font-variant-numeric: tabular-nums` on every countdown and duration so rows never jitter. Two faces, no serif.
 
-**Shape and rhythm.** 16px radius on cards, 8px on controls, pill chips. Rows ~40px, cards compact, whitespace spent on grouping. Quiet keylines, one soft shadow level. Phosphor duotone icons. Motion: countdown ticks and a subtle band-change transition only. Light only.
+**Shape and rhythm.** 14px radius on cards, 8px on controls, pill chips. Rows ~40px, cards compact, whitespace spent on grouping. Quiet keylines, one diffused shadow level. Phosphor duotone icons. Motion: countdown ticks and a subtle band-change transition only. Light only.
 
 **Illustration (Phase 2 polish).** A custom two-tone truck mark can replace the Phosphor glyph without touching layout. "Cards shaped like trucks with a trailer" is an experiment to try once the board works, kept only if it costs no scanability.
 

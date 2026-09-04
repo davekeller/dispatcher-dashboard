@@ -50,7 +50,7 @@ export default function LookoutSidebar() {
 
   if (collapsed) {
     return (
-      <aside className="flex w-14 shrink-0 flex-col items-center border-l border-line bg-panel" aria-label={`${LOOKOUT.name}, collapsed`}>
+      <aside className="lookout-panel flex w-14 shrink-0 flex-col items-center border-l border-line" aria-label={`${LOOKOUT.name}, collapsed`}>
         <button type="button" onClick={() => setCollapsed(false)} className="flex h-14 w-full items-center justify-center text-lookout-strong hover:bg-well" aria-label={`Open ${LOOKOUT.name}`}>
           <CaretDoubleLeft size={16} />
         </button>
@@ -61,8 +61,8 @@ export default function LookoutSidebar() {
   }
 
   return (
-    <aside className="flex w-[26rem] shrink-0 flex-col border-l border-line bg-panel" aria-label={`${LOOKOUT.name}, the shift co-pilot`}>
-      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-line pl-2 pr-3">
+    <aside className="lookout-panel flex w-[26rem] shrink-0 flex-col border-l border-line" aria-label={`${LOOKOUT.name}, the shift co-pilot`}>
+      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-line bg-panel/90 pl-2 pr-3 backdrop-blur">
         <div className="flex h-full items-end" role="tablist" aria-label={`${LOOKOUT.name} views`}>
           {(['chat', 'timeline'] as const).map((t) => (
             <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`-mb-px flex h-full items-center gap-1.5 border-b-2 px-3 text-[12px] font-semibold capitalize ${tab === t ? 'border-lookout text-ink' : 'border-transparent text-muted hover:text-ink'}`}>

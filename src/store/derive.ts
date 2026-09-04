@@ -9,6 +9,8 @@ export interface Metrics {
   over: number
   offline: number
   stopsDone: number
+  stopsDelivered: number
+  stopsFailed: number
   stopsRemaining: number
   needDriver: number
 }
@@ -30,6 +32,8 @@ export function computeMetrics(views: DriverView[]): Metrics {
     over: views.filter((v) => v.hos === 'over').length,
     offline: views.filter((v) => v.staleness === 'offline').length,
     stopsDone: views.reduce((t, v) => t + v.done, 0),
+    stopsDelivered: views.reduce((total, view) => total + view.route.stops.filter((stop) => stop.status === 'done').length, 0),
+    stopsFailed: views.reduce((total, view) => total + view.route.stops.filter((stop) => stop.status === 'failed').length, 0),
     stopsRemaining: views.reduce((t, v) => t + v.remaining.length, 0),
     needDriver: views.reduce((t, v) => t + v.unassigned.length, 0),
   }

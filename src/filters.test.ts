@@ -17,7 +17,8 @@ describe('applyFilters', () => {
     const offline = applyFilters(d.ranked, d.byId, { ...EMPTY_FILTERS, freshness: ['offline'] })
     expect(offline.map((c) => c.driverId)).toEqual(['drv-03'])
   })
-  it('search matches name or plate, case-insensitive', () => {
+  it('search matches route, driver, or plate, case-insensitive', () => {
+    expect(applyFilters(d.ranked, d.byId, { ...EMPTY_FILTERS, search: 'RT-01' }).map((c) => c.driverId)).toEqual(['drv-01'])
     expect(applyFilters(d.ranked, d.byId, { ...EMPTY_FILTERS, search: 'marc' }).map((c) => c.driverId)).toEqual(['drv-01'])
     expect(isFiltering({ ...EMPTY_FILTERS, search: 'x' })).toBe(true)
   })

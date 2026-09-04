@@ -102,6 +102,24 @@ export function notifyCustomer(fleet: Fleet, stopIds: string[], now: number): Fl
   return { ...fleet, routes: fleet.routes.map((r) => ({ ...r, stops: r.stops.map((s) => (stopIds.includes(s.id) ? { ...s, notifiedAt: now } : s)) })) }
 }
 
+export function updateStopNote(fleet: Fleet, stopId: string, note: string): Fleet {
+  const route = routeWithStop(fleet, stopId)
+  const current = route.stops.find((stop) => stop.id === stopId)!
+  const nextNote = note.trim() || undefined
+  if (current.note === nextNote) return fleet
+  const stops = route.stops.map((stop) => stop.id === stopId ? { ...stop, note: nextNote } : stop)
+  return withRoutes(fleet, { ...route, stops })
+}
+
+/** Canceling removes unresolved work from the active route. The store snapshot keeps the
+ * operation undoable, and the event log preserves the fact that dispatch canceled it. */
+export function cancelStop(fleet: Fleet, stopId: string): Fleet {
+  const route = routeWithStop(fleet, stopId)
+  const stop = route.stops.find((candidate) => candidate.id === stopId)!
+  if (stop.status !== 'pending' && stop.status !== 'unassigned') return fleet
+  return withRoutes(fleet, { ...route, stops: reseq(route.stops.filter((candidate) => candidate.id !== stopId)) })
+}
+
 export function callDriver(fleet: Fleet, driverId: string, now: number): Fleet {
   return withDriver(fleet, { ...driverOf(fleet, driverId), contactAttemptedAt: now })
 }
