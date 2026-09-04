@@ -26,9 +26,9 @@ export default function ShiftHero({ metrics, ranked, filters, onPreset }: { metr
   const items: Metric[] = [
     { id: 'act_now', label: 'Act now', value: count('act_now'), preset: { ...EMPTY_FILTERS, band: ['act_now'] }, dot: 'bg-act-now-fill', tone: 'text-act-now', detail: `${metrics.over} over limit`, detailTone: 'text-act-now' },
     { id: 'watch', label: 'Watch', value: count('watch'), preset: { ...EMPTY_FILTERS, band: ['watch'] }, dot: 'bg-watch-fill', tone: 'text-watch' },
-    { id: 'offline', label: 'Offline', value: count('offline'), preset: { ...EMPTY_FILTERS, band: ['offline'] }, dot: 'bg-offline-fill' },
-    { id: 'break', label: 'On break', value: count('break'), preset: { ...EMPTY_FILTERS, band: ['break'] }, dot: 'bg-break-fill' },
-    { id: 'clear', label: 'Clear', value: count('clear'), preset: { ...EMPTY_FILTERS, band: ['clear'] }, dot: 'bg-clear-fill' },
+    { id: 'offline', label: 'Offline', value: count('offline'), preset: { ...EMPTY_FILTERS, band: ['offline'] }, dot: 'bg-offline-fill', tone: 'text-offline' },
+    { id: 'break', label: 'On break', value: count('break'), preset: { ...EMPTY_FILTERS, band: ['break'] }, dot: 'bg-break-fill', tone: 'text-break' },
+    { id: 'clear', label: 'Clear', value: count('clear'), preset: { ...EMPTY_FILTERS, band: ['clear'] }, dot: 'bg-clear-fill', tone: 'text-clear' },
   ]
   const toDeliver = metrics.stopsRemaining + metrics.needDriver
   const totalStops = metrics.stopsDelivered + toDeliver + metrics.stopsFailed

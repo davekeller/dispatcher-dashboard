@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react'
+import { completedStopLightWeight, miniTimelineLayout, type MiniTimelineLayout } from '../../lib/routeTimeline'
 import { stopsPastLimit } from '../../store/actions'
 import type { DriverView } from '../../store/view'
 
@@ -10,66 +11,14 @@ function nodeTone(status: string, needsAttention: boolean): string {
   return 'border border-muted/70 bg-panel'
 }
 
-type TimelineLayout = {
-  positions: number[]
-  firstRemainingIndex: number
-  historyCompressed: boolean
-}
-
-const isHistory = (status: string) => status === 'done' || status === 'failed'
-
-/** A small fisheye layout: long completed prefixes overlap while the handoff into
- * remaining work gets the visual room. Short histories stay evenly distributed. */
-export function miniTimelineLayout(statuses: readonly string[]): TimelineLayout {
-  if (statuses.length === 0) return { positions: [], firstRemainingIndex: -1, historyCompressed: false }
-  if (statuses.length === 1) return { positions: [50], firstRemainingIndex: isHistory(statuses[0]) ? -1 : 0, historyCompressed: false }
-
-  const unresolvedIndex = statuses.findIndex((status) => !isHistory(status))
-  const completedPrefixCount = unresolvedIndex < 0 ? statuses.length : unresolvedIndex
-  const historyCompressed = completedPrefixCount >= 6 && completedPrefixCount < statuses.length
-
-  if (!historyCompressed) {
-    return {
-      positions: statuses.map((_, index) => 5 + (index / (statuses.length - 1)) * 90),
-      firstRemainingIndex: unresolvedIndex,
-      historyCompressed,
-    }
-  }
-
-  const gapWeights = statuses.slice(1).map((_, gapIndex) => {
-    if (gapIndex < unresolvedIndex - 1) return 0.14
-    if (gapIndex === unresolvedIndex - 1) return 1.35
-    const distanceFromFocus = gapIndex - unresolvedIndex
-    return [1.2, 1.1, 1.05][distanceFromFocus] ?? 1
-  })
-  const totalWeight = gapWeights.reduce((sum, weight) => sum + weight, 0)
-  let elapsedWeight = 0
-  const positions = [5]
-  gapWeights.forEach((weight) => {
-    elapsedWeight += weight
-    positions.push(5 + (elapsedWeight / totalWeight) * 90)
-  })
-
-  return { positions, firstRemainingIndex: unresolvedIndex, historyCompressed }
-}
-
-export function completedStopLightWeight(index: number, lastCompleteIndex: number): number {
-  if (lastCompleteIndex <= 0) return 50
-  const depth = Math.max(0, Math.min(1, index / lastCompleteIndex))
-  return Math.round((1 - depth) * 100)
-}
-
-function nodeSize(index: number, layout: TimelineLayout): string {
-  if (!layout.historyCompressed) return 'h-1.5 w-1.5'
-  if (index < layout.firstRemainingIndex - 1) return 'h-1 w-1'
-  if (index === layout.firstRemainingIndex) return 'h-2 w-2'
-  if (index === layout.firstRemainingIndex + 1) return 'h-[7px] w-[7px]'
+function nodeSize(index: number, layout: MiniTimelineLayout): string {
+  if (layout.firstRemainingIndex >= 0 && index >= layout.firstRemainingIndex) return 'h-[6.06px] w-[6.06px]'
   return 'h-1.5 w-1.5'
 }
 
 /** The route-detail stop spine reduced to its visual essentials. It occupies the full
- * left edge of a board card. Long completed histories compress so remaining work is
- * magnified, while every stop and the same HOS crossing as the rail remain visible. */
+ * left edge of a board card. Dominant completed histories use the first two-thirds,
+ * leaving the final third to remaining work with only one-percent marker emphasis. */
 export default function RouteTimelineMini({ view }: { view: DriverView }) {
   const stops = view.route.stops
   const layout = miniTimelineLayout(stops.map((stop) => stop.status))

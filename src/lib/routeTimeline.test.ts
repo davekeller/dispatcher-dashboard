@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { completedStopLightWeight, miniTimelineLayout } from './RouteTimelineMini'
+import { completedStopLightWeight, miniTimelineLayout } from './routeTimeline'
 
 describe('miniTimelineLayout', () => {
   it('keeps short route histories evenly distributed', () => {
@@ -9,7 +9,7 @@ describe('miniTimelineLayout', () => {
     expect(layout.positions).toEqual([5, 35, 65, 95])
   })
 
-  it('compresses a long completed prefix and gives remaining stops more room', () => {
+  it('uses roughly the last third for remaining stops when completed work dominates', () => {
     const layout = miniTimelineLayout([
       ...Array<string>(12).fill('done'),
       'in_progress',
@@ -19,9 +19,21 @@ describe('miniTimelineLayout', () => {
 
     expect(layout.historyCompressed).toBe(true)
     expect(layout.firstRemainingIndex).toBe(12)
-    expect(layout.positions[11] - layout.positions[0]).toBeLessThan(35)
-    expect(layout.positions[14] - layout.positions[12]).toBeGreaterThan(30)
+    expect(layout.positions[0]).toBe(5)
+    expect(layout.positions[11]).toBe(62)
+    expect(layout.positions[12]).toBe(66)
+    expect(layout.positions[14]).toBe(95)
     expect(layout.positions.every((position, index) => index === 0 || position > layout.positions[index - 1])).toBe(true)
+  })
+
+  it('keeps routes uniform when completed work is less than two-thirds', () => {
+    const layout = miniTimelineLayout([
+      ...Array<string>(8).fill('done'),
+      ...Array<string>(8).fill('pending'),
+    ])
+
+    expect(layout.historyCompressed).toBe(false)
+    expect(layout.positions.at(-1)).toBe(95)
   })
 
   it('does not compress a completed route with no remaining focus', () => {

@@ -66,14 +66,16 @@ The overall foundation should look warm white, not beige. The live board deliber
 
 | State | Strong / fill / soft | Meaning |
 |---|---|---|
-| Act now | `#a9333e` / `#c43f4d` / `#fdf0f1` | Violation, immediate intervention, failed or past-due stop |
-| Watch | `#805706` / `#c89528` / `#fff7e7` | Approaching a threshold or behind schedule |
-| Clear | `#276548` / `#5d9a78` / `#edf7f1` | Healthy, delivered, complete |
+| Act now | `#942b38` / `#b63846` / `#fdf0f1` | Violation, immediate intervention, failed or past-due stop |
+| Watch | `#6f4a00` / `#ad7c1c` / `#fff7e7` | Approaching a threshold or behind schedule |
+| Clear | `#1f593e` / `#4b8769` / `#edf7f1` | Healthy, delivered, complete |
 | Route progress | `#9bc5ae` → `#276548` | Completed route path, light at the start and dark at the current edge |
-| Offline | `#5b5f66` / `#999ba2` / `#f2f1f0` | Unknown or stale telemetry |
-| On break | `#3a5f9f` / `#7798d2` / `#eef2fb` | Paused HOS accumulation |
+| Offline | `#484d54` / `#7f858d` / `#f2f1f0` | Unknown or stale telemetry |
+| On break | `#2e518d` / `#5f82c1` / `#eef2fb` | Paused HOS accumulation |
 
 Operational color always appears with a label, number, icon, or shape. Red is never used as a general brand accent.
+
+The board uses one intentionally deeper wash per status lane—Act now `#f6dfe3`, Watch `#f4e6c2`, Offline `#e7e8eb`, On break `#e2e8f5`, and Clear `#dfeee5`. These board-only grounds make column structure legible at a glance while the softer fills above remain available for inline alerts and receipts. The shift totals mirror the lane order and use the corresponding strong text hue for every value, not only urgent states.
 
 ### Lookout and the AI spectrum
 
@@ -161,9 +163,11 @@ The card header pairs its highest-priority badge—Over limit, Approaching limit
 - red circle: failed, past due, or beyond projected HOS;
 - red cross-tick: the HOS boundary.
 
-The spine stays narrow and its dots stay deliberately small so a 15–20-stop route reads as a sequence rather than a column of badges. When six or more completed stops lead into remaining work, their markers compress into an overlapping history cluster. The last completed marker stays legible, the next stop is only slightly enlarged, and the following stop steps down by a single pixel—a subtle fisheye that spends a little more vertical room on what remains without hiding what happened. Completed routes and short histories remain evenly distributed. The remainder of the card is one flat structure: a vertically centered driver row followed by a full-bleed 2×2 grid for Stops, Next, HOS fit, and Route risk. Ping age is quiet gray text at the top right of the driver row, never a badge. The grid uses only the card's own dividers—no inset box, extra background, or padded wrapper. Repetitive headings such as "Assigned driver" and "Route progress" are omitted. Lookout’s pick may add a small orange chip; it must not recolor the card.
+The spine stays narrow and its dots stay deliberately small so a 15–20-stop route reads as a sequence rather than a column of badges. Only when completed work already represents at least two-thirds of the route do its markers tighten, and then they still occupy roughly the first two-thirds of the usable timeline while remaining stops use the final third. Remaining markers are a uniform 1% larger—barely perceptible emphasis, not a fisheye. Routes below that completion threshold and fully completed routes remain evenly distributed. The remainder of the card is one flat structure: a vertically centered driver row followed by a full-bleed 2×2 grid for Stops, Next, HOS fit, and Route risk. The top row is deliberately terse and value-first: `12 / 15` over `Stops`, then `#13` over `Next`; it does not repeat completion percentage or “up next.” Ping age is quiet gray text at the top right of the driver row, never a badge. The grid uses only the card's own dividers—no inset box, extra background, or padded wrapper. Repetitive headings such as "Assigned driver" and "Route progress" are omitted. Lookout’s pick may add a small orange chip; it must not recolor the card.
 
 ### Route file
+
+The expanded detail rail uses the same light-to-dark completed-path gradient and subtle next-stop marker emphasis as the mini timeline. Completed rows tighten from 40px to 32px, but retain their time, stop number, name, full click target, and one-to-one receipt mapping; failed stops remain full-size and red.
 
 The left rail and the receipt list are literal counterparts: one timeline node per receipt. Timeline entries read marker → time → stop number and name. The rail uses the same light, flat grid grammar as the rest of the product: Route status expands to a 2×2 divider grid for Progress, Remaining, Schedule, and HOS fit; Route timeline expands beneath it. Each section collapses independently, and neither introduces an inset card or dark header block.
 
