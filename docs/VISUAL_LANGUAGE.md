@@ -130,7 +130,7 @@ Rules:
 
 ## 5. Shape, borders, and depth
 
-- Cards: 14px radius.
+- Cards: 10px radius.
 - Controls: 8px radius.
 - Chips and status badges: pill radius.
 - Standard border: one-pixel `line` token.
