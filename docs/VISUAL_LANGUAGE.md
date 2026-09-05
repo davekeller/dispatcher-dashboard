@@ -92,11 +92,13 @@ The board uses one intentionally vivid wash per status lane—Act now `#f8d6df`,
 | `ai-violet` | `#8259d6` | Cool bridge |
 | `ai-cool` | `#4f7cdd` | Decorative gradient end |
 
+Lookout's circular agent mark may deliberately escape these shared tokens. Its current mesh field maps electric cyan, cobalt, violet, hot pink, orange, and acid green through a lightly warped surface beneath the two white insight sparkles. The broader range belongs only inside the avatar, where it makes the agent feel alive without recoloring surrounding product chrome.
+
 The shift instrument is deliberately outside the AI spectrum. It uses a fully desaturated city photograph beneath a single 70%-opacity warm-black overlay. The five status readings reuse their board-header wash colors as high-contrast foregrounds; throughput remains white and translucent white. This keeps the hero neutral and distinct from Lookout's decorative branding while preserving the board-to-hero status mapping.
 
 The spectrum may appear in:
 
-- Lookout’s radial avatar field;
+- Lookout’s mesh-mapped avatar field;
 - the AI ordering control and composer outline;
 - the thin active-tab indicator and softly washed recommendation header;
 - the border of a pinned Lookout recommendation.
@@ -191,10 +193,10 @@ All receipt sections center vertically across the row. Dispatcher notes are neut
 
 ### Lookout
 
-Lookout is visually related to the main product but clearly has a separate role. Its original mark layers five visible radial color fields—gold, orange, rose, violet, and blue—across the full disc behind one large and one small white line sparkle:
+Lookout is visually related to the main product but clearly has a separate role. Its original mark maps six vivid color regions through a lightly warped mesh behind one large and one small white line sparkle:
 
 - orange active tab and name;
-- multi-radial five-color disc avatar with a centered two-sparkle white line foreground;
+- freeform cyan-to-lime mesh avatar with a centered two-sparkle white line foreground;
 - softly washed recommendation header;
 - one pill-shaped composer with the mark inset left, a five-stop gradient outline, and a dark circular send action;
 - gradient outline around a pinned recommendation and a thin spectral active-tab underline;
