@@ -1,4 +1,5 @@
 import type { DriverCard } from '../alerts/types'
+import { fmtAge, fmtCompactAge } from '../lib/format'
 import type { DriverView } from '../store/view'
 import Chip from './Chip'
 import Countdown from './Countdown'
@@ -11,20 +12,30 @@ export function priorityAlertOf(card: DriverCard) {
   return card.alerts.find((alert) => PRIORITY_RULES.has(alert.ruleId))
 }
 
+interface RouteHeaderStatus {
+  label: string
+  title: string
+  className: string
+}
+
 /** The top line every route card shares, on the board and in the Lookout bar: band dot,
- *  route id, the priority chip, and the countdown on the right. One component, so the
- *  two surfaces cannot drift apart and an over-limit card never loses its chip. */
-export default function RouteHeader({ view, card }: { view: DriverView; card: DriverCard }) {
+ *  route id, the priority chip, and the countdown on the right. The dot occupies the
+ *  same 24px track as the miniature timeline below it on full cards. */
+export default function RouteHeader({ view, card, showPingAge = false, status }: { view: DriverView; card: DriverCard; showPingAge?: boolean; status?: RouteHeaderStatus }) {
   const tone = BAND_TONE[card.band]
   const offline = view.staleness === 'offline'
   const priorityAlert = priorityAlertOf(card)
   return (
-    <div className="flex items-center gap-2 border-b border-line/70 py-1.5 pl-3 pr-2">
-      <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${offline ? `border-2 border-dashed ${tone.border}` : tone.fill}`} aria-hidden="true" />
-      <span className="shrink-0 whitespace-nowrap font-mono text-[12px] font-semibold tracking-tight text-ink" title={`Route ${view.route.id.toUpperCase()}`}>{view.route.id.toUpperCase()}</span>
-      <span className="ml-auto flex min-w-0 items-center gap-1.5">
-        {priorityAlert && <Chip tone={severityTone(priorityAlert.severity)} className="px-1.5 py-0 text-[9px] leading-4" title={priorityAlert.title}>{priorityAlert.label}</Chip>}
-        <Countdown minutes={view.minutesUntilLimit} stale={view.staleness !== 'fresh'} />
+    <div className="flex min-h-10 items-center border-b border-line/70 pr-2">
+      <span className="flex w-6 shrink-0 items-center justify-center" aria-hidden="true">
+        <span className={`h-2 w-2 rounded-full ${offline ? `border border-dashed ${tone.border}` : tone.fill}`} />
+      </span>
+      <span className={`shrink-0 whitespace-nowrap font-mono font-semibold tracking-tight text-ink ${showPingAge ? 'text-[12px]' : 'text-[13px]'}`} title={`Route ${view.route.id.toUpperCase()}`}>{view.route.id.toUpperCase()}</span>
+      {status && <span className={`ml-1.5 shrink-0 whitespace-nowrap text-[8px] font-semibold leading-4 ${status.className}`} title={status.title}>{status.label}</span>}
+      {showPingAge && <span className="tnum ml-1.5 min-w-0 truncate text-[8px] leading-4 text-muted" title={`Updated ${fmtAge(view.pingAgeMin)}`}>{fmtCompactAge(view.pingAgeMin)}</span>}
+      <span className={`ml-auto flex min-w-0 items-center ${showPingAge ? 'gap-1' : 'gap-1.5'}`}>
+        {priorityAlert && <Chip tone={severityTone(priorityAlert.severity)} className={showPingAge ? 'px-1 py-0 text-[8px] leading-3.5' : 'px-1.5 py-0 text-[9px] leading-4'} title={priorityAlert.title}>{priorityAlert.label}</Chip>}
+        <Countdown minutes={view.minutesUntilLimit} stale={view.staleness !== 'fresh'} size={showPingAge ? 'xs' : 'sm'} />
       </span>
     </div>
   )

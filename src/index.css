@@ -66,9 +66,34 @@ body { @apply bg-canvas text-ink font-sans antialiased; }
 .tnum { font-variant-numeric: tabular-nums; }
 
 .lookout-metrics-band {
-  background:
-    radial-gradient(circle at 4% -45%, color-mix(in srgb, var(--color-ai-warm) 24%, transparent), transparent 26rem),
-    linear-gradient(108deg, color-mix(in srgb, var(--color-ai-warm) 7%, white) 0%, color-mix(in srgb, var(--color-ai-gold) 5%, white) 24%, color-mix(in srgb, var(--color-ai-rose) 7%, white) 50%, color-mix(in srgb, var(--color-ai-violet) 6%, white) 74%, color-mix(in srgb, var(--color-ai-cool) 8%, white) 100%);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #272526;
+}
+
+.lookout-metrics-band::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: 0;
+  pointer-events: none;
+  background: url('/images/dispatch-city-hero.webp') center 56% / cover no-repeat;
+  filter: grayscale(1) saturate(0) contrast(1.12) brightness(.88);
+}
+
+.lookout-metrics-band::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: rgba(25, 24, 24, .7);
+}
+
+.lookout-metrics-band > * {
+  position: relative;
+  z-index: 1;
 }
 
 .lookout-soft-surface {
@@ -146,3 +171,65 @@ body { @apply bg-canvas text-ink font-sans antialiased; }
 @media (prefers-reduced-motion: reduce) {
   .lane-content-enter { animation: none; }
 }
+
+/* Route map: Leaflet chrome on the tokens, and markers that read like the route rail. */
+.leaflet-container { background: var(--color-canvas); font-family: inherit; }
+/* Street tiles go to paper gray so the route's status colors are the only color on the map. */
+.leaflet-tile-pane { filter: grayscale(1) contrast(0.92) brightness(1.04) opacity(0.78); }
+.leaflet-container .leaflet-control-attribution { background: color-mix(in srgb, var(--color-panel) 85%, transparent); color: var(--color-muted); font-size: 9px; }
+.leaflet-container .leaflet-control-attribution a { color: var(--color-muted); }
+.leaflet-touch .leaflet-bar { border: 1px solid var(--color-line); box-shadow: none; }
+.leaflet-bar a { background: var(--color-panel); color: var(--color-ink); border-bottom-color: var(--color-line); }
+.leaflet-bar a:hover, .leaflet-bar a:focus { background: var(--color-well); color: var(--color-ink); }
+.leaflet-div-icon, .route-map-stop, .route-map-truck-icon { background: transparent; border: 0; }
+.leaflet-tooltip.route-map-tooltip { border: 1px solid var(--color-line); border-radius: var(--radius-control); background: var(--color-panel); color: var(--color-ink); box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); font-size: 11px; padding: 3px 7px; }
+.leaflet-tooltip.route-map-tooltip::before { border-top-color: var(--color-line); }
+
+.route-map-stop-dot { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 9999px; font-size: 9px; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; background: var(--color-panel); color: var(--color-muted); border: 2px solid color-mix(in srgb, var(--color-muted) 70%, transparent); box-shadow: 0 1px 2px rgb(0 0 0 / 0.12); transition: transform 150ms, box-shadow 150ms; }
+.route-map-stop-dot.is-done { border: 0; color: var(--color-on-accent); background-color: color-mix(in srgb, var(--color-route-done-start) var(--route-history-light, 50%), var(--color-route-done-end)); }
+.route-map-stop-dot.is-failed { border: 0; background: var(--color-act-now-fill); color: var(--color-on-accent); }
+.route-map-stop-dot.is-risk { border-color: var(--color-act-now); color: var(--color-act-now); }
+.route-map-stop-dot.is-unassigned { border-style: dashed; border-color: var(--color-offline); color: var(--color-offline); }
+.route-map-stop-dot.is-next { transform: scale(1.25); }
+.route-map-stop-dot.is-selected { box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-ink) 14%, transparent); }
+
+.route-map-leg-done { stroke: var(--color-clear-fill); }
+.route-map-leg-todo { stroke: var(--color-muted); stroke-dasharray: 1 7; stroke-linecap: round; opacity: 0.8; }
+.route-map-leg-risk { stroke: var(--color-act-now-fill); stroke-dasharray: 1 7; stroke-linecap: round; }
+
+/* The truck glides between 5-second ticks; Leaflet's own zoom animation must not be slowed. */
+.route-map-truck-icon { transition: transform 900ms linear; }
+.leaflet-zoom-anim .route-map-truck-icon { transition: none; }
+.route-map-truck { position: relative; display: block; width: 28px; height: 28px; }
+.route-map-truck-dot { position: absolute; inset: 7px; border-radius: 9999px; background: var(--color-ink); border: 2px solid var(--color-panel); box-shadow: 0 1px 3px rgb(0 0 0 / 0.3); }
+.route-map-truck-halo { position: absolute; inset: 0; border-radius: 9999px; background: color-mix(in srgb, var(--color-ink) 28%, transparent); animation: route-map-pulse 2s ease-out infinite; }
+.route-map-truck-stale .route-map-truck-dot { background: var(--color-watch-fill); }
+.route-map-truck-stale .route-map-truck-halo { animation: none; background: color-mix(in srgb, var(--color-watch-fill) 22%, transparent); }
+.route-map-truck-offline .route-map-truck-dot { background: var(--color-panel); border: 2px dashed var(--color-offline); }
+.route-map-truck-offline .route-map-truck-halo { display: none; }
+.inline-block.route-map-truck .route-map-truck-dot { inset: 2px; }
+@keyframes route-map-pulse { 0% { transform: scale(0.45); opacity: 0.9; } 100% { transform: scale(1.35); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .route-map-truck-halo { animation: none; } .route-map-truck-icon { transition: none; } }
+
+/* Fleet map: the attention rule on a map. Quiet trucks are dots; the ones that need Lena carry a pill. */
+.fleet-marker-icon { transition: transform 900ms linear; }
+.leaflet-zoom-anim .fleet-marker-icon { transition: none; }
+.fleet-marker { position: relative; display: block; width: 14px; height: 14px; }
+.fleet-marker-dot { position: absolute; left: 50%; top: 50%; width: 12px; height: 12px; border-radius: 9999px; transform: translate(-50%, -50%); border: 2px solid var(--color-panel); box-shadow: 0 1px 2px rgb(0 0 0 / 0.25); background: var(--color-ink); }
+.fleet-marker.is-quiet .fleet-marker-dot { width: 8px; height: 8px; border-width: 1.5px; background: var(--color-muted); opacity: 0.55; }
+.fleet-marker.is-watch .fleet-marker-dot { background: var(--color-watch-fill); }
+.fleet-marker.is-act_now .fleet-marker-dot { background: var(--color-act-now-fill); }
+.fleet-marker.is-offline .fleet-marker-dot { background: var(--color-panel); border: 2px dashed var(--color-offline); }
+.fleet-marker.is-dark .fleet-marker-dot { background: var(--color-panel); border-style: dashed; }
+.fleet-marker.is-dark.is-act_now .fleet-marker-dot { border-color: var(--color-act-now); }
+.fleet-marker.is-dark.is-watch .fleet-marker-dot { border-color: var(--color-watch); }
+.fleet-marker-pill { position: absolute; left: 100%; top: 50%; margin-left: 5px; transform: translateY(-50%); white-space: nowrap; padding: 1px 6px; border-radius: 9999px; background: var(--color-panel); border: 1px solid var(--color-line); box-shadow: 0 1px 2px rgb(0 0 0 / 0.08); font-size: 10px; font-weight: 600; line-height: 14px; color: var(--color-ink); font-variant-numeric: tabular-nums; }
+.fleet-marker.is-watch .fleet-marker-pill { color: var(--color-watch); }
+.fleet-marker.is-act_now .fleet-marker-pill { color: var(--color-act-now); }
+.fleet-marker.is-offline .fleet-marker-pill { color: var(--color-offline); }
+.fleet-marker.is-dark .fleet-marker-pill { border-style: dashed; }
+.fleet-marker.is-selected .fleet-marker-dot { box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-ink) 16%, transparent), 0 1px 2px rgb(0 0 0 / 0.25); }
+.fleet-marker.is-selected.is-quiet .fleet-marker-dot { opacity: 1; background: var(--color-ink); }
+.inline-block.fleet-marker .fleet-marker-dot { width: 10px; height: 10px; }
+.inline-block.fleet-marker.is-quiet .fleet-marker-dot { width: 7px; height: 7px; }
+@media (prefers-reduced-motion: reduce) { .fleet-marker-icon { transition: none; } }
