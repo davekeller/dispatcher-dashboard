@@ -61,12 +61,12 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
   ]
 
   const facts: StopFact[] = complete ? [
-    { label: 'On site', value: dwell },
+    { label: 'On-site', value: dwell },
     { label: 'Outcome', value: outcome, tone: stop.status === 'failed' ? 'text-act-now' : stop.outcome === 'partial' ? 'text-watch' : 'text-clear' },
     { label: 'Load', value: delivery?.items.join(', ') ?? '—' },
     { label: 'Priority', value: delivery?.priority === 'priority' ? 'Priority' : 'Standard' },
   ] : stop.status === 'in_progress' ? [
-    { label: 'On site', value: liveDwell },
+    { label: 'On-site', value: liveDwell },
     { label: 'Status', value: 'At the dock' },
     { label: 'Window', value: delivery ? fmtClock(delivery.window.end) : '—', tone: pastWindow ? 'text-act-now' : undefined },
     { label: 'Load', value: delivery?.items.join(', ') ?? '—' },
@@ -78,13 +78,14 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
   ]
 
   return (
-    <article className={`grid overflow-hidden rounded-card border bg-panel shadow-card lg:grid-cols-[minmax(8rem,0.8fr)_minmax(10rem,1fr)_minmax(14rem,1.2fr)_2rem] ${isNext ? 'border-break' : pastLimit || pastWindow ? 'border-act-now/50' : 'border-line'} ${stop.status === 'unassigned' ? 'border-dashed' : ''}`}>
-      <div className="flex min-w-0 flex-col justify-center p-3">
-        <div className="flex min-w-0 items-start gap-2">
-          <span className="tnum shrink-0 font-display text-[1.65rem] font-semibold leading-none tracking-[-0.05em] text-ink/80">#{stop.seq}</span>
-          {selectable && <input type="checkbox" checked={selected} onChange={onToggle} aria-label={`Select stop ${stop.seq} to reassign`} className="ml-auto mt-1 shrink-0 accent-ink" />}
-        </div>
-        <h3 className="mt-1 truncate text-[12px] font-semibold text-ink" title={delivery?.customer ?? stop.deliveryId}>{delivery?.customer ?? stop.deliveryId}</h3>
+    <article className={`relative grid overflow-hidden rounded-card border bg-panel shadow-card lg:grid-cols-[3.25rem_minmax(7.5rem,0.8fr)_minmax(9rem,1fr)_minmax(14rem,1.35fr)] ${isNext ? 'border-break' : pastLimit || pastWindow ? 'border-act-now/50' : 'border-line'} ${stop.status === 'unassigned' ? 'border-dashed' : ''}`}>
+      <div className="flex min-h-16 items-center justify-center border-b border-line p-2 lg:min-h-0 lg:border-b-0 lg:border-r">
+        <span className="tnum font-display text-[2rem] font-semibold leading-none tracking-[-0.055em] text-ink/80">{stop.seq}</span>
+      </div>
+
+      <div className="relative flex min-w-0 flex-col justify-center border-b border-line p-3 lg:border-b-0 lg:border-r">
+        {selectable && <input type="checkbox" checked={selected} onChange={onToggle} aria-label={`Select stop ${stop.seq} to reassign`} className="absolute right-2 top-2 shrink-0 accent-ink" />}
+        <h3 className={`truncate text-[12px] font-semibold text-ink ${selectable ? 'pr-5' : ''}`} title={delivery?.customer ?? stop.deliveryId}>{delivery?.customer ?? stop.deliveryId}</h3>
         <p className="mt-0.5 truncate text-[10px] text-muted" title={delivery?.address}>{delivery?.address ?? 'Address unavailable'}</p>
         <div className="mt-1 flex min-w-0 flex-wrap items-center gap-1">
           {delivery?.priority === 'priority' && <Chip tone={BAND_TONE.watch} className="px-1.5 py-0 text-[9px]">priority</Chip>}
@@ -97,7 +98,7 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
         {stop.notifiedAt !== undefined && <p className="mt-1 text-[9px] font-semibold text-muted">Customer notified {fmtClock(stop.notifiedAt)}</p>}
       </div>
 
-      <div className="flex min-w-0 items-center border-t border-line px-3 py-2.5 lg:border-l lg:border-t-0">
+      <div className="flex min-w-0 items-center border-b border-line px-3 py-2.5 lg:border-b-0 lg:border-r">
         <ol className="relative grid w-full items-start" style={{ gridTemplateColumns: `repeat(${events.length}, minmax(0, 1fr))` }} aria-label={`Stop ${stop.seq} events`}>
           <span className="absolute top-[0.2rem] h-px bg-line" style={{ left: `${100 / (events.length * 2)}%`, right: `${100 / (events.length * 2)}%` }} aria-hidden="true" />
           {events.map((event) => (
@@ -110,9 +111,9 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
         </ol>
       </div>
 
-      <dl className="grid grid-cols-4 border-t border-line bg-canvas/20 lg:border-l lg:border-t-0">
+      <dl className="grid grid-cols-4 bg-canvas/20 pr-5">
         {facts.map((fact, index) => (
-          <div key={fact.label} className={`flex min-w-0 flex-col justify-center px-1 py-2.5 ${index < facts.length - 1 ? 'border-r border-line' : ''}`}>
+          <div key={fact.label} className={`flex min-w-0 flex-col justify-center px-2 py-3 ${index < facts.length - 1 ? 'border-r border-line' : ''}`}>
             <dt className="truncate text-[7px] font-semibold uppercase tracking-[0.04em] text-label" title={fact.label}>{fact.label}</dt>
             <dd className={`tnum mt-0.5 truncate text-[11px] font-semibold leading-tight ${fact.tone ?? 'text-ink'}`} title={fact.value}>{fact.value}</dd>
           </div>
