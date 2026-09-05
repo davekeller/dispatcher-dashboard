@@ -175,7 +175,7 @@ The spine stays narrow and every stop keeps one evenly spaced position on a sing
 
 ### Route file
 
-The top-level driver card separates identity from measurements. Its padded identity and live-countdown section sits above a full-width five-column grid for Driving today, On duty, Break, Stops, and Driving left vs. limit. The grid touches the card edges, uses one horizontal boundary plus simple vertical dividers, and gives every cell the same padding and vertical centering—no nested metric cards or gutters.
+The top-level driver card separates identity from measurements. Its padded identity and live-countdown section sits above a full-width five-column grid for Driving today, On duty, Break, Stops, and Driving left vs. limit. The grid touches the card edges, uses one horizontal boundary plus simple vertical dividers, and gives every cell the same padding and vertical centering—no nested metric cards or gutters. An over-limit driver adds a 3px Act now red left border across the complete card, reinforcing the badge and countdown without tinting the surface.
 
 The expanded detail rail uses the same light-to-dark completed-path gradient and subtle next-stop marker emphasis as the mini timeline. Completed rows tighten from 40px to 32px, but retain their time, stop number, name, full click target, and one-to-one receipt mapping; failed stops remain full-size and red.
 
