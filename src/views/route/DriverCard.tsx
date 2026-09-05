@@ -9,6 +9,7 @@ import Chip from '../../ui/Chip'
 import CorrectionChip from '../../ui/CorrectionChip'
 import Countdown from '../../ui/Countdown'
 import { BAND_TONE, CRITICAL_TONE, STALENESS_TONE } from '../../ui/tones'
+import AlertStrip from './AlertStrip'
 
 const STATUS_LABEL: Record<DutyStatus, string> = { driving: 'driving', on_duty: 'on duty at a stop', on_break: 'on break', off_duty: 'off duty' }
 
@@ -60,6 +61,7 @@ export default function DriverCard({ view, card }: { view: DriverView; card: Ran
           </div>
         ))}
       </dl>
+      {card.alerts.length > 0 && <AlertStrip view={view} card={card} />}
     </Card>
   )
 }

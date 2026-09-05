@@ -175,7 +175,7 @@ The spine stays narrow and every stop keeps one evenly spaced position on a sing
 
 ### Route file
 
-The top-level driver card separates identity from measurements. Its padded identity and live-countdown section sits above a full-width five-column grid for Driving today, On duty, Break, Stops, and Driving left vs. limit. The grid touches the card edges, uses one horizontal boundary plus simple vertical dividers, and gives every cell the same padding and vertical centering—no nested metric cards or gutters. An over-limit driver adds a 3px Act now red left border across the complete card, reinforcing the badge and countdown without tinting the surface.
+The top-level driver header is one card, not a stack of similar containers. Its padded identity and live-countdown section sits above a full-width five-column grid for Driving today, On duty, Break, Stops, and Driving left vs. limit. The grid touches the card edges, uses one horizontal boundary plus simple vertical dividers, and gives every cell the same padding and vertical centering—no nested metric cards or gutters. Active alerts continue below as flat, divided message-and-action rows inside this same shell. An over-limit driver adds a 3px Act now red left border across the complete card, reinforcing the badge and countdown without tinting the surface. The Stops section begins beneath the unified header rather than after a separate alert card.
 
 The expanded detail rail uses the same light-to-dark completed-path gradient and subtle next-stop marker emphasis as the mini timeline. Completed rows tighten from 40px to 32px, but retain their time, stop number, name, full click target, and one-to-one receipt mapping; failed stops remain full-size and red.
 
@@ -183,7 +183,7 @@ The left rail and the receipt list are literal counterparts: one timeline node p
 
 Each stop receipt applies the same case-file grammar as four clear columns:
 
-- the first narrow column centers a large bare stop number, without a number sign;
+- the first narrow column centers a large bare stop number, without a number sign, beside the exact semantic marker used by the corresponding route-rail node;
 - the second column stacks the stop name, address, status, and instructions;
 - the third column is a compact horizontal event track with equal lanes for each label and time or result;
 - completed event spines read Arrived → Left → Signed;

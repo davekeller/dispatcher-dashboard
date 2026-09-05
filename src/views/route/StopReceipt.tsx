@@ -6,6 +6,7 @@ import { MIN } from '../../time/clock'
 import Chip from '../../ui/Chip'
 import { BAND_TONE } from '../../ui/tones'
 import StopActionsMenu from './StopActionsMenu'
+import StopStatusMarker, { stopHistoryStyle } from './StopStatusMarker'
 
 interface StopEvent {
   label: string
@@ -45,6 +46,8 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
   const dwell = stop.arrivedAt !== undefined && stop.departedAt !== undefined ? fmtMinutes((stop.departedAt - stop.arrivedAt) / MIN) : '—'
   const liveDwell = stop.status === 'in_progress' && stop.arrivedAt !== undefined ? fmtMinutes((view.now - stop.arrivedAt) / MIN) : '—'
   const outcome = stopOutcome(stop)
+  const stopIndex = view.route.stops.findIndex((routeStop) => routeStop.id === stop.id)
+  const lastCompleteIndex = view.route.stops.reduce((last, routeStop, index) => routeStop.status === 'done' || routeStop.status === 'failed' ? index : last, -1)
 
   const events: StopEvent[] = complete ? [
     ...(stop.arrivedAt !== undefined ? [{ label: 'Arrived', value: fmtClock(stop.arrivedAt), tone: 'clear' as const }] : []),
@@ -78,8 +81,9 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
   ]
 
   return (
-    <article className={`relative grid overflow-hidden rounded-card border bg-panel shadow-card lg:grid-cols-[3.25rem_minmax(7.5rem,0.8fr)_minmax(9rem,1fr)_minmax(14rem,1.35fr)] ${isNext ? 'border-break' : pastLimit || pastWindow ? 'border-act-now/50' : 'border-line'} ${stop.status === 'unassigned' ? 'border-dashed' : ''}`}>
-      <div className="flex min-h-16 items-center justify-center border-b border-line p-2 lg:min-h-0 lg:border-b-0 lg:border-r">
+    <article className={`relative grid overflow-hidden rounded-card border bg-panel shadow-card lg:grid-cols-[3.75rem_minmax(7rem,0.8fr)_minmax(9rem,1fr)_minmax(14rem,1.35fr)] ${isNext ? 'border-break' : pastLimit || pastWindow ? 'border-act-now/50' : 'border-line'} ${stop.status === 'unassigned' ? 'border-dashed' : ''}`}>
+      <div className="flex min-h-16 items-center justify-center gap-1.5 border-b border-line px-1 lg:min-h-0 lg:border-b-0 lg:border-r">
+        <StopStatusMarker stop={stop} pastLimit={pastLimit} late={pastWindow} className="h-4 w-4" style={stop.status === 'done' ? stopHistoryStyle(stopIndex, lastCompleteIndex) : undefined} />
         <span className="tnum font-display text-[2rem] font-semibold leading-none tracking-[-0.055em] text-ink/80">{stop.seq}</span>
       </div>
 
