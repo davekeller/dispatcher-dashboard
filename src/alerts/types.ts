@@ -5,7 +5,7 @@ export type Severity = 'critical' | 'act_now' | 'watch' | 'info'
 export type ActionId = 'reassign' | 'schedule_reset' | 'notify_customer' | 'call_driver' | 'acknowledge'
 
 /** One object per rule. Fixed severity and a `when` predicate keep the shape
- *  copy-pasteable in front of a panel; a rule that needs two severities is two objects. */
+ *  copy-pasteable in a live demo; a rule that needs two severities is two objects. */
 export interface Rule {
   id: string
   label: string

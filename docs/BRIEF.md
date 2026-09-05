@@ -6,29 +6,25 @@ Source of truth for what we're building, why, and in what order.
 
 ---
 
-## 1. The exercise
+## 1. The problem
 
 **Context.** Fleet logistics & dispatching. The Dispatcher is the "brain" of fleet operations: ~50 heavy-duty trucks, 1,000+ deliveries daily. The goal is to keep the machine running despite traffic, equipment failure, and strict legal regulation.
 
-**Challenge.** Design and build the primary **"Active Shift" Dashboard** — the view the dispatcher lives in. Focus on **one** variable: **HOS (Hours of Service)** — drivers have a legal 11-hour driving limit; the system must flag those nearing their mandatory reset.
+**The product.** The primary **"Active Shift" Dashboard** — the view the dispatcher lives in. Phase 1 focuses on **one** variable: **HOS (Hours of Service)** — drivers have a legal 11-hour driving limit; the system must flag those nearing their mandatory reset. What a dispatcher needs at a glance is the design problem. How the information is organized and how edge cases are handled come before pixel polish.
 
-> "Deciding what a dispatcher needs at a glance is part of the exercise — what goes in the view is up to you. We care much more about how you organize information and handle edge cases than about pixel-perfect visuals."
-
-**Build.** Real running front-end code:
+**Phase 1 delivers.** Real running front-end code:
 - The main Active Shift dashboard view
 - One exception flow — the HOS alert: surfacing a driver nearing the 11-hour limit / mandatory reset, and the drill-in from that alert
 - Driven by a real data model (drivers / trucks / deliveries with attributes), with working interactions
 - Time-until-reset computed from the data, not hardcoded
 
-**Not required.** Every constraint, the full fleet. Scaling and other situations are discussed in the walkthrough.
-
-**Guidance from the brief.** AI tools expected and encouraged. Not graded on unaided code or pixel polish. Graded on directing the tools, understanding what they produced, and defending decisions. Expected effort 2–3 hours. A small live change to the prototype (e.g. a new alert type or filter) will be requested during the walkthrough.
+**Not in Phase 1.** Every HOS constraint, the full fleet. Scaling and the other rules are covered in §4 and §6. The rules array is built so that a new alert type or filter is one object, small enough to add live in a demo.
 
 ---
 
 ## 2. Design principles
 
-The brief poses three questions. These are the answers the product is built around.
+The answers the product is built around.
 
 ### Show exceptions, not the fleet
 
@@ -65,7 +61,7 @@ The dashboard borrows the pattern of a **proactive co-pilot** — the kind of as
 
 ## 4. Domain notes — Hours of Service
 
-FMCSA rules for property-carrying drivers, simplified. The exercise requires only the 11-hour limit and the mandatory reset; the rest inform scaling and are candidates for additional alert rules.
+FMCSA rules for property-carrying drivers, simplified. Phase 1 covers only the 11-hour limit and the mandatory reset; the rest inform scaling and are candidates for additional alert rules.
 
 | Rule | Summary | In scope |
 |---|---|---|
@@ -143,7 +139,7 @@ interface Stop {
 
 ## 6. Scope
 
-### Phase 1 — core (submittable)
+### Phase 1 — core (shippable)
 - Three-pane shell
 - Metrics strip: active / approaching limit / on break / offline / stops remaining
 - **List view**: roster sorted by time-to-limit, banded, filterable (status · staleness · region)
@@ -172,7 +168,7 @@ Routing, auth, real LLM, settings, mobile layouts, animation polish.
 | Co-pilot: alert bar + cards | 25 | Right pane |
 | Drill-in + confirmed actions | 30 | Exception flow |
 | Staleness + copy pass | 15 | Edge cases visible |
-| Deploy + README + DECISIONS | 10 | Submittable |
+| Deploy + README + DECISIONS | 10 | Shippable |
 | **Phase 1 total** | **~3h** | |
 | Board view | 30 | Phase 2 |
 | Chat intents | 30 | Phase 2 |
@@ -182,7 +178,7 @@ If behind at the 2-hour mark: reduce filters to one, collapse the roster to coun
 
 ---
 
-## 8. Walkthrough plan (20 min)
+## 8. Demo script (20 min)
 
 **The user (2 min).** A dispatcher running a shift — see `docs/LAYOUT.md` for the persona. Hands full, interrupted constantly, legally exposed if a driver goes over. Her job is not monitoring; it's intervening in time.
 
@@ -200,7 +196,7 @@ If behind at the 2-hour mark: reduce filters to one, collapse the roster to coun
 
 **What was cut and why (2 min).** Routing, the full fleet, the 14-hour window — each with a one-line reason.
 
-**Live change.** `rules.ts` open. Add the 30-minute break rule. Narrate.
+**Extending the rules.** `rules.ts` open. Add the 30-minute break rule as one object; Sam K.'s card appears.
 
 ---
 

@@ -52,7 +52,7 @@ export default function OrderDropdown<T extends string>({ value, onChange, optio
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={`${label}: ${selected.label}`}
-        className={`inline-flex h-9 min-w-52 items-center gap-2 rounded-control border px-3 text-[12px] font-semibold shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-lookout/30 ${lookout ? 'iq-input-ring border-transparent text-lookout-strong hover:text-lookout' : 'border-line bg-panel text-ink hover:border-ink/25'}`}
+        className={`inline-flex h-9 min-w-52 items-center gap-2 rounded-control border px-3 text-[12px] font-semibold shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-lookout/30 ${lookout ? 'lookout-input-ring border-transparent text-lookout-strong hover:text-lookout' : 'border-line bg-panel text-ink hover:border-ink/25'}`}
       >
         {lookout ? <LookoutAvatar size={17} className="shrink-0" /> : <SelectedGlyph size={16} weight="regular" className="shrink-0" />}
         <span className="min-w-0 flex-1 truncate text-left">{selected.label}</span>

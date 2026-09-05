@@ -2,13 +2,14 @@ import { Link, Route, Routes } from 'react-router'
 import Layout from './app/Layout'
 import ActiveShiftPage from './views/shift/ActiveShiftPage'
 import RouteFilePage from './views/route/RouteFilePage'
+import MapPage from './views/map/MapPage'
 import Button from './ui/Button'
 import EmptyState from './ui/EmptyState'
 
 function NotFound() {
   return (
     <div className="p-6">
-      <EmptyState title="Nothing here." body="The board is the whole product for this exercise." action={<Link to="/"><Button size="sm">Back to the board</Button></Link>} />
+      <EmptyState title="Nothing here." body="The board is the whole product for now." action={<Link to="/"><Button size="sm">Back to the board</Button></Link>} />
     </div>
   )
 }
@@ -19,6 +20,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route index element={<ActiveShiftPage />} />
         <Route path="routes/:driverId" element={<RouteFilePage />} />
+        <Route path="map" element={<MapPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
