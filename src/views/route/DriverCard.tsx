@@ -27,8 +27,8 @@ export default function DriverCard({ view, card }: { view: DriverView; card: Ran
     { label: 'Driving left vs. limit', value: `${fmtHm(view.remainingDriveMin)} vs ${fmtCountdown(view.minutesUntilLimit, stale)}`, sub: view.remaining.length === 0 ? 'route complete' : fits ? 'fits before the limit' : 'does not fit', tone: view.remaining.length === 0 ? undefined : fits ? 'text-clear' : 'text-act-now' },
   ]
   return (
-    <Card className="px-5 py-4">
-      <div className="flex items-center gap-5">
+    <Card className="overflow-hidden">
+      <div className="flex items-center gap-5 px-5 py-4">
         <DriverAvatar driver={view.driver} size={56} />
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -50,12 +50,12 @@ export default function DriverCard({ view, card }: { view: DriverView; card: Ran
           </span>
         </div>
       </div>
-      <dl className="mt-4 grid grid-cols-5 gap-3 border-t border-line pt-3">
+      <dl className="grid grid-cols-5 divide-x divide-line border-t border-line">
         {metrics.map((m) => (
-          <div key={m.label}>
-            <dt className="text-[10px] font-semibold uppercase tracking-wide text-label">{m.label}</dt>
-            <dd className={`tnum mt-0.5 font-display text-xl font-semibold leading-none ${m.tone ?? 'text-ink'}`}>{m.value}</dd>
-            <dd className="mt-1 text-[11px] text-muted">{m.sub}</dd>
+          <div key={m.label} className="flex min-h-[5.25rem] min-w-0 flex-col justify-center px-4 py-3">
+            <dt className="text-[9px] font-semibold uppercase leading-3 tracking-[0.04em] text-label">{m.label}</dt>
+            <dd className={`tnum mt-1 font-display text-xl font-semibold leading-none ${m.tone ?? 'text-ink'}`}>{m.value}</dd>
+            <dd className="mt-1 truncate text-[10px] text-muted" title={m.sub}>{m.sub}</dd>
           </div>
         ))}
       </dl>
