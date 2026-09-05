@@ -9,7 +9,6 @@ import { useDerived } from '../../store/hooks'
 import { useStore } from '../../store/store'
 import Button from '../../ui/Button'
 import EmptyState from '../../ui/EmptyState'
-import AlertStrip from './AlertStrip'
 import DriverCard from './DriverCard'
 import StaleBanner from './StaleBanner'
 import RouteRail from './RouteRail'
@@ -20,8 +19,8 @@ const RouteMap = lazy(() => import('./map/RouteMap'))
 
 type StopsMode = 'list' | 'map'
 
-/** A file for one driver's day, in the case-file shape: the route rail down the left, then the
- *  driver card, the alerts, and the stop receipts. Lookout stays open and focuses on this driver. */
+/** A file for one driver's day, in the case-file shape: the route rail down the left, then one
+ *  driver-and-alert header card followed by the stop list or map. Lookout stays focused here. */
 export default function RouteFilePage() {
   const { driverId = '' } = useParams()
   const d = useDerived()
@@ -72,7 +71,6 @@ export default function RouteFilePage() {
       <div className="flex min-w-0 flex-1 flex-col gap-4">
       <DriverCard view={view} card={card} />
       {stale && <StaleBanner view={view} />}
-      {card.alerts.length > 0 && <AlertStrip view={view} card={card} />}
       <section>
         <header className="mb-2 flex items-center gap-3">
           <h2 className="text-[12px] font-semibold uppercase tracking-wide text-label">Stops</h2>

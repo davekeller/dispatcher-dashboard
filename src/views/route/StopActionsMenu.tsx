@@ -1,4 +1,4 @@
-import { ArrowsLeftRight, DotsThree, NotePencil, Prohibit } from '@phosphor-icons/react'
+import { ArrowsLeftRight, DotsThreeVertical, NotePencil, Prohibit } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useActions } from '../../actions/ActionContext'
@@ -63,9 +63,9 @@ export default function StopActionsMenu({ stop, view, customer }: { stop: Stop; 
 
   return (
     <>
-      <div className="flex min-h-12 items-center justify-center border-t border-line bg-panel lg:border-l lg:border-t-0">
-        <button ref={buttonRef} type="button" onClick={toggleMenu} aria-haspopup="menu" aria-expanded={open} aria-label={`More actions for stop ${stop.seq}, ${customer}`} title="More stop actions" className="flex h-7 w-7 items-center justify-center rounded-control text-muted transition hover:bg-well hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/15">
-          <DotsThree size={17} weight="bold" />
+      <div className="absolute right-0.5 top-1.5 z-20 lg:top-1/2 lg:-translate-y-1/2">
+        <button ref={buttonRef} type="button" onClick={toggleMenu} aria-haspopup="menu" aria-expanded={open} aria-label={`More actions for stop ${stop.seq}, ${customer}`} title="More stop actions" className="flex h-7 w-5 items-center justify-center rounded-control text-muted transition hover:bg-well hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/15">
+          <DotsThreeVertical size={17} weight="bold" />
         </button>
       </div>
 

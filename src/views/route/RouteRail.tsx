@@ -1,12 +1,12 @@
 import { ArrowLeft, CaretDown, Check, SidebarSimple } from '@phosphor-icons/react'
-import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import type { Delivery, Stop } from '../../data/types'
 import { projectedEta } from '../../hos/compute'
 import { fmtAge, fmtClock } from '../../lib/format'
 import { routeHosSignal, routeScheduleSignal, type RouteSignalTone } from '../../lib/routeProgress'
-import { completedStopLightWeight } from '../../lib/routeTimeline'
 import type { DriverView } from '../../store/view'
+import StopStatusMarker, { stopHistoryStyle } from './StopStatusMarker'
 
 interface Node {
   stop: Stop
@@ -31,24 +31,11 @@ const SIGNAL_TEXT: Record<RouteSignalTone, string> = {
 
 const TIMELINE_COLUMNS = { gridTemplateColumns: '1.25rem minmax(0, 1fr)' }
 
-function stopTone(node: Node, pastLimitIds: Set<string>): string {
-  const { stop } = node
-  if (stop.status === 'failed') return 'bg-act-now-fill text-on-accent'
-  if (stop.status === 'done') return 'route-history-node text-on-accent'
-  if (stop.status === 'unassigned') return 'border-2 border-dashed border-offline bg-panel text-offline'
-  if (pastLimitIds.has(stop.id) || node.late) return 'border-2 border-act-now bg-panel text-act-now'
-  return 'border-2 border-muted/70 bg-panel text-muted'
-}
-
 function detailNodeSize(index: number, firstRemainingIndex: number, status: Stop['status']): string {
   if (status === 'done') return 'h-3 w-3'
   if (index === firstRemainingIndex) return 'h-4 w-4'
   if (index === firstRemainingIndex + 1) return 'h-[15px] w-[15px]'
   return 'h-3.5 w-3.5'
-}
-
-function historyStyle(index: number, lastCompleteIndex: number): CSSProperties {
-  return { '--route-history-light': `${completedStopLightWeight(index, lastCompleteIndex)}%` } as CSSProperties
 }
 
 function rowTone(node: Node, pastLimitIds: Set<string>): string {
@@ -259,11 +246,9 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
                   className={`${collapsed ? `flex ${rowSize} w-full items-center justify-center rounded-control hover:bg-canvas` : `grid ${rowSize} w-full items-stretch rounded-control text-left transition ${rowTone(node, pastLimitIds)}`}`}
                 >
                   <span className={`relative flex ${collapsed ? rowSize : 'h-full min-h-7'} items-center justify-center`}>
-                    <span className={`absolute left-1/2 top-0 h-1/2 w-px -translate-x-1/2 ${connectorTone}`} style={completed ? historyStyle(index - 0.5, lastCompleteIndex) : undefined} />
-                    <span className={`absolute bottom-0 left-1/2 h-1/2 w-px -translate-x-1/2 ${connectorTone}`} style={completed ? historyStyle(index + 0.5, lastCompleteIndex) : undefined} />
-                    <span className={`relative z-10 flex items-center justify-center rounded-full motion-safe:transition-[width,height] motion-safe:duration-150 ${detailNodeSize(index, firstRemainingIndex, stop.status)} ${stopTone(node, pastLimitIds)} ${isActive ? 'ring-4 ring-ink/10' : ''}`} style={completed ? historyStyle(index, lastCompleteIndex) : undefined}>
-                      {completed && <Check size={8} weight="bold" className="drop-shadow-[0_1px_1px_rgb(0_0_0/0.3)]" />}
-                    </span>
+                    <span className={`absolute left-1/2 top-0 h-1/2 w-px -translate-x-1/2 ${connectorTone}`} style={completed ? stopHistoryStyle(index - 0.5, lastCompleteIndex) : undefined} />
+                    <span className={`absolute bottom-0 left-1/2 h-1/2 w-px -translate-x-1/2 ${connectorTone}`} style={completed ? stopHistoryStyle(index + 0.5, lastCompleteIndex) : undefined} />
+                    <StopStatusMarker stop={stop} pastLimit={pastLimitIds.has(stop.id)} late={node.late} active={isActive} className={`motion-safe:transition-[width,height] motion-safe:duration-150 ${detailNodeSize(index, firstRemainingIndex, stop.status)}`} style={completed ? stopHistoryStyle(index, lastCompleteIndex) : undefined} />
                   </span>
                   {!collapsed && (
                     <span className="min-w-0 py-1 pl-2 pr-2">
