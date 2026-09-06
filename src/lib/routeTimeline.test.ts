@@ -41,9 +41,9 @@ describe('miniTimelineLayout', () => {
     expect(layout.positions[0]).toBe(95)
   })
 
-  it('grades completed stops from dark at the origin to light at the recent edge', () => {
-    expect(completedStopLightWeight(0, 10)).toBe(0)
+  it('grades completed stops from light at the start to dark at the progress edge', () => {
+    expect(completedStopLightWeight(0, 10)).toBe(100)
     expect(completedStopLightWeight(5, 10)).toBe(50)
-    expect(completedStopLightWeight(10, 10)).toBe(100)
+    expect(completedStopLightWeight(10, 10)).toBe(0)
   })
 })
