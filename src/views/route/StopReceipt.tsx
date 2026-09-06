@@ -99,8 +99,7 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
         </div>
 
         <div className="relative flex min-w-0 flex-col justify-center border-b border-line p-3 lg:border-b-0 lg:border-r">
-          {selectable && <input type="checkbox" checked={selected} onChange={onToggle} aria-label={`Select stop ${stop.seq} to reassign`} className="absolute right-2 top-2 shrink-0 accent-ink" />}
-          <h3 className={`truncate text-[12px] font-semibold text-ink ${selectable ? 'pr-5' : ''}`} title={delivery?.customer ?? stop.deliveryId}>{delivery?.customer ?? stop.deliveryId}</h3>
+          <h3 className="truncate text-[12px] font-semibold text-ink" title={delivery?.customer ?? stop.deliveryId}>{delivery?.customer ?? stop.deliveryId}</h3>
           <p className="mt-0.5 truncate text-[10px] text-muted" title={delivery?.address}>{delivery?.address ?? 'Address unavailable'}</p>
           {(statusLabel || pastLimit || pastWindow) && <div className="mt-1 flex min-w-0 flex-wrap items-center gap-1">
             {statusTone && statusLabel && <Chip tone={statusTone} dashed={stop.status === 'unassigned'} className="px-1.5 py-0 text-[9px]">{statusLabel}</Chip>}
@@ -125,7 +124,7 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
           </ol>
         </div>
 
-        <dl className="grid grid-cols-4 bg-board/45 pr-5">
+        <dl className={`grid grid-cols-4 bg-board/45 ${selectable ? 'pr-11' : 'pr-5'}`}>
           {facts.map((fact, index) => (
             <div key={fact.label} className={`flex min-w-0 flex-col justify-center px-2 py-3 ${index < facts.length - 1 ? 'border-r border-line' : ''}`}>
               <dt className="truncate text-[7px] font-semibold uppercase tracking-[0.04em] text-label" title={fact.label}>{fact.label}</dt>
@@ -137,7 +136,12 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
             </div>
           ))}
         </dl>
-        <StopActionsMenu stop={stop} view={view} customer={delivery?.customer ?? stop.deliveryId} />
+        <StopActionsMenu
+          stop={stop}
+          view={view}
+          customer={delivery?.customer ?? stop.deliveryId}
+          selectionControl={selectable ? <input type="checkbox" checked={selected} onChange={onToggle} aria-label={`Select stop ${stop.seq} to reassign`} className="h-3.5 w-3.5 shrink-0 accent-ink" /> : undefined}
+        />
       </article>
     </div>
   )
