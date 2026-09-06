@@ -1,23 +1,33 @@
-import { ArrowCounterClockwise, CaretDown, Clock } from '@phosphor-icons/react'
+import { ArrowCounterClockwise, CaretDown, Clock, SunHorizon } from '@phosphor-icons/react'
 import { useEffect, useRef } from 'react'
-import { ANCHOR, MIN } from '../time/clock'
+import { ANCHOR, DAY_END, DAY_START, MIN } from '../time/clock'
 import { fmtClock } from '../lib/format'
 import { useDerived } from '../store/hooks'
 import { useStore } from '../store/store'
 import Button from '../ui/Button'
 
-const SCRUB_MAX_MIN = 240
 const SCRUB_STEP_MIN = 5
+const DAY_MIN = (DAY_END - DAY_START) / MIN
+const TICKS = [0, 120, 240, 360, 480, 600, 720] // every two hours across the twelve-hour day
+const ANCHOR_PCT = ((ANCHOR - DAY_START) / (DAY_END - DAY_START)) * 100
+
+function fmtOffset(minutes: number): string {
+  const sign = minutes < 0 ? '−' : '+'
+  const abs = Math.abs(minutes)
+  const h = Math.floor(abs / 60)
+  const m = abs % 60
+  return `${sign}${h > 0 ? `${h}h ${m}m` : `${m} min`}`
+}
 
 /** The simulated shift, as one button in the product bar. It opens a panel anchored under
- *  it that says plainly what this is, lets anyone scrub or fast-forward the day, and
- *  explains each demo action in a sentence. ⌘. opens it too. */
+ *  it that says plainly what this is, lets anyone scrub anywhere in the day or fast-forward,
+ *  and explains each demo action in a sentence. ⌘. opens it too. */
 export default function SimulatedShift() {
   const open = useStore((s) => s.devOpen)
   const toggle = useStore((s) => s.toggleDev)
   const scrubOffsetMs = useStore((s) => s.scrubOffsetMs)
   const scrub = useStore((s) => s.scrub)
-  const setScrubOffset = useStore((s) => s.setScrubOffset)
+  const setClock = useStore((s) => s.setClock)
   const resetClock = useStore((s) => s.resetClock)
   const resetFleet = useStore((s) => s.resetFleet)
   const bringOnline = useStore((s) => s.bringOnline)
@@ -48,7 +58,7 @@ export default function SimulatedShift() {
   const dre = byId.get('drv-03')
   const marcus = byId.get('drv-01')
   const offsetMin = Math.round(scrubOffsetMs / MIN)
-  const ticks = [0, 60, 120, 180, 240]
+  const dayMin = Math.min(DAY_MIN, Math.max(0, Math.round((now - DAY_START) / MIN)))
 
   return (
     <div ref={ref} className="relative">
@@ -68,35 +78,43 @@ export default function SimulatedShift() {
 
       {open && (
         <div role="dialog" aria-label="Simulated shift" className="absolute right-0 top-full z-40 mt-2 w-[26rem] rounded-card border border-line bg-panel p-4 shadow-card">
-          <p className="font-display text-[15px] font-semibold text-ink">This is a simulated shift.</p>
+          <p className="flex items-center gap-2 font-display text-[15px] font-semibold text-ink">
+            <SunHorizon size={20} weight="duotone" className="shrink-0 text-lookout" aria-hidden="true" />
+            This is a simulated shift.
+          </p>
           <p className="mt-1 text-[12px] leading-snug text-muted">
-            A typical day for a fleet of 50 trucks, pinned to 2:47 PM so everyone sees the same scenario. The clock is live: it ticks, every countdown is computed from it, and you can scrub or fast-forward to watch the shift unfold. Nothing here is a recording.
+            A typical day for a fleet of 50 trucks, pinned to 2:47 PM so everyone sees the same scenario. The clock is live: it ticks, every countdown is computed from it, and you can scrub anywhere in the day, 6:00 AM to 6:00 PM, to watch the shift unfold or unwind.
           </p>
 
           <div className="mt-4">
             <div className="flex items-baseline justify-between">
               <span className="text-[11px] font-semibold uppercase tracking-wide text-label">Time of day</span>
-              <span className="tnum text-[12px] font-semibold text-ink">{fmtClock(now)}{offsetMin > 0 ? <span className="font-normal text-muted"> · +{offsetMin} min</span> : ''}</span>
+              <span className="tnum text-[12px] font-semibold text-ink">{fmtClock(now)}{offsetMin !== 0 ? <span className="font-normal text-muted"> · {fmtOffset(offsetMin)} from 2:47</span> : ''}</span>
             </div>
-            <input
-              type="range"
-              min={0}
-              max={SCRUB_MAX_MIN}
-              step={SCRUB_STEP_MIN}
-              value={Math.min(SCRUB_MAX_MIN, offsetMin)}
-              onChange={(e) => setScrubOffset(Number(e.target.value) * MIN)}
-              aria-label="Scrub the simulated clock"
-              className="mt-2 w-full accent-lookout"
-            />
+            <div className="relative mt-2">
+              <span aria-hidden="true" title="2:47 PM, where the shift is pinned" className="pointer-events-none absolute -top-1.5 h-2 w-0.5 -translate-x-1/2 rounded-full bg-lookout" style={{ left: `${ANCHOR_PCT}%` }} />
+              <input
+                type="range"
+                min={0}
+                max={DAY_MIN}
+                step={SCRUB_STEP_MIN}
+                value={dayMin}
+                onChange={(e) => setClock(DAY_START + Number(e.target.value) * MIN)}
+                aria-label="Scrub the simulated clock across the day"
+                aria-valuetext={fmtClock(now)}
+                className="w-full accent-lookout"
+              />
+            </div>
             <div className="tnum mt-1 flex justify-between text-[10px] text-label">
-              {ticks.map((t) => <span key={t}>{fmtClock(ANCHOR + t * MIN)}</span>)}
+              {TICKS.map((t) => <span key={t}>{fmtClock(DAY_START + t * MIN)}</span>)}
             </div>
-            <div className="mt-2 flex items-center gap-2">
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <Button size="sm" onClick={() => scrub(-60 * MIN)}>−1 hour</Button>
               <Button size="sm" onClick={() => scrub(15 * MIN)}>+15 min</Button>
               <Button size="sm" onClick={() => scrub(60 * MIN)}>+1 hour</Button>
               <Button size="sm" variant="ghost" onClick={resetClock} disabled={scrubOffsetMs === 0}><ArrowCounterClockwise size={12} /> Back to 2:47 PM</Button>
             </div>
-            <p className="mt-2 text-[11px] text-muted">The fleet keeps moving as the clock runs; the planted scenarios (Marcus, Priya, Dre and the others) hold still so the demo always finds them.</p>
+            <p className="mt-2 text-[11px] text-muted">The fleet moves with the clock in both directions: receipts unwind, duty hours are counted only up to the clock, and a truck that went dark at 2:22 is fresh again at 2:00. The planted scenarios (Marcus, Priya, Dre and the others) hold still at 2:47 so the demo always finds them.</p>
           </div>
 
           <div className="mt-4 border-t border-line pt-3">

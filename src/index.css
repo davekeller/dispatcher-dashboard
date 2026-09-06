@@ -238,7 +238,8 @@ body { @apply bg-canvas text-ink font-sans; }
 .leaflet-zoom-anim .fleet-marker-icon { transition: none; }
 .fleet-marker { position: relative; display: block; width: 14px; height: 14px; }
 .fleet-marker-dot { position: absolute; left: 50%; top: 50%; width: 12px; height: 12px; border-radius: 9999px; transform: translate(-50%, -50%); border: 2px solid var(--color-panel); box-shadow: 0 1px 2px rgb(0 0 0 / 0.25); background: var(--color-ink); }
-.fleet-marker.is-quiet .fleet-marker-dot { width: 8px; height: 8px; border-width: 1.5px; background: var(--color-muted); opacity: 0.55; }
+/* Quiet trucks are colorless, not invisible: a dark neutral dot with a white ring reads at any zoom. */
+.fleet-marker.is-quiet .fleet-marker-dot { width: 10px; height: 10px; border-width: 2px; background: var(--color-ink); opacity: 0.82; }
 .fleet-marker.is-watch .fleet-marker-dot { background: var(--color-watch-fill); }
 .fleet-marker.is-act_now .fleet-marker-dot { background: var(--color-act-now-fill); }
 .fleet-marker.is-offline .fleet-marker-dot { background: var(--color-panel); border: 2px dashed var(--color-offline); }
@@ -253,5 +254,5 @@ body { @apply bg-canvas text-ink font-sans; }
 .fleet-marker.is-selected .fleet-marker-dot { box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-ink) 16%, transparent), 0 1px 2px rgb(0 0 0 / 0.25); }
 .fleet-marker.is-selected.is-quiet .fleet-marker-dot { opacity: 1; background: var(--color-ink); }
 .inline-block.fleet-marker .fleet-marker-dot { width: 10px; height: 10px; }
-.inline-block.fleet-marker.is-quiet .fleet-marker-dot { width: 7px; height: 7px; }
+.inline-block.fleet-marker.is-quiet .fleet-marker-dot { width: 8px; height: 8px; }
 @media (prefers-reduced-motion: reduce) { .fleet-marker-icon { transition: none; } }
