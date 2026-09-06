@@ -3,7 +3,6 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
 import { useActions } from '../../actions/ActionContext'
 import { stopsPastLimit } from '../../store/actions'
-import { fmtClock } from '../../lib/format'
 import { useLookout } from '../../lookout/LookoutContext'
 import { useDerived } from '../../store/hooks'
 import { useStore } from '../../store/store'
@@ -99,11 +98,11 @@ export default function RouteFilePage() {
               </div>
             </div>
             <div className="ml-auto flex gap-2">
-              <Button size="sm" variant="primary" disabled={selected.length === 0 || stale} title={staleReason} onClick={() => open('reassign', view.driver.id, { stopIds: selected })}>
-                Reassign selected{selected.length > 0 ? ` (${selected.length})` : ''}
-              </Button>
-              <Button size="sm" disabled={view.remaining.length === 0 || view.plannedResetAt !== undefined} title={view.plannedResetAt !== undefined ? `Reset already scheduled for ${fmtClock(view.plannedResetAt)}` : undefined} onClick={() => open('schedule_reset', view.driver.id)}>Schedule reset</Button>
-              <Button size="sm" disabled={stale || view.remaining.length === 0} title={staleReason} onClick={() => open('notify_customer', view.driver.id)}>Notify customers</Button>
+              {selected.length > 0 && (
+                <Button size="sm" variant="primary" disabled={stale} title={staleReason} onClick={() => open('reassign', view.driver.id, { stopIds: selected })}>
+                  Reassign selected ({selected.length})
+                </Button>
+              )}
               <div className="ml-1 flex shrink-0 items-center gap-0.5 rounded-control border border-line bg-panel p-0.5 shadow-sm" role="group" aria-label="Show stops as">
                 <button type="button" aria-pressed={mode === 'list'} onClick={() => setMode('list')} className={seg(mode === 'list')} title="Stops as a list">
                   <ListBullets size={14} weight={mode === 'list' ? 'fill' : 'regular'} /> List
