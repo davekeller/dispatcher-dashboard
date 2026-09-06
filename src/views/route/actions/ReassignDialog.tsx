@@ -100,7 +100,7 @@ export default function ReassignDialog({ driverId, initialStopIds, onClose }: { 
           ))}
         </ul>
       </section>
-      <section className="mt-5">
+      <section className="mt-5 border-t border-line pt-4">
         <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-label">
           Who can take them{candidates.length > 0 && (filtering ? ` · ${shown.length} of ${candidates.length}` : ` · ${candidates.length}`)}
         </h3>
@@ -112,7 +112,8 @@ export default function ReassignDialog({ driverId, initialStopIds, onClose }: { 
           />
         ) : (
           <>
-            <div className="relative z-20 mb-2 flex flex-wrap items-center gap-2">
+            {/* The picker's nav sits on the canvas tone so it reads as controls, not as another row of candidates. */}
+            <div className="relative z-20 mb-2 flex flex-wrap items-center gap-2 rounded-control border border-line/70 bg-canvas px-2 py-2">
               <OrderDropdown value={order} onChange={setOrder} options={ORDER_OPTIONS} label="Order drivers by" />
               <FiltersDropdown value={filterState} onChange={onFilterState} filters={filterGroups} copy={PICKER_COPY} />
               {filtering && (
