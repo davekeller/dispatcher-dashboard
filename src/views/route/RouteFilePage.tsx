@@ -75,9 +75,9 @@ export default function RouteFilePage() {
         {card.alerts.length > 0 && <AlertStrip view={view} card={card} />}
         {stale && <StaleBanner view={view} />}
         <section>
-          <header className="sticky top-0 z-30 mb-2 flex min-h-12 items-center gap-3 rounded-control border border-line bg-panel/95 px-3 py-2 shadow-sm backdrop-blur">
+          <header className="sticky top-0 z-30 mb-2 flex min-h-12 items-center gap-3 rounded-control border border-offline/25 bg-offline-board/90 px-3 py-2 shadow-[0_3px_12px_rgb(66_76_96/0.10)] backdrop-blur">
             <div className="flex min-w-0 items-center gap-2.5">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] bg-board text-ink" aria-hidden="true">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] bg-ink text-on-accent shadow-sm" aria-hidden="true">
                 <ListBullets size={15} weight="bold" />
               </span>
               <div className="min-w-0">
