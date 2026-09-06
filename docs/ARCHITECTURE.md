@@ -57,7 +57,7 @@ src/
     route/actions/  ReassignDialog.tsx · ResetDialog.tsx · NotifyDialog.tsx
     route/map/  RouteMap.tsx                                  (lazy chunk: the route file's map)
     driver/     DriverPhoneView.tsx · PhoneFrame.tsx        (Phase 2)
-    map/        MapPage.tsx · FleetMap.tsx (lazy) · leaflet.tsx (tiles, fit, fly, shared with the route map)
+    map/        MapPage.tsx · FleetMap.tsx (lazy) · RouteOverlay.tsx (one route in the rail's states, both maps) · leaflet.tsx (tiles, fit, fly)
   ui/           Chip · Button · Card · Modal · Toast · Countdown · Bar · Avatar · EmptyState · CorrectionChip
   lib/          format.ts (clock times, durations, tilde precision)
 ```
@@ -358,7 +358,7 @@ Mobile-first. Header collapses to the driver's avatar and their own countdown ch
 
 ### Map (`/map`)
 
-The fleet on one map, a Map tab beside Board in the product bar. It reads the same ranked list as the board and takes the board's filters (status, data, region, search), so "37 of 50 trucks" means the same thing on both. The attention rule applies: clear and on-break trucks are small neutral dots at reduced opacity with a hover tooltip; act-now, watch, and offline trucks carry their band color and a name-and-countdown pill ("Marcus R. · 0:12", "Dre W. · ~0:40 · last seen 25 min ago"); a dark truck is hollow and dashed whatever its band, because its fix is last known, not live. Every fix comes from `geo/truckPosition.ts`, so the trucks move with the same tick as everything else. Picking a truck (or arriving at `/map?driver=drv-01`) puts a small card over the map (name, route, plate, region, band, countdown, stops left, "Open route file"), draws only that driver's road ahead from the truck through the remaining stops (dashed, red when any of them is past the limit) with the stops numbered, pans to it, and focuses Lookout on that driver so its card and actions are one glance to the right. "Fit all" re-frames every visible truck. `geo/fleet.ts` turns views into markers and is tested against the seeded fleet, so the map view holds no logic. The route file's own map is the List | Map toggle described above.
+The fleet on one map, a Map tab beside Board in the product bar. It reads the same ranked list as the board and takes the board's filters (status, data, region, search), so "37 of 50 trucks" means the same thing on both. The attention rule applies: clear and on-break trucks are small neutral dots at reduced opacity with a hover tooltip; act-now, watch, and offline trucks carry their band color and a name-and-countdown pill ("Marcus R. · 0:12", "Dre W. · ~0:40 · last seen 25 min ago"); a dark truck is hollow and dashed whatever its band, because its fix is last known, not live. Every fix comes from `geo/truckPosition.ts`, so the trucks move with the same tick as everything else. Picking a truck (or arriving at `/map?driver=drv-01`) puts a small card over the map (name, route, plate, region, band, countdown, stops left, "Open route file"), draws that driver's whole route in the rail's states (delivered stops in the completion gradient, undelivered outlined, late and past-limit stops red with dashed legs, the next stop larger), frames the route, and focuses Lookout on that driver so its card and actions are one glance to the right. "Fit all" re-frames every visible truck. `geo/fleet.ts` turns views into markers and is tested against the seeded fleet, so the map view holds no logic. The route file's own map is the List | Map toggle described above.
 
 ---
 
@@ -383,7 +383,7 @@ Each is designed, not discovered. Where it shows up is as important as what happ
 | Late planted driver on the map | The truck holds at 96% of its leg instead of landing on a stop that is still pending | Route map |
 | Map tiles unreachable | The basemap stays a blank canvas; legs, stops, the truck, and the attribution draw regardless | Route map |
 | Fleet map filters hide every truck | The count reads 0 of 50 and Clear resets the filters; the map keeps its last framing | Fleet map |
-| Selected truck on the fleet map is dark | Hollow dashed marker at the last known fix, the card says "last known position", and the road ahead still draws from that fix | Fleet map |
+| Selected truck on the fleet map is dark | Hollow dashed marker at the last known fix, the card says "last known position", and the whole route still draws around it | Fleet map |
 | Two alerts, one driver | One card, two reasons | Rail, card badges |
 | Acknowledge | Snoozed 10 min, de-emphasized, never hidden for critical/act now; snooze expiry restores emphasis | Rail |
 | Reset mid-route | Stops after the reset point become unassigned; `stops_unassigned` fires; metrics show "need a driver" | Route file, metrics, rail |
