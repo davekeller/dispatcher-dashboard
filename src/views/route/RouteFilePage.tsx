@@ -1,5 +1,5 @@
 import { ListBullets, MapTrifold } from '@phosphor-icons/react'
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
 import { useActions } from '../../actions/ActionContext'
 import { stopsPastLimit } from '../../store/actions'
@@ -14,6 +14,7 @@ import DriverCard from './DriverCard'
 import StaleBanner from './StaleBanner'
 import RouteRail from './RouteRail'
 import StopReceipt from './StopReceipt'
+import { nextStopSelection } from './stopSelection'
 
 // Leaflet and its stylesheet load only when someone opens the map; the board never pays for them.
 const RouteMap = lazy(() => import('./map/RouteMap'))
@@ -30,6 +31,7 @@ export default function RouteFilePage() {
   const { setFocus } = useLookout()
   const { open } = useActions()
   const [selected, setSelected] = useState<string[]>([])
+  const selectionAnchor = useRef<string | null>(null)
   const [railCollapsed, setRailCollapsed] = useState(true)
   const [params, setParams] = useSearchParams()
   const mode: StopsMode = params.get('view') === 'map' ? 'map' : 'list'
@@ -47,7 +49,10 @@ export default function RouteFilePage() {
     setFocus(driverId)
     return () => setFocus(null)
   }, [driverId, setFocus])
-  useEffect(() => setSelected([]), [driverId])
+  useEffect(() => {
+    setSelected([])
+    selectionAnchor.current = null
+  }, [driverId])
   useEffect(() => setSelectedStop(null), [driverId])
   useEffect(() => setRailCollapsed(true), [driverId])
 
@@ -61,7 +66,15 @@ export default function RouteFilePage() {
 
   const stale = view.staleness !== 'fresh'
   const staleReason = stale ? 'Position unknown. This action is disabled until the truck reports in.' : undefined
-  const toggle = (id: string) => setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]))
+  const selectableStopIds = [...view.route.stops]
+    .reverse()
+    .filter((stop) => stop.status === 'pending' || stop.status === 'unassigned')
+    .map((stop) => stop.id)
+  const selectStop = (id: string, extendRange: boolean) => {
+    const anchor = selectionAnchor.current
+    setSelected((current) => nextStopSelection(current, selectableStopIds, id, anchor, extendRange))
+    if (!extendRange || anchor === null) selectionAnchor.current = id
+  }
   const pastLimitIds = new Set(stopsPastLimit(view))
   // On the map the rail's selection is the page's; it starts on the next stop, like the rail does when reading.
   const mapSelection = selectedStop ?? view.next?.id ?? null
@@ -109,7 +122,7 @@ export default function RouteFilePage() {
             <ol className="flex flex-col gap-2">
               {[...view.route.stops].reverse().map((s) => (
                 <li key={s.id} id={`stop-${s.id}`} className="scroll-mt-16">
-                  <StopReceipt stop={s} delivery={deliveryById.get(s.deliveryId)} view={view} selected={selected.includes(s.id)} onToggle={() => toggle(s.id)} pastLimit={pastLimitIds.has(s.id)} />
+                  <StopReceipt stop={s} delivery={deliveryById.get(s.deliveryId)} view={view} selected={selected.includes(s.id)} onSelect={(extendRange) => selectStop(s.id, extendRange)} pastLimit={pastLimitIds.has(s.id)} />
                 </li>
               ))}
             </ol>
