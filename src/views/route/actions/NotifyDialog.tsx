@@ -7,13 +7,13 @@ import Button from '../../../ui/Button'
 import Modal from '../../../ui/Modal'
 
 /** Pre-filled, editable, confirmed. Stamps the stops so the schedule rule and the receipts know. */
-export default function NotifyDialog({ driverId, onClose }: { driverId: string; onClose: () => void }) {
+export default function NotifyDialog({ driverId, initialStopIds, onClose }: { driverId: string; initialStopIds?: string[]; onClose: () => void }) {
   const d = useDerived()
   const notify = useStore((s) => s.notifyCustomer)
   const deliveries = useStore((s) => s.fleet.deliveries)
   const view = d.byId.get(driverId)!
   const affected = view.lateStops.length > 0 ? view.lateStops : view.remaining.filter((s) => s.status === 'pending')
-  const [ids, setIds] = useState<string[]>(() => affected.filter((s) => s.notifiedAt === undefined).map((s) => s.id))
+  const [ids, setIds] = useState<string[]>(() => initialStopIds?.length ? initialStopIds : affected.filter((s) => s.notifiedAt === undefined).map((s) => s.id))
   const delay = Math.max(5, Math.round(view.driftMin / 5) * 5)
   const firstEta = affected.find((s) => ids.includes(s.id))
   const [message, setMessage] = useState(

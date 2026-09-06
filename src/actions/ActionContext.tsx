@@ -8,11 +8,21 @@ export interface ActionRequest {
   action: DialogAction
   driverId: string
   stopIds?: string[]
+  /** Reassign: the candidate to pre-pick. */
+  toId?: string
+  /** Schedule reset: the stop to reset after; null means reset now. */
+  afterStopId?: string | null
+}
+
+export interface ActionOptions {
+  stopIds?: string[]
+  toId?: string
+  afterStopId?: string | null
 }
 
 interface ActionState {
   request: ActionRequest | null
-  open: (action: DialogAction, driverId: string, opts?: { stopIds?: string[] }) => void
+  open: (action: DialogAction, driverId: string, opts?: ActionOptions) => void
   close: () => void
 }
 
@@ -21,7 +31,7 @@ const Ctx = createContext<ActionState | null>(null)
 export function ActionProvider({ children }: { children: ReactNode }) {
   const [request, setRequest] = useState<ActionRequest | null>(null)
   const value = useMemo<ActionState>(
-    () => ({ request, open: (action, driverId, opts) => setRequest({ action, driverId, stopIds: opts?.stopIds }), close: () => setRequest(null) }),
+    () => ({ request, open: (action, driverId, opts) => setRequest({ action, driverId, stopIds: opts?.stopIds, toId: opts?.toId, afterStopId: opts?.afterStopId }), close: () => setRequest(null) }),
     [request],
   )
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>

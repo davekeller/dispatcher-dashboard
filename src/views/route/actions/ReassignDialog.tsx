@@ -41,7 +41,7 @@ function orderDetail(order: CandidateOrder, from: DriverView, c: Candidate): str
  *  and the preview shows the receiving driver's new figures, so a reassign never just moves
  *  the violation to someone else. The picker's order, filters, and search only re-sequence
  *  and narrow that capacity-safe set; nothing here adds anyone back. */
-export default function ReassignDialog({ driverId, initialStopIds, onClose }: { driverId: string; initialStopIds?: string[]; onClose: () => void }) {
+export default function ReassignDialog({ driverId, initialStopIds, initialToId, onClose }: { driverId: string; initialStopIds?: string[]; initialToId?: string; onClose: () => void }) {
   const d = useDerived()
   const { open } = useActions()
   const reassign = useStore((s) => s.reassignStops)
@@ -49,7 +49,7 @@ export default function ReassignDialog({ driverId, initialStopIds, onClose }: { 
   const from = d.byId.get(driverId)!
   const card = d.cardById.get(driverId)!
   const [stopIds, setStopIds] = useState<string[]>(() => (initialStopIds?.length ? initialStopIds : defaultSelection(from, card.alerts.some((a) => a.ruleId === 'wont_finish'))))
-  const [toId, setToId] = useState<string | null>(null)
+  const [toId, setToId] = useState<string | null>(initialToId ?? null) // a Lookout plan can pre-pick the candidate
   const [order, setOrder] = useState<CandidateOrder>('lookout')
   const [filters, setFilters] = useState<CandidateFilters>(EMPTY_CANDIDATE_FILTERS)
   const candidates = useMemo(() => reassignCandidates(d.views, from, stopIds), [d.views, from, stopIds])

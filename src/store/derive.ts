@@ -1,6 +1,6 @@
 import { evaluateRules, rankDrivers } from '../alerts/rank'
 import type { Alert, DriverCard } from '../alerts/types'
-import type { Fleet } from '../data/types'
+import type { Delivery, Fleet } from '../data/types'
 import { buildViews, type DriverView } from './view'
 
 export interface Metrics {
@@ -17,6 +17,7 @@ export interface Metrics {
 
 export interface Derived {
   now: number
+  deliveryById: Map<string, Delivery>
   views: DriverView[]
   byId: Map<string, DriverView>
   alerts: Alert[]
@@ -50,6 +51,7 @@ export function derive(fleet: Fleet, now: number, snoozes: Record<string, number
   const ranked = rankDrivers(views, alerts, snoozes, now)
   const result: Derived = {
     now,
+    deliveryById: new Map(fleet.deliveries.map((x) => [x.id, x])),
     views,
     byId: new Map(views.map((v) => [v.driver.id, v])),
     alerts,

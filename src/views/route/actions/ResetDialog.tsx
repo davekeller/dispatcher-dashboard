@@ -11,13 +11,13 @@ import { BAND_TONE } from '../../../ui/tones'
 
 /** Pick the stop after which the driver goes off duty for ten hours. Stops after that point
  *  need another driver; the dialog says so in numbers before anything commits. */
-export default function ResetDialog({ driverId, onClose }: { driverId: string; onClose: () => void }) {
+export default function ResetDialog({ driverId, initialAfterStopId, onClose }: { driverId: string; initialAfterStopId?: string | null; onClose: () => void }) {
   const d = useDerived()
   const scheduleReset = useStore((s) => s.scheduleReset)
   const deliveries = useStore((s) => s.fleet.deliveries)
   const view = d.byId.get(driverId)!
   const suggested = suggestResetStop(view)
-  const [afterId, setAfterId] = useState<string | null>(suggested)
+  const [afterId, setAfterId] = useState<string | null>(initialAfterStopId !== undefined ? initialAfterStopId : suggested)
   const idx = afterId === null ? -1 : view.remaining.findIndex((s) => s.id === afterId)
   const orphaned = view.remaining.slice(idx + 1).filter((s) => s.status === 'pending').length
   const resetAt = afterId === null ? view.now : projectedDepartureAt(view.route, afterId, view.now)

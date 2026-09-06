@@ -10,6 +10,8 @@ import Composer from './Composer'
 import { INTENTS, matchIntent } from './intents'
 import LookoutAvatar from './LookoutAvatar'
 import { useLookout } from './LookoutContext'
+import PlanCard from './PlanCard'
+import { routePlans } from './plans'
 import RecommendationCard from './RecommendationCard'
 import RecommendationsBar from './RecommendationsBar'
 import TimelinePanel from './TimelinePanel'
@@ -33,8 +35,11 @@ export default function LookoutSidebar() {
 
   const withAlerts = ranked.filter((c) => c.alerts.length > 0)
   const urgentCards = withAlerts.filter((c) => c.severity === 'critical' || c.severity === 'act_now')
-  const pinned = focusDriverId ? withAlerts.find((c) => c.driverId === focusDriverId) : undefined
-  const rest = pinned ? withAlerts.filter((c) => c.driverId !== pinned.driverId) : withAlerts
+  // A focused driver (a route file, a fleet-map pick) gets plans for that route instead of the generic card.
+  const focusView = focusDriverId ? byId.get(focusDriverId) : undefined
+  const focusCard = focusDriverId ? d.cardById.get(focusDriverId) : undefined
+  const plans = focusView && focusCard ? routePlans(focusView, focusCard, d) : []
+  const rest = focusDriverId ? withAlerts.filter((c) => c.driverId !== focusDriverId) : withAlerts
   const shown = showAll ? rest : rest.slice(0, TOP_N)
   const hidden = rest.length - shown.length
   const first = urgentCards[0] ? byId.get(urgentCards[0].driverId)?.driver.name : undefined
@@ -84,17 +89,17 @@ export default function LookoutSidebar() {
       {tab === 'chat' ? (
         <div className="min-h-0 flex-1 overflow-y-auto">
           <RecommendationsBar open={recOpen} onToggle={() => setRecOpen((o) => !o)} summary={summary}>
-            {pinned && (
+            {focusView && plans.length > 0 && (
               <>
-                <p className="font-lookout text-[11px] font-semibold uppercase tracking-wide text-label">{LOOKOUT.focusIntro(byId.get(pinned.driverId)!.driver.name)}</p>
-                <RecommendationCard view={byId.get(pinned.driverId)!} card={pinned} pinned compact />
+                <p className="font-lookout text-[11px] font-semibold uppercase tracking-wide text-label">{LOOKOUT.focusIntro(focusView.driver.name)}</p>
+                {plans.map((plan) => <PlanCard key={plan.id} plan={plan} view={focusView} />)}
                 {rest.length > 0 && <p className="mt-1 font-lookout text-[11px] font-semibold uppercase tracking-wide text-label">Everyone else</p>}
               </>
             )}
             {shown.map((c) => <RecommendationCard key={c.driverId} view={byId.get(c.driverId)!} card={c} compact />)}
             {hidden > 0 && <Button size="sm" variant="ghost" onClick={() => setShowAll(true)}>Show {hidden} more</Button>}
             {showAll && rest.length > TOP_N && <Button size="sm" variant="ghost" onClick={() => setShowAll(false)}>Show fewer</Button>}
-            {withAlerts.length === 0 && <p className="font-lookout text-[12px] text-muted">{LOOKOUT.allClear(d.metrics.onShift)}</p>}
+            {withAlerts.length === 0 && !focusView && <p className="font-lookout text-[12px] text-muted">{LOOKOUT.allClear(d.metrics.onShift)}</p>}
           </RecommendationsBar>
           <ChatThread messages={messages} d={d} onExample={send} />
         </div>
