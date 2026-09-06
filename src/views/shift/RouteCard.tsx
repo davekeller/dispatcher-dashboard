@@ -39,11 +39,11 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
   return (
     <Link to={`/routes/${view.driver.id}`} className={`group block shrink-0 overflow-hidden rounded-card border-[1.5px] transition hover:-translate-y-px hover:border-ink/25 hover:shadow-md ${surface} ${dim}`}>
       <RouteHeader view={view} card={card} showPingAge status={headerStatus} />
-      <div className="flex min-h-[6.75rem]">
+      <div className="flex min-h-[6.25rem]">
         <RouteTimelineMini view={view} />
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className="grid min-h-16 min-w-0 grid-cols-4">
-            <div className="col-span-2 flex min-w-0 items-center gap-1.5 border-r border-line/80 px-2 py-2">
+          <div className="grid min-h-14 min-w-0 grid-cols-4">
+            <div className="col-span-2 flex min-w-0 items-center gap-1.5 border-r border-line/80 px-2 py-1.5">
               <DriverAvatar driver={view.driver} size={20} className={quiet ? 'opacity-80' : ''} />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[12px] font-semibold leading-4 text-ink" title={view.driver.name}>{view.driver.name}</p>
@@ -51,13 +51,13 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
               </div>
             </div>
             <dl className="contents">
-              <div className="flex min-w-0 flex-col items-end justify-center border-r border-line/80 px-1.5 text-right">
-                <dd className="tnum whitespace-nowrap text-[11px] font-semibold leading-none text-ink">{view.done} / {view.total}</dd>
-                <dt className="mt-1 text-[7px] font-semibold uppercase tracking-[0.03em] text-label">Stops</dt>
+              <div className="flex min-w-0 flex-col items-start justify-center border-r border-line/80 px-1 text-left">
+                <dd className="tnum whitespace-nowrap text-[13px] font-semibold leading-none tracking-[-0.02em] text-ink">{view.done}/{view.total}</dd>
+                <dt className="mt-0.5 text-[7px] font-semibold uppercase tracking-[0.03em] text-label">Stops</dt>
               </div>
-              <div className="flex min-w-0 flex-col items-end justify-center px-1.5 text-right">
-                <dd className="tnum whitespace-nowrap text-[11px] font-semibold leading-none text-ink">{nextValue}</dd>
-                <dt className="mt-1 max-w-full truncate whitespace-nowrap text-[7px] font-semibold uppercase tracking-[0.03em] text-label" title={nextLabel}>{nextLabel}</dt>
+              <div className="flex min-w-0 flex-col items-start justify-center px-1 text-left">
+                <dd className="tnum whitespace-nowrap text-[13px] font-semibold leading-none tracking-[-0.02em] text-ink">{nextValue}</dd>
+                <dt className="mt-0.5 max-w-full truncate whitespace-nowrap text-[7px] font-semibold uppercase tracking-[0.03em] text-label" title={nextLabel}>{nextLabel}</dt>
               </div>
             </dl>
           </div>
