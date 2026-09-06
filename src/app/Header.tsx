@@ -1,6 +1,7 @@
 import { CaretRight, MapTrifold, SquaresFour, TruckTrailer } from '@phosphor-icons/react'
 import { Link, useLocation } from 'react-router'
 import { useDerived } from '../store/hooks'
+import { NAV_ITEM_BASE, navigationItemState } from '../ui/navigation'
 import SimulatedShift from './SimulatedShift'
 
 /** The product bar. Dispatch is the product; the board is its home; a route file is one level in. */
@@ -11,7 +12,7 @@ export default function Header() {
   const focused = routeMatch ? byId.get(routeMatch[1]) : undefined
   const onMap = pathname === '/map'
   const onBoard = !onMap && !routeMatch
-  const tab = (on: boolean) => `flex h-8 items-center gap-1.5 rounded-control px-3 text-[13px] font-semibold transition hover:bg-well ${on ? 'text-ink' : 'text-muted hover:text-ink'}`
+  const tab = (on: boolean) => `${NAV_ITEM_BASE} text-[13px] ${navigationItemState(on)}`
 
   return (
     <header className="flex h-14 shrink-0 items-center gap-0.5 border-b border-line bg-panel px-5">
