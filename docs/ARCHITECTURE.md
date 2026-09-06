@@ -421,7 +421,7 @@ Warm, dense, calm, and direct. This is operations software used mid-shift, expre
 | `--color-*-board` | `#f8d6df` / `#f5dfa7` / `#dce3ed` / `#d8e5fb` / `#d3eedf` | Vivid Act now → Clear lane washes, in board order |
 | `--color-on-accent` | `#ffffff` | Text on saturated grounds |
 
-Over the limit is the one state that must never be missed: its chip is solid dark red with white text everywhere it appears. Text variants must pass AA on panel; fills are for bars and markers. The AI spectrum is decorative and never carries meaning or body copy. Validate the semantic pairs whenever tokens move. Watch's text color is deliberately darker than its fill so it clears AA while staying distinct from Lookout's orange.
+Over the limit is the one state that must never be missed: its chip is dark red with white text and a slight vertical stripe texture everywhere it appears. The texture belongs to the critical chip token rather than any individual surface, and does not extend to markers or red alert text. Text variants must pass AA on panel; fills are for bars and markers. The AI spectrum is decorative and never carries meaning or body copy. Validate the semantic pairs whenever tokens move. Watch's text color is deliberately darker than its fill so it clears AA while staying distinct from Lookout's orange.
 
 **Type.** Bricolage Grotesque Variable for display: page titles, the large countdown, metric numbers. Inter Variable for everything else, `font-variant-numeric: tabular-nums` on every countdown and duration so rows never jitter. Two faces, no serif.
 

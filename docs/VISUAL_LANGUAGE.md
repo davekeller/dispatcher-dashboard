@@ -224,7 +224,7 @@ Disabled controls keep their label visible and use reduced opacity. Every positi
 
 ### Chips
 
-Chips label state; they do not behave like buttons unless explicitly wired as filters. Critical Over limit chips use dark red with white text. Other status chips use strong text on their matching soft ground.
+Chips label state; they do not behave like buttons unless explicitly wired as filters. Critical Over limit chips use dark red with white text and a subtle 1px vertical stripe pattern to separate the hard limit from other red statuses. Other status chips use strong text on their matching soft ground.
 
 ### Inputs and focus
 
