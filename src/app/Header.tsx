@@ -11,7 +11,7 @@ export default function Header() {
   const routeMatch = pathname.match(/^\/routes\/(drv-\d+)$/)
   const focused = routeMatch ? byId.get(routeMatch[1]) : undefined
   const onMap = pathname === '/map'
-  const onBoard = !onMap && !routeMatch
+  const onBoard = pathname === '/' || routeMatch !== null
   const tab = (on: boolean) => `${NAV_ITEM_BASE} text-[13px] ${navigationItemState(on)}`
 
   return (

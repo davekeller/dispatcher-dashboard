@@ -16,7 +16,7 @@ Dispatch combines three layers:
 2. **Strict operational color.** Red, amber, green, slate, and blue describe route state. These colors carry meaning and never become decoration.
 3. **A distinct AI signature.** Lookout owns accessible orange plus a restrained ember → gold → rose → violet → blue spectrum. The spectrum identifies AI entry points and focus, never risk.
 
-The product bar adds one industrial counterweight to those lighter surfaces: the truck logo is an icon-only warm near-black `ink` tile, followed by the Dispatch wordmark as dark text on the white bar. Board and Map use a quiet warm-neutral fill, inset keyline, and stronger text/icon weight for the selected item. Lookout's Chat and Timeline tabs use this exact same selected-state pattern instead of a separate underline language.
+The product bar adds one industrial counterweight to those lighter surfaces: the truck logo is an icon-only warm near-black `ink` tile, followed by the Dispatch wordmark as dark text on the white bar. Board and Map use a quiet warm-neutral fill, inset keyline, and stronger text/icon weight for the selected item. A driver/route detail is a child of Board, so Board remains selected while its route breadcrumb is visible. Lookout's Chat and Timeline tabs use this exact same selected-state pattern instead of a separate underline language.
 
 The result should read as product software, not a marketing page placed around a dashboard.
 
