@@ -18,6 +18,7 @@ interface StopFact {
   label: string
   value: string
   tone?: string
+  badge?: boolean
 }
 
 function eventDot(tone: StopEvent['tone']): string {
@@ -68,21 +69,22 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
     ...(delivery ? [{ label: 'Window', value: `until ${fmtClock(delivery.window.end)}`, tone: pastWindow ? 'critical' as const : 'muted' as const }] : []),
   ]
 
+  const priorityFact: StopFact = { label: 'Priority', value: delivery?.priority === 'priority' ? 'Priority' : 'Standard', badge: delivery?.priority === 'priority' }
   const facts: StopFact[] = complete ? [
     { label: 'On-site', value: dwell },
     { label: 'Outcome', value: outcome, tone: stop.status === 'failed' ? 'text-act-now' : stop.outcome === 'partial' ? 'text-watch' : 'text-clear' },
     { label: 'Load', value: delivery?.items.join(', ') ?? '—' },
-    { label: 'Priority', value: delivery?.priority === 'priority' ? 'Priority' : 'Standard' },
+    priorityFact,
   ] : stop.status === 'in_progress' ? [
     { label: 'On-site', value: liveDwell },
-    { label: 'Status', value: 'At the dock' },
     { label: 'Window', value: delivery ? fmtClock(delivery.window.end) : '—', tone: pastWindow ? 'text-act-now' : undefined },
     { label: 'Load', value: delivery?.items.join(', ') ?? '—' },
+    priorityFact,
   ] : [
     { label: eta !== undefined && eta !== stop.plannedEta ? 'Projected' : 'ETA', value: fmtClock(eta ?? stop.plannedEta), tone: pastWindow ? 'text-act-now' : undefined },
     { label: 'Window', value: delivery ? fmtClock(delivery.window.end) : '—', tone: pastWindow ? 'text-act-now' : undefined },
-    { label: 'Drive in', value: `${stop.driveMinutesFromPrev} min` },
-    { label: stop.status === 'unassigned' ? 'Assignment' : 'Load', value: stop.status === 'unassigned' ? 'Needs driver' : delivery?.items.join(', ') ?? '—', tone: stop.status === 'unassigned' ? 'text-offline' : undefined },
+    { label: 'Load', value: delivery?.items.join(', ') ?? '—' },
+    priorityFact,
   ]
 
   return (
@@ -100,12 +102,11 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
           {selectable && <input type="checkbox" checked={selected} onChange={onToggle} aria-label={`Select stop ${stop.seq} to reassign`} className="absolute right-2 top-2 shrink-0 accent-ink" />}
           <h3 className={`truncate text-[12px] font-semibold text-ink ${selectable ? 'pr-5' : ''}`} title={delivery?.customer ?? stop.deliveryId}>{delivery?.customer ?? stop.deliveryId}</h3>
           <p className="mt-0.5 truncate text-[10px] text-muted" title={delivery?.address}>{delivery?.address ?? 'Address unavailable'}</p>
-          <div className="mt-1 flex min-w-0 flex-wrap items-center gap-1">
-            {delivery?.priority === 'priority' && <Chip tone={BAND_TONE.watch} className="px-1.5 py-0 text-[9px]">priority</Chip>}
+          {(statusLabel || pastLimit || pastWindow) && <div className="mt-1 flex min-w-0 flex-wrap items-center gap-1">
             {statusTone && statusLabel && <Chip tone={statusTone} dashed={stop.status === 'unassigned'} className="px-1.5 py-0 text-[9px]">{statusLabel}</Chip>}
             {pastLimit && stop.status !== 'unassigned' && <Chip tone={BAND_TONE.act_now} className="px-1.5 py-0 text-[9px]">past the limit</Chip>}
             {pastWindow && <Chip tone={BAND_TONE.act_now} className="px-1.5 py-0 text-[9px]">past window</Chip>}
-          </div>
+          </div>}
           {delivery?.instructions && <p className="mt-1 line-clamp-2 text-[9px] leading-3.5 text-muted">{delivery.instructions}</p>}
           {stop.note && <p className="mt-1 line-clamp-2 text-[9px] font-medium leading-3.5 text-ink/75"><span className="font-semibold uppercase tracking-[0.04em] text-label">Note · </span>{stop.note}</p>}
           {stop.notifiedAt !== undefined && <p className="mt-1 text-[9px] font-semibold text-muted">Customer notified {fmtClock(stop.notifiedAt)}</p>}
@@ -128,7 +129,11 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
           {facts.map((fact, index) => (
             <div key={fact.label} className={`flex min-w-0 flex-col justify-center px-2 py-3 ${index < facts.length - 1 ? 'border-r border-line' : ''}`}>
               <dt className="truncate text-[7px] font-semibold uppercase tracking-[0.04em] text-label" title={fact.label}>{fact.label}</dt>
-              <dd className={`tnum mt-0.5 truncate text-[11px] font-semibold leading-tight ${fact.tone ?? 'text-ink'}`} title={fact.value}>{fact.value}</dd>
+              {fact.badge ? (
+                <dd className="mt-1 min-w-0" title={fact.value}><Chip tone={BAND_TONE.watch} className="max-w-full px-1.5 py-0 text-[9px]">priority</Chip></dd>
+              ) : (
+                <dd className={`tnum mt-0.5 truncate text-[11px] font-semibold leading-tight ${fact.tone ?? 'text-ink'}`} title={fact.value}>{fact.value}</dd>
+              )}
             </div>
           ))}
         </dl>

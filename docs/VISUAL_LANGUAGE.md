@@ -193,7 +193,7 @@ Each stop receipt applies the same case-file grammar as four clear columns:
 - pending event spines read Planned → Projected → Window;
 - the remaining right side is a compact, single-row grid of four scan metrics rather than a sentence of metadata;
 - a vertical ellipsis floats at the far right without a cell or divider and opens stop-level Reassign, Add/edit note, and Cancel actions;
-- status chips remain beside identity, not inside the metric cells.
+- operational status chips remain beside identity; the delivery-priority badge appears only in the dedicated Priority metric cell.
 
 All receipt sections center vertically across the row. Dispatcher notes are neutral supporting text, not alert red. This keeps identity easy to read, chronology left-to-right, and measurements comparable in one scan.
 
