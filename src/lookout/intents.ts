@@ -1,4 +1,5 @@
 import type { Derived } from '../store/derive'
+import { routePlans } from './plans'
 import { LOOKOUT } from './voice'
 
 // Intent matching is a lookup, not a model. It exists to show the pattern: a small array of
@@ -37,6 +38,19 @@ export const INTENTS: Intent[] = [
     reply: (_input, d) => {
       const ids = d.ranked.filter((c) => d.byId.get(c.driverId)!.staleness !== 'fresh').map((c) => c.driverId)
       return { text: ids.length > 0 ? `${ids.length} not reporting fresh data.` : 'Every truck has pinged in the last three minutes.', driverIds: ids }
+    },
+  },
+  {
+    id: 'plan',
+    example: 'What should I do about Marcus?',
+    patterns: [/what should i do/i, /what do i do/i, /plan for/i, /how do i handle/i, /what about/i, /help with/i],
+    reply: (input, d) => {
+      const words = input.toLowerCase()
+      const hit = d.views.find((v) => words.includes(v.driver.name.split(' ')[0].toLowerCase()))
+      if (!hit) return { text: "About whom? Give me a driver's first name.", examples: ['What should I do about Marcus?'] }
+      const card = d.cardById.get(hit.driver.id)
+      const plans = card ? routePlans(hit, card, d) : []
+      return { text: `For ${hit.driver.name}: ${plans.map((p) => p.title).join(' · ')}.`, driverIds: [hit.driver.id] }
     },
   },
   {
