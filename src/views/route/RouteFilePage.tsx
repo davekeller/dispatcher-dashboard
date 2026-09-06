@@ -107,7 +107,7 @@ export default function RouteFilePage() {
             </Suspense>
           ) : (
             <ol className="flex flex-col gap-2">
-              {view.route.stops.map((s) => (
+              {[...view.route.stops].reverse().map((s) => (
                 <li key={s.id} id={`stop-${s.id}`} className="scroll-mt-16">
                   <StopReceipt stop={s} delivery={deliveryById.get(s.deliveryId)} view={view} selected={selected.includes(s.id)} onToggle={() => toggle(s.id)} pastLimit={pastLimitIds.has(s.id)} />
                 </li>

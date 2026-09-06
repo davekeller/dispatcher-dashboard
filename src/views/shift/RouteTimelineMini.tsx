@@ -16,8 +16,8 @@ function nodeSize(status: string): string {
 }
 
 /** The route-detail stop spine reduced to its visual essentials. It occupies the full
- * left edge of a board card. Stops keep one uniform route scale; completed deliveries
- * recede into smaller connective nodes while unresolved and exceptional stops stay larger. */
+ * left edge of a board card. Stops keep one uniform reverse-route scale so the work left
+ * is at the top; completed deliveries recede into smaller connective nodes below it. */
 export default function RouteTimelineMini({ view }: { view: DriverView }) {
   const stops = view.route.stops
   const layout = miniTimelineLayout(stops.map((stop) => stop.status))
@@ -26,15 +26,15 @@ export default function RouteTimelineMini({ view }: { view: DriverView }) {
   const firstPastIndex = stops.findIndex((stop) => pastLimitIds.has(stop.id))
   const lastCompleteIndex = stops.reduce((last, stop, index) => stop.status === 'done' || stop.status === 'failed' ? index : last, -1)
   const position = (index: number) => layout.positions[index] ?? 50
-  const completeThrough = lastCompleteIndex < 0 ? 5 : position(lastCompleteIndex)
-  const pastLimitFrom = firstPastIndex < 0 ? 100 : position(firstPastIndex)
+  const completeFrom = lastCompleteIndex < 0 ? 95 : position(lastCompleteIndex)
+  const pastLimitThrough = firstPastIndex < 0 ? 5 : position(firstPastIndex)
 
   return (
     <div className="relative isolate w-6 shrink-0 self-stretch border-r border-line/70 bg-canvas/50" aria-label={`Route timeline: ${view.done} of ${view.total} stops complete${pastLimitIds.size > 0 ? `, ${pastLimitIds.size} stops past HOS` : ''}.`}>
       <span className="absolute bottom-[5%] left-1/2 top-[5%] w-px -translate-x-1/2 bg-line" aria-hidden="true" />
-      {lastCompleteIndex >= 0 && <span className="route-history-progress absolute left-1/2 top-[5%] w-px -translate-x-1/2" style={{ height: `${Math.max(0, completeThrough - 5)}%` }} aria-hidden="true" />}
-      {firstPastIndex >= 0 && <span className="absolute bottom-[5%] left-1/2 w-px -translate-x-1/2 bg-act-now-fill/70" style={{ top: `${pastLimitFrom}%` }} aria-hidden="true" />}
-      {firstPastIndex >= 0 && <span className="absolute left-1/2 z-10 h-px w-4 -translate-x-1/2 bg-act-now-fill" style={{ top: `${pastLimitFrom}%` }} aria-hidden="true" />}
+      {lastCompleteIndex >= 0 && <span className="route-history-progress absolute bottom-[5%] left-1/2 w-px -translate-x-1/2" style={{ top: `${completeFrom}%` }} aria-hidden="true" />}
+      {firstPastIndex >= 0 && <span className="absolute left-1/2 top-[5%] w-px -translate-x-1/2 bg-act-now-fill/70" style={{ bottom: `${100 - pastLimitThrough}%` }} aria-hidden="true" />}
+      {firstPastIndex >= 0 && <span className="absolute left-1/2 z-10 h-px w-4 -translate-x-1/2 bg-act-now-fill" style={{ top: `${pastLimitThrough}%` }} aria-hidden="true" />}
       {stops.map((stop, index) => (
         <span
           key={stop.id}

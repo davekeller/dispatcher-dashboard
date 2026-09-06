@@ -10,6 +10,7 @@ import StopStatusMarker, { stopHistoryStyle } from './StopStatusMarker'
 
 interface Node {
   stop: Stop
+  routeIndex: number
   t: number
   customer: string
   late: boolean
@@ -55,15 +56,15 @@ function stopState(node: Node, nextId: string | undefined, pastLimitIds: Set<str
 }
 
 /** A route-first progress rail. The summary answers "where are we?" and "does it fit?"
- * before the stop sequence supplies detail. Stop spacing follows route order rather than
- * elapsed time so completed, current, upcoming, and post-limit work remain scannable. */
+ * before the stop sequence supplies detail. Stops render in reverse route order so the
+ * remaining and newly reassigned work leads, while the source route order stays intact. */
 export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed, onCollapsedChange, activeStopId, onSelectStop }: { view: DriverView; deliveryById: Map<string, Delivery>; pastLimitIds: Set<string>; activeStopId?: string | null; onSelectStop?: (id: string) => void; collapsed: boolean; onCollapsedChange: (c: boolean) => void }) {
   const { route, now } = view
   const schedule = routeScheduleSignal(view)
   const hos = routeHosSignal(view)
   const nextId = view.next?.id
   const progress = view.total === 0 ? 1 : view.done / view.total
-  const [active, setActive] = useState<string | null>(route.stops[0]?.id ?? null)
+  const [active, setActive] = useState<string | null>(nextId ?? route.stops.at(-1)?.id ?? null)
   // In map mode the page owns the selection; in list mode the receipt being read does.
   const shownActive = activeStopId !== undefined ? activeStopId : active
   const [summaryOpen, setSummaryOpen] = useState(true)
@@ -71,7 +72,7 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
   const timelineRef = useRef<HTMLDivElement>(null)
   const nodeRefs = useRef(new Map<string, HTMLButtonElement>())
 
-  const nodes = useMemo<Node[]>(() => route.stops.map((stop) => {
+  const nodes = useMemo<Node[]>(() => route.stops.map((stop, routeIndex) => {
     const t = stop.status === 'done' || stop.status === 'failed'
       ? (stop.departedAt ?? stop.plannedEta)
       : stop.status === 'in_progress'
@@ -80,19 +81,21 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
     const windowEnd = deliveryById.get(stop.deliveryId)?.window.end
     return {
       stop,
+      routeIndex,
       t,
       customer: deliveryById.get(stop.deliveryId)?.customer ?? stop.deliveryId,
       late: stop.status === 'pending' && windowEnd !== undefined && t > windowEnd,
     }
   }), [deliveryById, now, route.stops, view.driftMin])
+  const displayedNodes = useMemo(() => [...nodes].reverse(), [nodes])
 
   const firstPastLimitId = nodes.find((node) => pastLimitIds.has(node.stop.id))?.stop.id
   const firstRemainingIndex = nodes.findIndex((node) => node.stop.status !== 'done' && node.stop.status !== 'failed')
   const lastCompleteIndex = nodes.reduce((last, node, index) => node.stop.status === 'done' || node.stop.status === 'failed' ? index : last, -1)
 
   useEffect(() => {
-    setActive(route.stops[0]?.id ?? null)
-  }, [route.id, route.stops])
+    setActive(nextId ?? route.stops.at(-1)?.id ?? null)
+  }, [nextId, route.id, route.stops])
 
   useEffect(() => {
     setSummaryOpen(true)
@@ -208,8 +211,9 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
 
       {(collapsed || timelineOpen) && <div ref={timelineRef} data-collapsed={collapsed} className={`route-timeline-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain ${collapsed ? 'px-1 py-2' : 'px-2 pb-2'}`}>
         <ol>
-          {nodes.map((node, index) => {
+          {displayedNodes.map((node) => {
             const { stop } = node
+            const index = node.routeIndex
             const isActive = shownActive === stop.id
             const isFirstPast = stop.id === firstPastLimitId
             const state = stopState(node, nextId, pastLimitIds)
@@ -220,18 +224,6 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
             const rowSize = collapsed ? completed ? 'h-5' : 'h-7' : completed ? 'min-h-8' : 'min-h-10'
             return (
               <li key={stop.id}>
-                {isFirstPast && (
-                  <div style={collapsed ? undefined : TIMELINE_COLUMNS} className={`${collapsed ? 'my-1 flex justify-center' : 'grid h-6 items-center'}`} title="The remaining route crosses the driver's 11-hour HOS limit here">
-                    {collapsed ? (
-                      <span className="h-px w-7 bg-act-now-fill" />
-                    ) : (
-                      <>
-                        <span className="relative flex h-6 items-center justify-center"><span className="absolute inset-y-0 w-px bg-act-now-fill" /><span className="relative h-px w-4 bg-act-now-fill" /></span>
-                        <span className="pl-2 text-[8px] font-semibold uppercase tracking-[0.05em] text-act-now">HOS limit</span>
-                      </>
-                    )}
-                  </div>
-                )}
                 <button
                   ref={(element) => {
                     if (element) nodeRefs.current.set(stop.id, element)
@@ -260,6 +252,18 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
                     </span>
                   )}
                 </button>
+                {isFirstPast && (
+                  <div style={collapsed ? undefined : TIMELINE_COLUMNS} className={`${collapsed ? 'my-1 flex justify-center' : 'grid h-6 items-center'}`} title="The remaining route crosses the driver's 11-hour HOS limit here">
+                    {collapsed ? (
+                      <span className="h-px w-7 bg-act-now-fill" />
+                    ) : (
+                      <>
+                        <span className="relative flex h-6 items-center justify-center"><span className="absolute inset-y-0 w-px bg-act-now-fill" /><span className="relative h-px w-4 bg-act-now-fill" /></span>
+                        <span className="pl-2 text-[8px] font-semibold uppercase tracking-[0.05em] text-act-now">HOS limit</span>
+                      </>
+                    )}
+                  </div>
+                )}
               </li>
             )
           })}
