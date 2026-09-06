@@ -9,7 +9,7 @@ const DOT: Record<ShiftEvent['kind'], string> = { action: 'bg-ink', snooze: 'bg-
 export default function TimelinePanel({ events }: { events: ShiftEvent[] }) {
   const rows = [...events].reverse()
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3">
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3 font-lookout">
       {rows.length <= 1 && <EmptyState title="Nothing has happened yet this session." body="Actions, snoozes, and reconnects land here as they happen." />}
       <ol className="flex flex-col">
         {rows.map((e, i) => (

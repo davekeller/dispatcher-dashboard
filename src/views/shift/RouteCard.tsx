@@ -73,7 +73,7 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
           </dl>
           {(footerAlerts.length > 0 || pick || hasCorrection) && (
             <div className="flex flex-wrap gap-1 border-t border-line/80 px-2.5 py-1.5">
-              {pick && <Chip tone={LOOKOUT_TONE} title="Lookout's top pick across the fleet">✦ Lookout's pick</Chip>}
+              {pick && <Chip tone={LOOKOUT_TONE} title="Lookout's top pick across the fleet" className="font-lookout">✦ Lookout's pick</Chip>}
               <CorrectionChip driverId={view.driver.id} />
               {footerAlerts.map((a) => (
                 <span key={a.id} className={`text-[9px] font-semibold leading-4 ${severityTone(a.severity).text}`} title={a.title}>{a.label}</span>

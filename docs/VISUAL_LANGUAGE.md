@@ -118,6 +118,8 @@ Do not use it for status, charts, full card fills, body text, or routine control
 - route-detail metric values;
 - compact product identity.
 
+**IBM Plex Mono** is Lookout's agent voice. Use it for Lookout-authored recommendations and chat replies, the agent header and tabs, timeline entries, composer text, and branded entry points such as Lookout ordering and pick labels. Shared route cards, evidence values, and action buttons remain in Inter/Bricolage so the underlying operations layer stays consistent.
+
 Rules:
 
 - Every duration and operational count uses tabular numerals (`.tnum`).

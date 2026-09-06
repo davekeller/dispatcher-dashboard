@@ -52,7 +52,7 @@ export default function OrderDropdown<T extends string>({ value, onChange, optio
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={`${label}: ${selected.label}`}
-        className={`inline-flex h-9 min-w-52 items-center gap-2 rounded-control border px-3 text-[12px] font-semibold shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-lookout/30 ${lookout ? 'lookout-input-ring border-transparent text-lookout-strong hover:text-lookout' : 'border-line bg-panel text-ink hover:border-ink/25'}`}
+        className={`inline-flex h-9 min-w-52 items-center gap-2 rounded-control border px-3 text-[12px] font-semibold shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-lookout/30 ${lookout ? 'lookout-input-ring border-transparent font-lookout text-lookout-strong hover:text-lookout' : 'border-line bg-panel text-ink hover:border-ink/25'}`}
       >
         {lookout ? <LookoutAvatar size={17} className="shrink-0" /> : <SelectedGlyph size={16} weight="regular" className="shrink-0" />}
         <span className="min-w-0 flex-1 truncate text-left">{selected.label}</span>
@@ -78,7 +78,7 @@ export default function OrderDropdown<T extends string>({ value, onChange, optio
                 <span className={`flex h-8 w-8 items-center justify-center rounded-control ${isLookout(option.id) ? 'bg-lookout-soft text-lookout-strong' : 'bg-well text-ink'}`}>
                   {isLookout(option.id) ? <LookoutAvatar size={20} /> : <Glyph size={16} weight={isSelected ? 'fill' : 'regular'} />}
                 </span>
-                <span className="min-w-0">
+                <span className={`min-w-0 ${isLookout(option.id) ? 'font-lookout' : ''}`}>
                   <span className="block text-[12px] font-semibold text-ink">{option.label}</span>
                   <span className="mt-0.5 block text-[11px] leading-4 text-muted">{option.description}</span>
                 </span>

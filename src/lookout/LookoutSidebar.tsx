@@ -66,14 +66,14 @@ export default function LookoutSidebar() {
       <header className="flex h-14 shrink-0 items-center gap-2 border-b border-line bg-panel/90 pl-2 pr-1.5 backdrop-blur">
         <div className="flex items-center gap-0.5" role="tablist" aria-label={`${LOOKOUT.name} views`}>
           {(['chat', 'timeline'] as const).map((t) => (
-            <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`${NAV_ITEM_BASE} text-[12px] capitalize ${navigationItemState(tab === t)}`}>
+            <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`${NAV_ITEM_BASE} font-lookout text-[12px] capitalize ${navigationItemState(tab === t)}`}>
               {t}
               {t === 'chat' && urgentCards.length > 0 && <span className="tnum rounded-full bg-act-now px-1.5 text-[10px] font-semibold leading-4 text-on-accent" title={`${urgentCards.length} need action now`}>{urgentCards.length}</span>}
             </button>
           ))}
         </div>
-        <div className="ml-auto min-w-0 text-right">
-          <p className="font-display text-[14px] font-semibold leading-tight text-lookout-strong">{LOOKOUT.name}</p>
+        <div className="ml-auto min-w-0 text-right font-lookout">
+          <p className="text-[14px] font-semibold leading-tight text-lookout-strong">{LOOKOUT.name}</p>
           <p className="text-[10px] leading-tight text-muted">{LOOKOUT.role}</p>
         </div>
         <LookoutAvatar size={30} className="shrink-0" />
@@ -86,15 +86,15 @@ export default function LookoutSidebar() {
           <RecommendationsBar open={recOpen} onToggle={() => setRecOpen((o) => !o)} summary={summary}>
             {pinned && (
               <>
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-label">{LOOKOUT.focusIntro(byId.get(pinned.driverId)!.driver.name)}</p>
+                <p className="font-lookout text-[11px] font-semibold uppercase tracking-wide text-label">{LOOKOUT.focusIntro(byId.get(pinned.driverId)!.driver.name)}</p>
                 <RecommendationCard view={byId.get(pinned.driverId)!} card={pinned} pinned compact />
-                {rest.length > 0 && <p className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-label">Everyone else</p>}
+                {rest.length > 0 && <p className="mt-1 font-lookout text-[11px] font-semibold uppercase tracking-wide text-label">Everyone else</p>}
               </>
             )}
             {shown.map((c) => <RecommendationCard key={c.driverId} view={byId.get(c.driverId)!} card={c} compact />)}
             {hidden > 0 && <Button size="sm" variant="ghost" onClick={() => setShowAll(true)}>Show {hidden} more</Button>}
             {showAll && rest.length > TOP_N && <Button size="sm" variant="ghost" onClick={() => setShowAll(false)}>Show fewer</Button>}
-            {withAlerts.length === 0 && <p className="text-[12px] text-muted">{LOOKOUT.allClear(d.metrics.onShift)}</p>}
+            {withAlerts.length === 0 && <p className="font-lookout text-[12px] text-muted">{LOOKOUT.allClear(d.metrics.onShift)}</p>}
           </RecommendationsBar>
           <ChatThread messages={messages} d={d} onExample={send} />
         </div>

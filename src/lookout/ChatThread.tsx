@@ -21,11 +21,11 @@ export default function ChatThread({ messages, d, onExample }: { messages: Messa
           <div key={i} className="flex gap-2">
             <LookoutAvatar size={22} className="mt-0.5 shrink-0" />
             <div className="min-w-0 flex-1">
-              {m.text && <p className="text-[12px] leading-snug text-ink">{m.text}</p>}
+              {m.text && <p className="font-lookout text-[12px] leading-snug text-ink">{m.text}</p>}
               {m.reply?.examples && (
                 <div className="mt-1.5 flex flex-wrap gap-1">
                   {m.reply.examples.map((e) => (
-                    <button key={e} type="button" onClick={() => onExample(e)} className="rounded-full border border-line bg-panel px-2 py-0.5 text-[11px] text-ink hover:border-lookout hover:text-lookout-strong">{e}</button>
+                    <button key={e} type="button" onClick={() => onExample(e)} className="rounded-full border border-line bg-panel px-2 py-0.5 font-lookout text-[11px] text-ink hover:border-lookout hover:text-lookout-strong">{e}</button>
                   ))}
                 </div>
               )}
@@ -36,7 +36,7 @@ export default function ChatThread({ messages, d, onExample }: { messages: Messa
                     const card = d.cardById.get(id)
                     return view && card ? <RecommendationCard key={id} view={view} card={card} /> : null
                   })}
-                  {m.reply.driverIds.length > 3 && <p className="text-[11px] text-muted">and {m.reply.driverIds.length - 3} more on the board.</p>}
+                  {m.reply.driverIds.length > 3 && <p className="font-lookout text-[11px] text-muted">and {m.reply.driverIds.length - 3} more on the board.</p>}
                 </div>
               )}
             </div>

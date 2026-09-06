@@ -28,7 +28,7 @@ Vite · React 19 · TypeScript · Tailwind v4 (via `@tailwindcss/vite`). Light t
 | `react-router` | Four real routes (board, route file, map, not found), the phone view still Phase 2; drivers get URLs worth sharing |
 | `zustand` | One small store with actions and one-level undo; less ceremony than context + reducer |
 | `@phosphor-icons/react` | Interface icons in the duotone weight |
-| `@fontsource-variable/bricolage-grotesque`, `@fontsource-variable/inter` | Display and body faces, bundled, no CDN |
+| `@fontsource-variable/bricolage-grotesque`, `@fontsource-variable/inter`, `@fontsource/ibm-plex-mono` | Display, body, and Lookout agent faces, bundled, no CDN |
 | `leaflet`, `react-leaflet` | The route file's map, behind the Map toggle as a lazy chunk; the board never loads them. OpenStreetMap tiles, muted to gray by a CSS filter, are the app's one network dependency, and the legs and markers draw without them |
 
 Dev: `vite`, `typescript`, `vitest`, `oxlint`, `@vitejs/plugin-react`, `@types/*`.
@@ -425,7 +425,7 @@ Warm, dense, calm, and direct. This is operations software used mid-shift, expre
 
 Over the limit is the one state that must never be missed: its chip is dark red with white text and a slight vertical stripe texture everywhere it appears. The texture belongs to the critical chip token rather than any individual surface, and does not extend to markers or red alert text. Text variants must pass AA on panel; fills are for bars and markers. The AI spectrum is decorative and never carries meaning or body copy. Validate the semantic pairs whenever tokens move. Watch's text color is deliberately darker than its fill so it clears AA while staying distinct from Lookout's orange.
 
-**Type.** Bricolage Grotesque Variable for display: page titles, the large countdown, metric numbers. Inter Variable for everything else, `font-variant-numeric: tabular-nums` on every countdown and duration so rows never jitter. Two faces, no serif.
+**Type.** Bricolage Grotesque Variable for display: page titles, the large countdown, metric numbers. Inter Variable for the operational interface, `font-variant-numeric: tabular-nums` on every countdown and duration so rows never jitter. IBM Plex Mono distinguishes Lookout-authored language and agent chrome, while shared evidence cards and actions stay in the operational faces. Three faces, no serif.
 
 **Shape and rhythm.** 10px radius on cards, 8px on controls, pill chips. Rows ~40px, cards compact, whitespace spent on grouping. Quiet keylines, one diffused shadow level. Phosphor duotone icons. Motion: countdown ticks and a subtle band-change transition only. Light only.
 
