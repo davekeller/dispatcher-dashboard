@@ -191,7 +191,7 @@ The left rail and the receipt list are literal counterparts: one timeline node p
 Each stop receipt applies the same case-file grammar as four clear columns:
 
 - a dedicated 16px gutter outside the cards carries the shared semantic markers and a continuous one-pixel spine across card gaps, grading completed history green before continuing gray or red with the same semantics as the route rail;
-- the card itself begins with a compact bare-number column, using a restrained sans-serif number with the rail sequence's semibold weight;
+- the card itself begins with a compact bare-number column, using a 20px sans-serif number with the rail sequence's semibold weight;
 - the second column stacks the stop name, address, status, and instructions;
 - the third column is a compact horizontal event track with equal lanes for each label and time or result;
 - completed event spines read Arrived → Left → Signed;

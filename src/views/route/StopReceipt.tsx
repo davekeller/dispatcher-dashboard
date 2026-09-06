@@ -95,7 +95,7 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
       </div>
       <article className={`relative grid overflow-hidden rounded-card border bg-panel shadow-card lg:grid-cols-[2.5rem_minmax(8.75rem,0.72fr)_minmax(9.75rem,0.95fr)_minmax(16rem,1.55fr)] ${isNext ? 'border-break' : pastLimit || pastWindow ? 'border-act-now/50' : 'border-line'} ${stop.status === 'unassigned' ? 'border-dashed' : ''}`}>
         <div className="flex min-h-16 items-center justify-center border-b border-line px-1 lg:min-h-0 lg:border-b-0 lg:border-r">
-          <span className="tnum min-w-0 text-center text-[1.625rem] font-semibold leading-none tracking-[-0.035em] text-ink/80">{stop.seq}</span>
+          <span className="tnum min-w-0 text-center text-xl font-semibold leading-none tracking-[-0.025em] text-ink/80">{stop.seq}</span>
         </div>
 
         <div className="relative flex min-w-0 flex-col justify-center border-b border-line p-3 lg:border-b-0 lg:border-r">
