@@ -122,6 +122,7 @@ Do not use it for status, charts, full card fills, body text, or routine control
 
 Rules:
 
+- Apply antialiased font smoothing and optimized legibility at the document root so Inter, Bricolage, IBM Plex Mono, and their fallbacks render consistently throughout the app.
 - Every duration and operational count uses tabular numerals (`.tnum`).
 - Body copy generally sits between 11px and 13px in this desktop-only prototype.
 - Micro-labels use 8–10px, semibold, uppercase, and modest tracking.
