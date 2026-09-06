@@ -86,14 +86,13 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
   ]
 
   return (
-    <div className="relative">
-      <span aria-hidden="true" className={`pointer-events-none absolute left-[0.8125rem] w-px ${timelineTone} ${firstStop ? 'top-0' : '-top-1'} ${lastStop ? 'bottom-0' : '-bottom-1'}`} style={timelineStyle} />
-      <article className={`relative grid overflow-hidden rounded-card border bg-panel shadow-card lg:grid-cols-[3.5rem_minmax(7rem,0.8fr)_minmax(9rem,1fr)_minmax(14rem,1.35fr)] ${isNext ? 'border-break' : pastLimit || pastWindow ? 'border-act-now/50' : 'border-line'} ${stop.status === 'unassigned' ? 'border-dashed' : ''}`}>
-        <div className="relative grid min-h-16 grid-cols-[0.875rem_minmax(0,1fr)] items-center gap-1.5 border-b border-line px-1.5 lg:min-h-0 lg:border-b-0 lg:border-r">
-          <span aria-hidden="true" className={`pointer-events-none absolute inset-y-0 left-[0.8125rem] w-px ${timelineTone}`} style={timelineStyle} />
-          <span className="flex items-center justify-center">
-            <StopStatusMarker stop={stop} pastLimit={pastLimit} late={pastWindow} className="h-3.5 w-3.5" style={timelineStyle} />
-          </span>
+    <div className="relative grid grid-cols-[1rem_minmax(0,1fr)] gap-2">
+      <div className="relative flex items-center justify-center">
+        <span aria-hidden="true" className={`pointer-events-none absolute left-1/2 w-px -translate-x-1/2 ${timelineTone} ${firstStop ? 'top-1/2' : '-top-1'} ${lastStop ? 'bottom-1/2' : '-bottom-1'}`} style={timelineStyle} />
+        <StopStatusMarker stop={stop} pastLimit={pastLimit} late={pastWindow} className="h-3.5 w-3.5" style={timelineStyle} />
+      </div>
+      <article className={`relative grid overflow-hidden rounded-card border bg-panel shadow-card lg:grid-cols-[2.5rem_minmax(8.75rem,0.72fr)_minmax(9.75rem,0.95fr)_minmax(16rem,1.55fr)] ${isNext ? 'border-break' : pastLimit || pastWindow ? 'border-act-now/50' : 'border-line'} ${stop.status === 'unassigned' ? 'border-dashed' : ''}`}>
+        <div className="flex min-h-16 items-center justify-center border-b border-line px-1 lg:min-h-0 lg:border-b-0 lg:border-r">
           <span className="tnum min-w-0 text-center text-[1.625rem] font-semibold leading-none tracking-[-0.035em] text-ink/80">{stop.seq}</span>
         </div>
 
