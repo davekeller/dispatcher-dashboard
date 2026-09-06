@@ -52,8 +52,8 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
   const timelineRed = stop.status === 'failed' || pastLimit || pastWindow
   const timelineTone = stop.status === 'done' ? 'route-history-node' : timelineRed ? 'bg-act-now-fill/70' : 'bg-line'
   const timelineStyle = stop.status === 'done' ? stopHistoryStyle(stopIndex, lastCompleteIndex) : undefined
-  const firstStop = stopIndex === 0
-  const lastStop = stopIndex === view.route.stops.length - 1
+  const firstStop = stopIndex === view.route.stops.length - 1
+  const lastStop = stopIndex === 0
 
   const events: StopEvent[] = complete ? [
     ...(stop.arrivedAt !== undefined ? [{ label: 'Arrived', value: fmtClock(stop.arrivedAt), tone: 'clear' as const }] : []),
