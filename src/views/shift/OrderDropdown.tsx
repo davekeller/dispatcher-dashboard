@@ -11,7 +11,7 @@ export interface OrderOption<T extends string> {
 }
 
 export const BOARD_ORDERS: OrderOption<BoardSort>[] = [
-  { id: 'lookout', label: 'Lookout orders each column', description: 'Urgency first, then time to violation and data freshness.', Glyph: Sparkle },
+  { id: 'lookout', label: 'Lookout orders', description: 'Urgency first, then time to violation and data freshness.', Glyph: Sparkle },
   { id: 'limit', label: 'Closest to HOS limit', description: 'Least drive time remaining appears first.', Glyph: ClockCountdown },
   { id: 'stops', label: 'Most stops remaining', description: 'Routes with the most work left appear first.', Glyph: ListNumbers },
   { id: 'data_age', label: 'Oldest data first', description: 'The least recent telematics pings appear first.', Glyph: WifiSlash },

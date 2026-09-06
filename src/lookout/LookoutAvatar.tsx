@@ -43,11 +43,11 @@ export default function LookoutAvatar({ size = 28, className = '' }: { size?: nu
         </clipPath>
       </defs>
       <g clipPath={`url(#${clipId})`}>
-        <circle cx="16" cy="16" r="15" fill={`url(#${baseId})`} />
-        <circle cx="16" cy="16" r="15" fill={`url(#${cyanId})`} />
-        <circle cx="16" cy="16" r="15" fill={`url(#${pinkId})`} />
-        <circle cx="16" cy="16" r="15" fill={`url(#${orangeId})`} />
-        <circle cx="16" cy="16" r="15" fill={`url(#${limeId})`} />
+        <rect x="1" y="1" width="30" height="30" fill={`url(#${baseId})`} />
+        <rect x="1" y="1" width="30" height="30" fill={`url(#${cyanId})`} />
+        <rect x="1" y="1" width="30" height="30" fill={`url(#${pinkId})`} />
+        <rect x="1" y="1" width="30" height="30" fill={`url(#${orangeId})`} />
+        <rect x="1" y="1" width="30" height="30" fill={`url(#${limeId})`} />
       </g>
       <g className="fill-on-accent" shapeRendering="crispEdges">
         <rect x="9" y="10" width="4" height="4" />
