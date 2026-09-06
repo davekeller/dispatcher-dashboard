@@ -148,7 +148,9 @@ Cards should be defined primarily by white surface and a hairline border. Shadow
 
 ### Product bar
 
-The original truck mark sits in a soft-orange outlined tile. Orange also marks the active workspace. Everything else remains white and near-black so the bar feels like product chrome rather than a banner.
+The truck mark sits in a near-black tile with white foreground. Everything else remains white and near-black so the bar feels like product chrome rather than a banner.
+
+Selected workspace, board-lens, and Lookout tab controls use one quiet blue-slate treatment: a pale slate fill, a restrained slate keyline, and dark slate type. The state is intentionally light rather than inverted so the near-black fill with white type remains exclusive to primary actions.
 
 ### Shift instrument
 

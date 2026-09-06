@@ -3,6 +3,6 @@ export const NAV_ITEM_BASE = 'flex h-8 items-center gap-1.5 rounded-control px-3
 /** Shared selected-state grammar for the workspace links and Lookout tabs. */
 export function navigationItemState(selected: boolean): string {
   return selected
-    ? 'bg-well text-ink ring-1 ring-inset ring-line shadow-sm'
-    : 'text-muted hover:bg-well/70 hover:text-ink'
+    ? 'bg-nav-selected text-nav-selected-ink ring-1 ring-inset ring-nav-selected-line shadow-sm'
+    : 'text-muted hover:bg-nav-selected/60 hover:text-nav-selected-ink'
 }

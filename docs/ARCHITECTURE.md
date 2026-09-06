@@ -409,6 +409,7 @@ Warm, dense, calm, and direct. This is operations software used mid-shift, expre
 | `--color-panel` | `#ffffff` | Cards, rail |
 | `--color-well` | `#f1ede9` | Inset grounds, column backgrounds |
 | `--color-line` | `#e3ddd7` | Keylines |
+| `--color-nav-selected` / `-ink` / `-line` | `#e2e7ef` / `#424c60` / `#c7d0dc` | Shared light-slate selection for workspace, board-lens, and Lookout navigation |
 | `--color-ink` | `#211e1c` | Text, primary buttons |
 | `--color-muted` | `#625d59` | Secondary text |
 | `--color-label` | `#6d6661` | Micro-labels on panel only |
