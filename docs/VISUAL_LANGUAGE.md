@@ -179,6 +179,8 @@ The top-level driver header keeps two layers inside one card: its padded identit
 
 The Stops section begins with a compact white instrument bar: icon and delivered count on the left, route actions and List/Map mode on the right. It remains sticky at the top of the route workspace beneath the product bar, keeping selection and mode controls available while the receipts scroll.
 
+Route details use the same cool `board` canvas as the dispatch board, with white cards as the foreground plane. Neutral controls and receipt fact bands use translucent board gray instead of the warmer page `canvas`; route alerts, stale banners, and late rail rows use the same stronger `*-board` status washes as the board lane headers. Chips retain their softer fills so compact labels remain distinct from structural surfaces.
+
 The expanded detail rail uses the same light-to-dark completed-path gradient and subtle next-stop marker emphasis as the mini timeline. Completed rows tighten from 40px to 32px, but retain their time, stop number, name, full click target, and one-to-one receipt mapping; failed stops remain full-size and red.
 
 The left rail and the receipt list are literal counterparts: one timeline node per receipt. The rail sits flush against the left edge of the route view and defaults collapsed, preserving the full stop spine while giving the detail grid the working width. Timeline entries read marker → time → stop number and name. Expanded, the rail uses the same light, flat grid grammar as the rest of the product: Route status opens to a 2×2 divider grid for Progress, Remaining, Schedule, and HOS fit; Route timeline opens beneath it. Each section collapses independently, and neither introduces an inset card or dark header block.

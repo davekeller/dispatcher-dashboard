@@ -65,10 +65,10 @@ export default function RouteFilePage() {
   const pastLimitIds = new Set(stopsPastLimit(view))
   // On the map the rail's selection is the page's; it starts on the next stop, like the rail does when reading.
   const mapSelection = selectedStop ?? view.next?.id ?? null
-  const seg = (on: boolean) => `inline-flex h-7 items-center gap-1.5 rounded-[6px] px-2.5 text-[11px] font-semibold transition ${on ? 'bg-well text-ink' : 'text-muted hover:text-ink'}`
+  const seg = (on: boolean) => `inline-flex h-7 items-center gap-1.5 rounded-[6px] px-2.5 text-[11px] font-semibold transition ${on ? 'bg-board text-ink' : 'text-muted hover:bg-board/60 hover:text-ink'}`
 
   return (
-    <div className="flex items-start gap-5 py-5 pr-5">
+    <div className="flex min-h-full items-start gap-5 bg-board py-5 pr-5">
       <RouteRail view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} collapsed={railCollapsed} onCollapsedChange={setRailCollapsed} activeStopId={mode === 'map' ? mapSelection : undefined} onSelectStop={mode === 'map' ? setSelectedStop : undefined} />
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         <DriverCard view={view} card={card} />
@@ -77,7 +77,7 @@ export default function RouteFilePage() {
         <section>
           <header className="sticky top-0 z-30 mb-2 flex min-h-12 items-center gap-3 rounded-control border border-line bg-panel/95 px-3 py-2 shadow-sm backdrop-blur">
             <div className="flex min-w-0 items-center gap-2.5">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] bg-well text-ink" aria-hidden="true">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] bg-board text-ink" aria-hidden="true">
                 <ListBullets size={15} weight="bold" />
               </span>
               <div className="min-w-0">

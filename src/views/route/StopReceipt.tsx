@@ -125,7 +125,7 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
           </ol>
         </div>
 
-        <dl className="grid grid-cols-4 bg-canvas/20 pr-5">
+        <dl className="grid grid-cols-4 bg-board/45 pr-5">
           {facts.map((fact, index) => (
             <div key={fact.label} className={`flex min-w-0 flex-col justify-center px-2 py-3 ${index < facts.length - 1 ? 'border-r border-line' : ''}`}>
               <dt className="truncate text-[7px] font-semibold uppercase tracking-[0.04em] text-label" title={fact.label}>{fact.label}</dt>

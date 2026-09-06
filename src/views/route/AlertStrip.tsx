@@ -18,9 +18,10 @@ export default function AlertStrip({ view, card }: { view: DriverView; card: Dri
         {card.alerts.map((a) => {
           const tone = severityTone(a.severity)
           const critical = a.severity === 'critical'
+          const iconSurface = critical ? 'bg-act-now-board' : tone.board ?? tone.soft
           return (
             <li key={a.id} className="grid min-h-16 grid-cols-[2.75rem_minmax(0,1fr)_auto] items-stretch">
-              <div className={`flex items-center justify-center border-r border-line ${critical ? 'bg-act-now-soft/75' : tone.soft}`}>
+              <div className={`flex items-center justify-center border-r border-line ${iconSurface}`}>
                 <WarningCircle size={18} weight={critical ? 'fill' : 'duotone'} className={critical ? 'text-act-now' : tone.text} aria-hidden="true" />
               </div>
               <div className="flex min-w-0 items-center gap-3 px-3 py-3">

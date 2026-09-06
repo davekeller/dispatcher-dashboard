@@ -39,8 +39,8 @@ function detailNodeSize(index: number, firstRemainingIndex: number, status: Stop
 }
 
 function rowTone(node: Node, pastLimitIds: Set<string>): string {
-  if (pastLimitIds.has(node.stop.id) || node.late) return 'bg-act-now-soft/65 hover:bg-act-now-soft'
-  return 'hover:bg-canvas'
+  if (pastLimitIds.has(node.stop.id) || node.late) return 'bg-act-now-board/65 hover:bg-act-now-board/90'
+  return 'hover:bg-board/70'
 }
 
 function stopState(node: Node, nextId: string | undefined, pastLimitIds: Set<string>): string {
@@ -140,7 +140,7 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
   return (
     <nav aria-label="Route" className={`sticky left-0 top-0 z-20 flex h-[calc(100vh-3.5rem-2.5rem)] shrink-0 flex-col overflow-hidden rounded-r-card border-y border-r border-line bg-panel shadow-card transition-[width] duration-200 ${collapsed ? 'w-16' : 'w-64'}`}>
       <div className={`flex shrink-0 items-center border-b border-line px-2 py-2 ${collapsed ? 'flex-col gap-1' : 'gap-2'}`}>
-        <Link to="/" title="Back to the board" aria-label="Back to the board" className="flex h-7 w-7 shrink-0 items-center justify-center rounded-control text-muted transition hover:bg-well hover:text-ink">
+        <Link to="/" title="Back to the board" aria-label="Back to the board" className="flex h-7 w-7 shrink-0 items-center justify-center rounded-control text-muted transition hover:bg-board hover:text-ink">
           <ArrowLeft size={16} />
         </Link>
         {!collapsed && (
@@ -149,7 +149,7 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
             <p className="truncate font-mono text-[12px] font-semibold text-ink">{route.id.toUpperCase()}</p>
           </div>
         )}
-        <button type="button" onClick={() => onCollapsedChange(!collapsed)} aria-expanded={!collapsed} aria-label={collapsed ? 'Expand the route rail' : 'Collapse the route rail'} title={collapsed ? 'Expand' : 'Collapse'} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-control text-muted transition hover:bg-well hover:text-ink">
+        <button type="button" onClick={() => onCollapsedChange(!collapsed)} aria-expanded={!collapsed} aria-label={collapsed ? 'Expand the route rail' : 'Collapse the route rail'} title={collapsed ? 'Expand' : 'Collapse'} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-control text-muted transition hover:bg-board hover:text-ink">
           <SidebarSimple size={16} className={collapsed ? '-scale-x-100' : ''} />
         </button>
       </div>
@@ -166,13 +166,13 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
           </div>
         ) : (
           <>
-            <button type="button" onClick={() => setSummaryOpen((open) => !open)} aria-expanded={summaryOpen} className="flex w-full items-center gap-2 px-3 py-2 text-left transition hover:bg-canvas">
+            <button type="button" onClick={() => setSummaryOpen((open) => !open)} aria-expanded={summaryOpen} className="flex w-full items-center gap-2 px-3 py-2 text-left transition hover:bg-board/70">
               <span className="text-[9px] font-semibold uppercase tracking-[0.08em] text-label">Route status</span>
               <span className="ml-auto text-[9px] text-muted">4 metrics</span>
               <CaretDown size={12} className={`shrink-0 text-muted transition-transform ${summaryOpen ? '' : '-rotate-90'}`} />
             </button>
             {summaryOpen && (
-              <dl className="grid grid-cols-2 border-t border-line bg-canvas/20">
+              <dl className="grid grid-cols-2 border-t border-line bg-board/45">
                 <div className="min-w-0 border-b border-r border-line px-3 py-2.5">
                   <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">Progress</dt>
                   <dd className="tnum mt-1 font-display text-[1.35rem] font-semibold leading-none tracking-[-0.035em] text-ink">{view.done} <span className="text-[11px] font-medium tracking-normal text-muted">of {view.total}</span></dd>
@@ -199,7 +199,7 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
       </section>
 
       {!collapsed && (
-        <button type="button" onClick={() => setTimelineOpen((open) => !open)} aria-expanded={timelineOpen} className="flex w-full shrink-0 items-center gap-2 px-3 py-2 text-left transition hover:bg-canvas">
+        <button type="button" onClick={() => setTimelineOpen((open) => !open)} aria-expanded={timelineOpen} className="flex w-full shrink-0 items-center gap-2 px-3 py-2 text-left transition hover:bg-board/70">
           <h2 className="text-[9px] font-semibold uppercase tracking-[0.08em] text-label">Route timeline</h2>
           <span className="ml-auto text-[9px] text-muted">Stop order</span>
           <CaretDown size={12} className={`shrink-0 text-muted transition-transform ${timelineOpen ? '' : '-rotate-90'}`} />
@@ -243,7 +243,7 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
                   aria-label={`Stop ${stop.seq}, ${node.customer}, ${fmtClock(node.t)}, ${state}`}
                   title={`${stop.seq} · ${node.customer} · ${fmtClock(node.t)} · ${state}`}
                   style={collapsed ? undefined : TIMELINE_COLUMNS}
-                  className={`${collapsed ? `flex ${rowSize} w-full items-center justify-center rounded-control hover:bg-canvas` : `grid ${rowSize} w-full items-stretch rounded-control text-left transition ${rowTone(node, pastLimitIds)}`}`}
+                  className={`${collapsed ? `flex ${rowSize} w-full items-center justify-center rounded-control hover:bg-board/70` : `grid ${rowSize} w-full items-stretch rounded-control text-left transition ${rowTone(node, pastLimitIds)}`}`}
                 >
                   <span className={`relative flex ${collapsed ? rowSize : 'h-full min-h-7'} items-center justify-center`}>
                     <span className={`absolute left-1/2 top-0 h-1/2 w-px -translate-x-1/2 ${connectorTone}`} style={completed ? stopHistoryStyle(index - 0.5, lastCompleteIndex) : undefined} />
@@ -266,7 +266,7 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
         </ol>
       </div>}
 
-      {!collapsed && !timelineOpen && <div className="min-h-0 flex-1 border-t border-line bg-canvas/20" />}
+      {!collapsed && !timelineOpen && <div className="min-h-0 flex-1 border-t border-line bg-board/45" />}
 
       {!collapsed && timelineOpen && (
         <div className="flex shrink-0 items-center gap-3 border-t border-line px-3 py-2 text-[8px] text-label">

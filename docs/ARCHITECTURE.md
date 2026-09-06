@@ -337,6 +337,8 @@ The route rail shares the miniature timeline's completed-path gradient and subtl
 
 Content, in reading order:
 
+The route workspace sits on the same cool `board` ground as the dispatch board. White cards remain the primary content plane, while neutral sub-grids and controls use translucent board gray and semantic route surfaces reuse the board-header wash tokens.
+
 1. **Driver header card.** One two-layer card: an inset identity section with avatar, name, band and drift chips, a scheduled-reset chip when one exists, plate, region, status, the large live countdown, and data age. Beneath it, five full-width equal grid cells carry Driving today, On duty, Break, Stops, and Driving left vs. limit. The metric grid runs edge to edge inside the card with one top rule, simple vertical dividers, consistent padding, and no surrounding inset or gap. When the live HOS countdown is at or below zero, a 3px Act now red keyline replaces the neutral left border across the card height.
 2. **Alert card.** Only when alerts exist, directly beneath the driver card. One three-column horizontal row per firing rule: a semantic warning icon occupies a narrow first column, chip and explanation take the flexible middle, and that alert's no-wrap action group aligns to the far right. A card containing a critical alert gets a restrained Act now border. Multiple alerts use simple internal dividers, copy and actions still come from the rule object, and confirmations remain inline. New rules render here with no new UI.
 3. **Stale banner.** If stale or offline: "Last ping 25 min ago. Figures are estimates."
