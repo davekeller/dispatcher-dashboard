@@ -8,7 +8,7 @@ import { useActions } from './ActionContext'
 export default function ActionDialogs() {
   const { request, close } = useActions()
   if (!request) return null
-  if (request.action === 'reassign') return <ReassignDialog key={request.driverId} driverId={request.driverId} initialStopIds={request.stopIds} onClose={close} />
-  if (request.action === 'schedule_reset') return <ResetDialog key={request.driverId} driverId={request.driverId} onClose={close} />
-  return <NotifyDialog key={request.driverId} driverId={request.driverId} onClose={close} />
+  if (request.action === 'reassign') return <ReassignDialog key={request.driverId} driverId={request.driverId} initialStopIds={request.stopIds} initialToId={request.toId} onClose={close} />
+  if (request.action === 'schedule_reset') return <ResetDialog key={request.driverId} driverId={request.driverId} initialAfterStopId={request.afterStopId} onClose={close} />
+  return <NotifyDialog key={request.driverId} driverId={request.driverId} initialStopIds={request.stopIds} onClose={close} />
 }
