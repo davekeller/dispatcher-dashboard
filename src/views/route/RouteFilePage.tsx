@@ -9,6 +9,7 @@ import { useDerived } from '../../store/hooks'
 import { useStore } from '../../store/store'
 import Button from '../../ui/Button'
 import EmptyState from '../../ui/EmptyState'
+import AlertStrip from './AlertStrip'
 import DriverCard from './DriverCard'
 import StaleBanner from './StaleBanner'
 import RouteRail from './RouteRail'
@@ -71,6 +72,7 @@ export default function RouteFilePage() {
       <RouteRail view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} collapsed={railCollapsed} onCollapsedChange={setRailCollapsed} activeStopId={mode === 'map' ? mapSelection : undefined} onSelectStop={mode === 'map' ? setSelectedStop : undefined} />
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         <DriverCard view={view} card={card} />
+        {card.alerts.length > 0 && <AlertStrip view={view} card={card} />}
         {stale && <StaleBanner view={view} />}
         <section>
           <header className="mb-2 flex items-center gap-3">

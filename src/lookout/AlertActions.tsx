@@ -16,13 +16,13 @@ const LABEL: Record<ActionId, string> = {
 /** The one place action buttons are rendered. The rail and the route file both use it, so
  *  the same handler runs from either surface. Dialog actions open a dialog; the two light
  *  actions confirm inline. `positionDependentDisabled` carries the stale-data reason. */
-export default function AlertActions({ driverId, actions, alertIds, positionDependentDisabled, resetScheduledAt }: { driverId: string; actions: ActionId[]; alertIds: string[]; positionDependentDisabled?: string; resetScheduledAt?: number }) {
+export default function AlertActions({ driverId, actions, alertIds, positionDependentDisabled, resetScheduledAt, singleLine = false }: { driverId: string; actions: ActionId[]; alertIds: string[]; positionDependentDisabled?: string; resetScheduledAt?: number; singleLine?: boolean }) {
   const { open } = useActions()
   const callDriver = useStore((s) => s.callDriver)
   const acknowledge = useStore((s) => s.acknowledge)
   const unique = [...new Set(actions)]
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div className={`flex gap-1.5 ${singleLine ? 'flex-nowrap whitespace-nowrap' : 'flex-wrap'}`}>
       {unique.map((a) => {
         if (a === 'call_driver') return <ActionConfirm key={a} label={LABEL[a]} confirmLabel="Place call" doneLabel="Call logged" onConfirm={() => callDriver(driverId)} />
         if (a === 'acknowledge') return <ActionConfirm key={a} label={LABEL[a]} confirmLabel="Snooze" doneLabel="Snoozed" onConfirm={() => alertIds.forEach((id) => acknowledge(id))} />
