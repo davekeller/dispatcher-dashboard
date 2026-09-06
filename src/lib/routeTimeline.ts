@@ -12,9 +12,9 @@ export function miniTimelineLayout(statuses: readonly string[]): MiniTimelineLay
 }
 
 /** Percentage of the light endpoint to use for a completed stop. The route origin
- * starts dark and the most recently completed stop resolves to the light progress edge. */
+ * starts light and the last completed stop resolves to the dark progress edge. */
 export function completedStopLightWeight(index: number, lastCompleteIndex: number): number {
   if (lastCompleteIndex <= 0) return 50
   const depth = Math.max(0, Math.min(1, index / lastCompleteIndex))
-  return Math.round(depth * 100)
+  return Math.round((1 - depth) * 100)
 }
