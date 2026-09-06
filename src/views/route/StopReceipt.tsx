@@ -69,6 +69,7 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
     ...(delivery ? [{ label: 'Window', value: `until ${fmtClock(delivery.window.end)}`, tone: pastWindow ? 'critical' as const : 'muted' as const }] : []),
   ]
 
+  const notes = [delivery?.instructions, stop.note, stop.notifiedAt !== undefined ? 'notified' : undefined].filter(Boolean)
   const priorityFact: StopFact = { label: 'Priority', value: delivery?.priority === 'priority' ? 'Priority' : 'Standard', badge: delivery?.priority === 'priority' }
   const facts: StopFact[] = complete ? [
     { label: 'On-site', value: dwell },
@@ -99,16 +100,13 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
         </div>
 
         <div className="relative flex min-w-0 flex-col justify-center border-b border-line p-3 lg:border-b-0 lg:border-r">
-          <h3 className="truncate text-[12px] font-semibold text-ink" title={delivery?.customer ?? stop.deliveryId}>{delivery?.customer ?? stop.deliveryId}</h3>
-          <p className="mt-0.5 truncate text-[10px] text-muted" title={delivery?.address}>{delivery?.address ?? 'Address unavailable'}</p>
-          {(statusLabel || pastLimit || pastWindow) && <div className="mt-1 flex min-w-0 flex-wrap items-center gap-1">
-            {statusTone && statusLabel && <Chip tone={statusTone} dashed={stop.status === 'unassigned'} className="px-1.5 py-0 text-[9px]">{statusLabel}</Chip>}
-            {pastLimit && stop.status !== 'unassigned' && <Chip tone={BAND_TONE.act_now} className="px-1.5 py-0 text-[9px]">past the limit</Chip>}
-            {pastWindow && <Chip tone={BAND_TONE.act_now} className="px-1.5 py-0 text-[9px]">past window</Chip>}
+          <h3 className="truncate text-[13px] font-semibold text-ink" title={delivery?.customer ?? stop.deliveryId}>{delivery?.customer ?? stop.deliveryId}</h3>
+          <p className="mt-0.5 truncate text-[11px] text-muted" title={delivery?.address}>{delivery?.address ?? 'Address unavailable'}</p>
+          {(statusLabel || pastLimit || pastWindow) && <div className="mt-1.5 flex min-w-0 flex-wrap items-center gap-1">
+            {statusTone && statusLabel && <Chip tone={statusTone} dashed={stop.status === 'unassigned'} className="px-1.5 py-0 text-[10px]">{statusLabel}</Chip>}
+            {pastLimit && stop.status !== 'unassigned' && <Chip tone={BAND_TONE.act_now} className="px-1.5 py-0 text-[10px]">past the limit</Chip>}
+            {pastWindow && <Chip tone={BAND_TONE.act_now} className="px-1.5 py-0 text-[10px]">past window</Chip>}
           </div>}
-          {delivery?.instructions && <p className="mt-1 line-clamp-2 text-[9px] leading-3.5 text-muted">{delivery.instructions}</p>}
-          {stop.note && <p className="mt-1 line-clamp-2 text-[9px] font-medium leading-3.5 text-ink/75"><span className="font-semibold uppercase tracking-[0.04em] text-label">Note · </span>{stop.note}</p>}
-          {stop.notifiedAt !== undefined && <p className="mt-1 text-[9px] font-semibold text-muted">Customer notified {fmtClock(stop.notifiedAt)}</p>}
         </div>
 
         <div className="flex min-w-0 items-center border-b border-line px-3 py-2.5 lg:border-b-0 lg:border-r">
@@ -117,25 +115,36 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
             {events.map((event) => (
               <li key={`${event.label}:${event.value}`} className="relative flex min-w-0 flex-col items-center px-0.5 text-center">
                 <span className={`relative z-10 h-1.5 w-1.5 rounded-full border ${eventDot(event.tone)}`} aria-hidden="true" />
-                <span className={`mt-1.5 block w-full truncate text-[7px] font-semibold uppercase tracking-[0.04em] ${event.tone === 'critical' ? 'text-act-now' : 'text-label'}`}>{event.label}</span>
-                <span className={`tnum mt-0.5 block w-full min-w-0 truncate text-[10px] font-semibold ${event.tone === 'critical' ? 'text-act-now' : 'text-ink'}`} title={event.value}>{event.value}</span>
+                <span className={`mt-1.5 block w-full truncate text-[8px] font-semibold uppercase tracking-[0.04em] ${event.tone === 'critical' ? 'text-act-now' : 'text-label'}`}>{event.label}</span>
+                <span className={`tnum mt-0.5 block w-full min-w-0 truncate text-[11px] font-semibold ${event.tone === 'critical' ? 'text-act-now' : 'text-ink'}`} title={event.value}>{event.value}</span>
               </li>
             ))}
           </ol>
         </div>
 
-        <dl className={`grid grid-cols-4 bg-board/45 ${selectable ? 'pr-11' : 'pr-5'}`}>
+        <dl className={`grid grid-cols-4 bg-board/45 ${selectable ? 'pr-14' : 'pr-8'}`}>
           {facts.map((fact, index) => (
-            <div key={fact.label} className={`flex min-w-0 flex-col justify-center px-2 py-3 ${index < facts.length - 1 ? 'border-r border-line' : ''}`}>
-              <dt className="truncate text-[7px] font-semibold uppercase tracking-[0.04em] text-label" title={fact.label}>{fact.label}</dt>
+            <div key={fact.label} className={`flex min-w-0 flex-col justify-center px-2.5 py-3 ${index < facts.length - 1 ? 'border-r border-line' : ''}`}>
+              <dt className="truncate text-[8px] font-semibold uppercase tracking-[0.04em] text-label" title={fact.label}>{fact.label}</dt>
               {fact.badge ? (
-                <dd className="mt-1 min-w-0" title={fact.value}><Chip tone={BAND_TONE.watch} className="max-w-full px-1.5 py-0 text-[9px]">priority</Chip></dd>
+                <dd className="mt-1 min-w-0" title={fact.value}><Chip tone={BAND_TONE.watch} className="max-w-full px-1.5 py-0 text-[10px]">priority</Chip></dd>
               ) : (
-                <dd className={`tnum mt-0.5 truncate text-[11px] font-semibold leading-tight ${fact.tone ?? 'text-ink'}`} title={fact.value}>{fact.value}</dd>
+                <dd className={`tnum mt-0.5 truncate text-[12px] font-semibold leading-tight ${fact.tone ?? 'text-ink'}`} title={fact.value}>{fact.value}</dd>
               )}
             </div>
           ))}
         </dl>
+        {/* Free text gets its own field at the end of the card, so identity stays name and address. */}
+        {notes.length > 0 && (
+          <div className="col-span-full flex min-w-0 items-baseline gap-3 border-t border-line px-3 py-2 text-[11px] leading-4 text-ink">
+            <span className="shrink-0 text-[8px] font-semibold uppercase tracking-[0.04em] text-label">Notes</span>
+            <span className="flex min-w-0 flex-wrap gap-x-4 gap-y-0.5">
+              {delivery?.instructions && <span>{delivery.instructions}</span>}
+              {stop.note && <span className="font-medium"><span className="font-semibold uppercase tracking-[0.04em] text-label">Dispatcher · </span>{stop.note}</span>}
+              {stop.notifiedAt !== undefined && <span className="text-muted">Customer notified {fmtClock(stop.notifiedAt)}</span>}
+            </span>
+          </div>
+        )}
         <StopActionsMenu
           stop={stop}
           view={view}
