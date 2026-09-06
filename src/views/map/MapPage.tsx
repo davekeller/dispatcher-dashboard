@@ -70,7 +70,7 @@ export default function MapPage() {
             <MagnifyingGlass size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
             <input value={(filters[search.id] as string | undefined) ?? ''} onChange={(e) => setFilters({ ...filters, [search.id]: e.target.value })} placeholder={search.label} className="h-9 w-full rounded-control border border-line bg-panel pl-9 pr-3 text-[12px] text-ink shadow-sm outline-none transition placeholder:text-muted focus:border-ink/35 focus:ring-2 focus:ring-ink/10" aria-label={search.label} />
           </label>
-          <Button size="sm" variant="secondary" onClick={() => setFitKey((k) => k + 1)} title="Fit every visible truck">
+          <Button size="sm" variant="secondary" onClick={() => { select(null); setFitKey((k) => k + 1) }} title="Clear the selection and fit every visible truck">
             <ArrowsOutSimple size={13} /> Fit all
           </Button>
         </div>

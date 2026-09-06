@@ -3,7 +3,7 @@ import { makeFleet } from '../data/seed'
 import { materialize } from '../data/simulate'
 import { derive } from '../store/derive'
 import { ANCHOR } from '../time/clock'
-import { fleetMarkers, remainingPath } from './fleet'
+import { fleetMarkers } from './fleet'
 
 describe('fleet markers', () => {
   const fleet = materialize(makeFleet(ANCHOR), ANCHOR)
@@ -35,13 +35,5 @@ describe('fleet markers', () => {
     expect(dre.staleness).toBe('offline')
     expect(dre.dark).toBe(true)
     expect(dre.label).toBe('Dre W. · ~0:40 · last seen 25 min ago')
-  })
-
-  it("draws the selected driver's remaining path from the truck through the stops ahead", () => {
-    const marcus = d.byId.get('drv-01')!
-    const path = remainingPath(marcus, deliveryById)
-    expect(path.stops.map((s) => s.seq)).toEqual([13, 14, 15])
-    expect(path.points).toHaveLength(4)
-    expect(path.points[0]).toEqual(by('drv-01').position)
   })
 })

@@ -1,14 +1,15 @@
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
-import { MapContainer, Marker, Polyline, Tooltip } from 'react-leaflet'
-import type { Delivery, Stop } from '../../data/types'
-import { remainingPath, type FleetMarker } from '../../geo/fleet'
+import { MapContainer, Marker, Tooltip } from 'react-leaflet'
+import type { Delivery } from '../../data/types'
+import type { FleetMarker } from '../../geo/fleet'
 import type { DriverView } from '../../store/view'
-import { FitOnce, FlyTo, Tiles, escapeHtml, toLatLng } from './leaflet'
+import { FitOnce, Tiles, escapeHtml, toLatLng } from './leaflet'
+import RouteOverlay, { routeStops } from './RouteOverlay'
 
 // A lazy chunk, like the route file's map. Marker styles live in index.css under .fleet-marker.
-const FIT_MAX_ZOOM = 13
-const FOCUS_ZOOM = 13
+const FLEET_MAX_ZOOM = 13
+const ROUTE_MAX_ZOOM = 14
 const Z = { quiet: 0, watch: 100, act_now: 200, offline: 150 } as const
 
 function truckIcon(m: FleetMarker, selected: boolean): L.DivIcon {
@@ -22,16 +23,6 @@ function truckIcon(m: FleetMarker, selected: boolean): L.DivIcon {
   })
 }
 
-function stopIcon(stop: Stop, risk: boolean): L.DivIcon {
-  return L.divIcon({
-    className: 'route-map-stop',
-    html: `<span class="route-map-stop-dot ${risk ? 'is-risk' : 'is-pending'}">${escapeHtml(String(stop.seq))}</span>`,
-    iconSize: [22, 22],
-    iconAnchor: [11, 11],
-    tooltipAnchor: [0, -12],
-  })
-}
-
 export default function FleetMap({ markers, selectedId, selectedView, deliveryById, pastLimitIds, fitKey, onSelect }: {
   markers: FleetMarker[]
   selectedId: string | null
@@ -41,21 +32,17 @@ export default function FleetMap({ markers, selectedId, selectedView, deliveryBy
   fitKey: number
   onSelect: (id: string) => void
 }) {
-  const path = selectedView ? remainingPath(selectedView, deliveryById) : null
   const selected = markers.find((m) => m.driverId === selectedId)
+  // A picked driver's whole route frames the map; otherwise every visible truck does.
+  const routePoints = selectedView ? routeStops(selectedView, deliveryById).map((m) => toLatLng(m.position)) : []
+  const framing = selectedView && selectedId
+    ? { key: `driver:${selectedId}`, points: [...routePoints, ...(selected ? [toLatLng(selected.position)] : [])], maxZoom: ROUTE_MAX_ZOOM }
+    : { key: `fleet:${fitKey}`, points: markers.map((m) => toLatLng(m.position)), maxZoom: FLEET_MAX_ZOOM }
   return (
     <MapContainer center={[41.87, -87.7]} zoom={11} zoomControl scrollWheelZoom className="h-full w-full" attributionControl>
       <Tiles />
-      <FitOnce fitKey={fitKey} points={markers.map((m) => toLatLng(m.position))} maxZoom={FIT_MAX_ZOOM} />
-      <FlyTo id={selectedId} position={selected?.position} minZoom={FOCUS_ZOOM} flyOnMount />
-      {path && path.points.length > 1 && (
-        <Polyline positions={path.points.map(toLatLng)} pathOptions={{ className: pastLimitIds.size > 0 ? 'route-map-leg-risk' : 'route-map-leg-todo', weight: 3 }} />
-      )}
-      {path?.stops.map((stop) => (
-        <Marker key={stop.id} position={toLatLng(deliveryById.get(stop.deliveryId)!.position)} icon={stopIcon(stop, pastLimitIds.has(stop.id))} zIndexOffset={50} keyboard={false}>
-          <Tooltip direction="top" offset={[0, -2]} className="route-map-tooltip">{`${stop.seq} · ${deliveryById.get(stop.deliveryId)?.customer ?? ''}`}</Tooltip>
-        </Marker>
-      ))}
+      <FitOnce fitKey={framing.key} points={framing.points} maxZoom={framing.maxZoom} />
+      {selectedView && <RouteOverlay view={selectedView} deliveryById={deliveryById} pastLimitIds={pastLimitIds} />}
       {markers.map((m) => (
         <Marker
           key={m.driverId}
