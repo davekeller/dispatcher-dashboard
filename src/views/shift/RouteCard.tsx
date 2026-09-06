@@ -18,6 +18,9 @@ const TITLE_STATUS_RULES = new Set(['wont_finish', 'offline_near_limit', 'offlin
 export default function RouteCard({ view, card, pick = false }: { view: DriverView; card: DriverCard; pick?: boolean }) {
   const quiet = card.band === 'clear' && !pick
   const surface = quiet ? 'border-line/70 bg-panel/80 opacity-80 hover:opacity-100' : 'border-line bg-panel shadow-card'
+  const overLimit = card.alerts.some((alert) => alert.ruleId === 'over_limit')
+  const approachingLimit = !overLimit && card.alerts.some((alert) => alert.ruleId === 'limit_act_now' || alert.ruleId === 'limit_watch')
+  const limitBorder = overLimit ? 'critical-alert-card' : approachingLimit ? 'approaching-limit-card' : ''
   const dim = card.snoozed ? 'opacity-60' : ''
   const hasCorrection = useStore((s) => Boolean(s.corrections[view.driver.id]))
   const hos = routeHosSignal(view)
@@ -37,7 +40,7 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
   const riskValue = pastLimitCount > 0 ? `${pastLimitCount} past HOS` : view.lateStops.length > 0 ? `${view.lateStops.length} late` : 'Clear'
   const riskTone = pastLimitCount > 0 ? 'text-act-now' : view.lateStops.length > 0 ? 'text-watch' : 'text-clear'
   return (
-    <Link to={`/routes/${view.driver.id}`} className={`group block shrink-0 overflow-hidden rounded-card border-[1.5px] transition hover:-translate-y-px hover:border-ink/25 hover:shadow-md ${surface} ${dim}`}>
+    <Link to={`/routes/${view.driver.id}`} className={`group block shrink-0 overflow-hidden rounded-card border-[1.5px] transition hover:-translate-y-px hover:border-ink/25 hover:shadow-md ${surface} ${limitBorder} ${dim}`}>
       <RouteHeader view={view} card={card} showPingAge status={headerStatus} />
       <div className="flex min-h-[6.25rem]">
         <RouteTimelineMini view={view} />

@@ -160,6 +160,18 @@ body { @apply bg-canvas text-ink font-sans; }
   border-color: color-mix(in srgb, var(--color-act-now) 55%, var(--color-line));
 }
 
+.critical-alert-card:hover {
+  border-color: color-mix(in srgb, var(--color-act-now) 68%, var(--color-line));
+}
+
+.approaching-limit-card {
+  border-color: color-mix(in srgb, var(--color-act-now) 30%, var(--color-line));
+}
+
+.approaching-limit-card:hover {
+  border-color: color-mix(in srgb, var(--color-act-now) 42%, var(--color-line));
+}
+
 @keyframes lane-content-enter {
   from { opacity: 0; transform: translateY(3px); }
   to { opacity: 1; transform: translateY(0); }
