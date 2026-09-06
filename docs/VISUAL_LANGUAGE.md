@@ -214,7 +214,7 @@ Lookout is visually related to the main product but clearly has a separate role.
 - white recommendation cards with normal operational severity inside them;
 - the same flat route-card shell: route/status header, miniature stop spine, centered driver row, full-width explanation rows, and a divided action footer.
 
-Recommendation cards preserve their explanation and actions instead of repeating the board's four scan metrics. They follow the same priority-badge and plain-text freshness rules as board cards; secondary reason labels are text, not chips. Lookout never replaces status color with its own gradient and never hides the underlying evidence.
+Recommendation cards preserve their explanation and actions instead of repeating the board's four scan metrics. Compact recommendations give each alert three explicit beats: the bold directive on its own line, muted supporting evidence beneath it with a small gap, and the divided action row below. They follow the same priority-badge and plain-text freshness rules as board cards; secondary reason labels are text, not chips. Lookout never replaces status color with its own gradient and never hides the underlying evidence.
 
 ---
 

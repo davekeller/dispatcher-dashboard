@@ -43,11 +43,14 @@ export default function RecommendationCard({ view, card, pinned = false, compact
             <DriverAvatar driver={view.driver} size={26} />
           </Link>
           <div className="min-w-0 flex-1 py-px font-lookout">
-            {card.alerts.map((a) => (
-              <p key={a.id} className="text-[12px] leading-snug">
-                <span className="font-semibold text-ink">{a.title}</span> <span className="text-muted">{a.body}</span>
-              </p>
-            ))}
+            <div className="space-y-2">
+              {card.alerts.map((a) => (
+                <div key={a.id} className="text-[12px] leading-snug">
+                  <p className="font-semibold text-ink">{a.title}</p>
+                  <p className="mt-1 text-muted">{a.body}</p>
+                </div>
+              ))}
+            </div>
             {(stale || hasStatus) && (
               <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[10px] text-muted">
                 {stale && <Chip tone={STALENESS_TONE[view.staleness]} dashed={offline} className="px-1.5 py-0 text-[9px] leading-4">{fmtAge(view.pingAgeMin)}</Chip>}
@@ -56,7 +59,7 @@ export default function RecommendationCard({ view, card, pinned = false, compact
             )}
           </div>
         </div>
-        <div className="border-t border-line/80 px-2.5 py-1.5">{actions}</div>
+        <div className="border-t border-line/80 px-2.5 py-2">{actions}</div>
       </article>
     )
   }
