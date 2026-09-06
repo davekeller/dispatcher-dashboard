@@ -75,9 +75,16 @@ export default function RouteFilePage() {
         {card.alerts.length > 0 && <AlertStrip view={view} card={card} />}
         {stale && <StaleBanner view={view} />}
         <section>
-          <header className="mb-2 flex items-center gap-3">
-            <h2 className="text-[12px] font-semibold uppercase tracking-wide text-label">Stops</h2>
-            <span className="tnum text-[12px] text-muted">{view.done} of {view.total} done</span>
+          <header className="sticky top-0 z-30 mb-2 flex min-h-12 items-center gap-3 rounded-control border border-line bg-panel/95 px-3 py-2 shadow-sm backdrop-blur">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] bg-well text-ink" aria-hidden="true">
+                <ListBullets size={15} weight="bold" />
+              </span>
+              <div className="min-w-0">
+                <h2 className="text-[12px] font-semibold uppercase leading-none tracking-[0.07em] text-ink">Stops</h2>
+                <p className="tnum mt-1 whitespace-nowrap text-[10px] leading-none text-muted">{view.done} of {view.total} delivered</p>
+              </div>
+            </div>
             <div className="ml-auto flex gap-2">
               <Button size="sm" variant="primary" disabled={selected.length === 0 || stale} title={staleReason} onClick={() => open('reassign', view.driver.id, { stopIds: selected })}>
                 Reassign selected{selected.length > 0 ? ` (${selected.length})` : ''}
@@ -101,7 +108,7 @@ export default function RouteFilePage() {
           ) : (
             <ol className="flex flex-col gap-2">
               {view.route.stops.map((s) => (
-                <li key={s.id} id={`stop-${s.id}`} className="scroll-mt-4">
+                <li key={s.id} id={`stop-${s.id}`} className="scroll-mt-16">
                   <StopReceipt stop={s} delivery={deliveryById.get(s.deliveryId)} view={view} selected={selected.includes(s.id)} onToggle={() => toggle(s.id)} pastLimit={pastLimitIds.has(s.id)} />
                 </li>
               ))}
