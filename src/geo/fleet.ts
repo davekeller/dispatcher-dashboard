@@ -1,6 +1,6 @@
 import type { DriverCard } from '../alerts/types'
 import type { Band } from '../bands'
-import type { Delivery, LatLng, Stop } from '../data/types'
+import type { Delivery, LatLng } from '../data/types'
 import type { Staleness } from '../hos/compute'
 import { fmtAge, fmtCountdown } from '../lib/format'
 import type { DriverView } from '../store/view'
@@ -48,11 +48,4 @@ export function fleetMarkers(views: DriverView[], cardById: Map<string, DriverCa
       : `${v.driver.name} · ${fmtCountdown(v.minutesUntilLimit, v.staleness !== 'fresh')}${dark ? ` · last seen ${fmtAge(v.pingAgeMin)}` : ''}`
     return [{ driverId: v.driver.id, name: v.driver.name, routeId: v.route.id, band: card.band, kind, position: fix.position, fix, staleness: v.staleness, pingAgeMin: v.pingAgeMin, minutesUntilLimit: v.minutesUntilLimit, dark, label }]
   })
-}
-
-/** The selected driver's remaining path: from the truck's fix through the stops still ahead. */
-export function remainingPath(view: DriverView, deliveryById: Map<string, Delivery>): { points: LatLng[]; stops: Stop[] } {
-  const fix = truckFixAt(view.route, view.truck, deliveryById, view.lastPingAt)
-  const stops = view.route.stops.filter((s) => (s.status === 'pending' || s.status === 'in_progress') && deliveryById.has(s.deliveryId))
-  return { points: [fix.position, ...stops.map((s) => deliveryById.get(s.deliveryId)!.position)], stops }
 }

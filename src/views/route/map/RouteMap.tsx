@@ -1,60 +1,19 @@
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import { useMemo } from 'react'
-import { MapContainer, Marker, Polyline, Tooltip } from 'react-leaflet'
-import type { Delivery, LatLng, Stop } from '../../../data/types'
+import { MapContainer, Marker, Tooltip } from 'react-leaflet'
+import type { Delivery } from '../../../data/types'
 import { truckFixAt, type TruckFix } from '../../../geo/truckPosition'
-import { projectedEta } from '../../../hos/compute'
 import { fmtAge, fmtClock } from '../../../lib/format'
-import { completedStopLightWeight } from '../../../lib/routeTimeline'
 import type { DriverView } from '../../../store/view'
-import { FitOnce, FlyTo, Tiles, escapeHtml, toLatLng } from '../../map/leaflet'
+import { FitOnce, FlyTo, Tiles, toLatLng } from '../../map/leaflet'
+import RouteOverlay, { routeStops, type MapStop } from '../../map/RouteOverlay'
 
 // This file is a lazy chunk: Leaflet and its stylesheet load the first time someone opens
-// the map, never on the board. Tiles, fitting, and flying live in views/map/leaflet.tsx,
-// shared with the fleet map.
+// the map, never on the board. The route itself is views/map/RouteOverlay.tsx, shared with
+// the fleet map; tiles, fitting, and flying are views/map/leaflet.tsx.
 const FIT_MAX_ZOOM = 15
 const FOCUS_ZOOM = 14
-
-interface MapStop {
-  stop: Stop
-  position: LatLng
-  customer: string
-  t: number
-  late: boolean
-}
-
-/** The same states the route rail paints, as marker classes (styles live in index.css). */
-function stopClass(m: MapStop, pastLimitIds: Set<string>, nextId: string | undefined, selectedId: string | null): string {
-  const { stop } = m
-  const state = stop.status === 'failed' ? 'is-failed'
-    : stop.status === 'done' ? 'is-done'
-    : stop.status === 'unassigned' ? 'is-unassigned'
-    : pastLimitIds.has(stop.id) || m.late ? 'is-risk'
-    : 'is-pending'
-  return `route-map-stop-dot ${state} ${stop.id === nextId ? 'is-next' : ''} ${stop.id === selectedId ? 'is-selected' : ''}`
-}
-
-function stopState(m: MapStop, pastLimitIds: Set<string>): string {
-  const { stop } = m
-  if (stop.status === 'done') return 'delivered'
-  if (stop.status === 'failed') return 'failed'
-  if (stop.status === 'unassigned') return 'needs a driver'
-  if (stop.status === 'in_progress') return 'at the dock'
-  if (pastLimitIds.has(stop.id)) return 'past the HOS limit'
-  if (m.late) return 'late'
-  return 'up next'
-}
-
-function stopIcon(m: MapStop, lightWeight: number, className: string): L.DivIcon {
-  return L.divIcon({
-    className: 'route-map-stop',
-    html: `<span class="${className}" style="--route-history-light:${lightWeight}%">${escapeHtml(String(m.stop.seq))}</span>`,
-    iconSize: [22, 22],
-    iconAnchor: [11, 11],
-    tooltipAnchor: [0, -12],
-  })
-}
 
 function truckIcon(view: DriverView): L.DivIcon {
   const freshness = view.staleness === 'fresh' ? 'route-map-truck-live' : view.staleness === 'stale' ? 'route-map-truck-stale' : 'route-map-truck-offline'
@@ -77,21 +36,8 @@ function truckCaption(view: DriverView, fix: TruckFix, stops: MapStop[]): string
 
 export default function RouteMap({ view, deliveryById, pastLimitIds, selectedStopId, onSelectStop }: { view: DriverView; deliveryById: Map<string, Delivery>; pastLimitIds: Set<string>; selectedStopId: string | null; onSelectStop: (id: string) => void }) {
   const { route, now } = view
-  const stops = useMemo<MapStop[]>(() => route.stops.flatMap((stop) => {
-    const delivery = deliveryById.get(stop.deliveryId)
-    if (!delivery) return []
-    const t = stop.status === 'done' || stop.status === 'failed' ? (stop.departedAt ?? stop.plannedEta) : stop.status === 'in_progress' ? (stop.arrivedAt ?? now) : projectedEta(stop, view.driftMin)
-    return [{ stop, position: delivery.position, customer: delivery.customer, t, late: stop.status === 'pending' && t > delivery.window.end }]
-  }), [deliveryById, now, route.stops, view.driftMin])
-  const lastCompleteIndex = stops.reduce((last, m, index) => (m.stop.status === 'done' || m.stop.status === 'failed' ? index : last), -1)
+  const stops = useMemo(() => routeStops(view, deliveryById), [view, deliveryById])
   const fix = useMemo(() => truckFixAt(route, view.truck, deliveryById, view.lastPingAt), [route, view.truck, deliveryById, view.lastPingAt])
-  const nextId = view.next?.id
-  const routed = stops.filter((m) => m.stop.status !== 'unassigned')
-  const legs = routed.slice(1).map((m, i) => {
-    const from = routed[i]
-    const tone = m.stop.status === 'done' || m.stop.status === 'failed' ? 'route-map-leg-done' : pastLimitIds.has(m.stop.id) || m.late ? 'route-map-leg-risk' : 'route-map-leg-todo'
-    return { id: m.stop.id, positions: [toLatLng(from.position), toLatLng(m.position)], tone }
-  })
   const points = [...stops.map((m) => toLatLng(m.position)), toLatLng(fix.position)]
   const selected = stops.find((m) => m.stop.id === selectedStopId)?.position
   const stale = view.staleness !== 'fresh'
@@ -110,18 +56,7 @@ export default function RouteMap({ view, deliveryById, pastLimitIds, selectedSto
           <Tiles />
           <FitOnce fitKey={route.id} points={points} maxZoom={FIT_MAX_ZOOM} />
           <FlyTo id={selectedStopId} position={selected} minZoom={FOCUS_ZOOM} />
-          {legs.map((leg) => <Polyline key={leg.id} positions={leg.positions} pathOptions={{ className: leg.tone, weight: 3 }} />)}
-          {stops.map((m, index) => (
-            <Marker
-              key={m.stop.id}
-              position={toLatLng(m.position)}
-              icon={stopIcon(m, m.stop.status === 'done' ? completedStopLightWeight(index, lastCompleteIndex) : 50, stopClass(m, pastLimitIds, nextId, selectedStopId))}
-              eventHandlers={{ click: () => onSelectStop(m.stop.id) }}
-              zIndexOffset={m.stop.id === nextId ? 200 : m.stop.status === 'done' ? 0 : 100}
-            >
-              <Tooltip direction="top" offset={[0, -2]} className="route-map-tooltip">{`${m.stop.seq} · ${m.customer} · ${fmtClock(m.t)} · ${stopState(m, pastLimitIds)}`}</Tooltip>
-            </Marker>
-          ))}
+          <RouteOverlay view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} selectedStopId={selectedStopId} onSelectStop={onSelectStop} />
           <Marker position={toLatLng(fix.position)} icon={truckIcon(view)} zIndexOffset={400} keyboard={false}>
             <Tooltip direction="top" offset={[0, -4]} permanent={stale} className="route-map-tooltip">{truckCaption(view, fix, stops)}</Tooltip>
           </Marker>
