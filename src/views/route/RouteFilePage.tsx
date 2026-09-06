@@ -9,6 +9,7 @@ import { useDerived } from '../../store/hooks'
 import { useStore } from '../../store/store'
 import Button from '../../ui/Button'
 import EmptyState from '../../ui/EmptyState'
+import AlertStrip from './AlertStrip'
 import DriverCard from './DriverCard'
 import StaleBanner from './StaleBanner'
 import RouteRail from './RouteRail'
@@ -29,7 +30,7 @@ export default function RouteFilePage() {
   const { setFocus } = useLookout()
   const { open } = useActions()
   const [selected, setSelected] = useState<string[]>([])
-  const [railCollapsed, setRailCollapsed] = useState(false)
+  const [railCollapsed, setRailCollapsed] = useState(true)
   const [params, setParams] = useSearchParams()
   const mode: StopsMode = params.get('view') === 'map' ? 'map' : 'list'
   const setMode = (next: StopsMode) => setParams((prev) => {
@@ -48,6 +49,7 @@ export default function RouteFilePage() {
   }, [driverId, setFocus])
   useEffect(() => setSelected([]), [driverId])
   useEffect(() => setSelectedStop(null), [driverId])
+  useEffect(() => setRailCollapsed(true), [driverId])
 
   if (!view || !card) {
     return (
@@ -63,48 +65,56 @@ export default function RouteFilePage() {
   const pastLimitIds = new Set(stopsPastLimit(view))
   // On the map the rail's selection is the page's; it starts on the next stop, like the rail does when reading.
   const mapSelection = selectedStop ?? view.next?.id ?? null
-  const seg = (on: boolean) => `inline-flex h-7 items-center gap-1.5 rounded-[6px] px-2.5 text-[11px] font-semibold transition ${on ? 'bg-well text-ink' : 'text-muted hover:text-ink'}`
+  const seg = (on: boolean) => `inline-flex h-7 items-center gap-1.5 rounded-[6px] px-2.5 text-[11px] font-semibold transition ${on ? 'bg-board text-ink' : 'text-muted hover:bg-board/60 hover:text-ink'}`
 
   return (
-    <div className="flex items-start gap-5 p-5">
+    <div className="flex min-h-full items-start gap-5 bg-board py-5 pr-5">
       <RouteRail view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} collapsed={railCollapsed} onCollapsedChange={setRailCollapsed} activeStopId={mode === 'map' ? mapSelection : undefined} onSelectStop={mode === 'map' ? setSelectedStop : undefined} />
       <div className="flex min-w-0 flex-1 flex-col gap-4">
-      <DriverCard view={view} card={card} />
-      {stale && <StaleBanner view={view} />}
-      <section>
-        <header className="mb-2 flex items-center gap-3">
-          <h2 className="text-[12px] font-semibold uppercase tracking-wide text-label">Stops</h2>
-          <span className="tnum text-[12px] text-muted">{view.done} of {view.total} done</span>
-          <div className="ml-auto flex gap-2">
-            <Button size="sm" variant="primary" disabled={selected.length === 0 || stale} title={staleReason} onClick={() => open('reassign', view.driver.id, { stopIds: selected })}>
-              Reassign selected{selected.length > 0 ? ` (${selected.length})` : ''}
-            </Button>
-            <Button size="sm" disabled={view.remaining.length === 0 || view.plannedResetAt !== undefined} title={view.plannedResetAt !== undefined ? `Reset already scheduled for ${fmtClock(view.plannedResetAt)}` : undefined} onClick={() => open('schedule_reset', view.driver.id)}>Schedule reset</Button>
-            <Button size="sm" disabled={stale || view.remaining.length === 0} title={staleReason} onClick={() => open('notify_customer', view.driver.id)}>Notify customers</Button>
-            <div className="ml-1 flex shrink-0 items-center gap-0.5 rounded-control border border-line bg-panel p-0.5 shadow-sm" role="group" aria-label="Show stops as">
-              <button type="button" aria-pressed={mode === 'list'} onClick={() => setMode('list')} className={seg(mode === 'list')} title="Stops as a list">
-                <ListBullets size={14} weight={mode === 'list' ? 'fill' : 'regular'} /> List
-              </button>
-              <button type="button" aria-pressed={mode === 'map'} onClick={() => setMode('map')} className={seg(mode === 'map')} title="Stops on a map, with the truck">
-                <MapTrifold size={14} weight={mode === 'map' ? 'fill' : 'regular'} /> Map
-              </button>
+        <DriverCard view={view} card={card} />
+        {card.alerts.length > 0 && <AlertStrip view={view} card={card} />}
+        {stale && <StaleBanner view={view} />}
+        <section>
+          <header className="sticky top-0 z-30 mb-2 flex min-h-12 items-center gap-3 rounded-control border border-line bg-panel/95 px-3 py-2 shadow-sm backdrop-blur">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] bg-board text-ink" aria-hidden="true">
+                <ListBullets size={15} weight="bold" />
+              </span>
+              <div className="min-w-0">
+                <h2 className="text-[12px] font-semibold uppercase leading-none tracking-[0.07em] text-ink">Stops</h2>
+                <p className="tnum mt-1 whitespace-nowrap text-[10px] leading-none text-muted">{view.done} of {view.total} delivered</p>
+              </div>
             </div>
-          </div>
-        </header>
-        {mode === 'map' ? (
-          <Suspense fallback={<div className="flex h-[22rem] items-center justify-center rounded-card border border-line bg-panel text-[12px] text-muted">Loading the map…</div>}>
-            <RouteMap view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} selectedStopId={mapSelection} onSelectStop={setSelectedStop} />
-          </Suspense>
-        ) : (
-          <ol className="flex flex-col gap-2">
-            {view.route.stops.map((s) => (
-              <li key={s.id} id={`stop-${s.id}`} className="scroll-mt-4">
-                <StopReceipt stop={s} delivery={deliveryById.get(s.deliveryId)} view={view} selected={selected.includes(s.id)} onToggle={() => toggle(s.id)} pastLimit={pastLimitIds.has(s.id)} />
-              </li>
-            ))}
-          </ol>
-        )}
-      </section>
+            <div className="ml-auto flex gap-2">
+              <Button size="sm" variant="primary" disabled={selected.length === 0 || stale} title={staleReason} onClick={() => open('reassign', view.driver.id, { stopIds: selected })}>
+                Reassign selected{selected.length > 0 ? ` (${selected.length})` : ''}
+              </Button>
+              <Button size="sm" disabled={view.remaining.length === 0 || view.plannedResetAt !== undefined} title={view.plannedResetAt !== undefined ? `Reset already scheduled for ${fmtClock(view.plannedResetAt)}` : undefined} onClick={() => open('schedule_reset', view.driver.id)}>Schedule reset</Button>
+              <Button size="sm" disabled={stale || view.remaining.length === 0} title={staleReason} onClick={() => open('notify_customer', view.driver.id)}>Notify customers</Button>
+              <div className="ml-1 flex shrink-0 items-center gap-0.5 rounded-control border border-line bg-panel p-0.5 shadow-sm" role="group" aria-label="Show stops as">
+                <button type="button" aria-pressed={mode === 'list'} onClick={() => setMode('list')} className={seg(mode === 'list')} title="Stops as a list">
+                  <ListBullets size={14} weight={mode === 'list' ? 'fill' : 'regular'} /> List
+                </button>
+                <button type="button" aria-pressed={mode === 'map'} onClick={() => setMode('map')} className={seg(mode === 'map')} title="Stops on a map, with the truck">
+                  <MapTrifold size={14} weight={mode === 'map' ? 'fill' : 'regular'} /> Map
+                </button>
+              </div>
+            </div>
+          </header>
+          {mode === 'map' ? (
+            <Suspense fallback={<div className="flex h-[22rem] items-center justify-center rounded-card border border-line bg-panel text-[12px] text-muted">Loading the map…</div>}>
+              <RouteMap view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} selectedStopId={mapSelection} onSelectStop={setSelectedStop} />
+            </Suspense>
+          ) : (
+            <ol className="flex flex-col gap-2">
+              {view.route.stops.map((s) => (
+                <li key={s.id} id={`stop-${s.id}`} className="scroll-mt-16">
+                  <StopReceipt stop={s} delivery={deliveryById.get(s.deliveryId)} view={view} selected={selected.includes(s.id)} onToggle={() => toggle(s.id)} pastLimit={pastLimitIds.has(s.id)} />
+                </li>
+              ))}
+            </ol>
+          )}
+        </section>
       </div>
     </div>
   )

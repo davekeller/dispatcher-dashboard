@@ -10,6 +10,7 @@ export interface Tone {
   soft: string
   border: string
   board?: string
+  pattern?: string
 }
 
 export const BAND_TONE: Record<Band, Tone> = {
@@ -20,8 +21,8 @@ export const BAND_TONE: Record<Band, Tone> = {
   clear: { text: 'text-clear', fill: 'bg-clear-fill', soft: 'bg-clear-soft', border: 'border-clear', board: 'bg-clear-board' },
 }
 
-/** Over the limit is the one state that must never be missed: solid dark red, white text. */
-export const CRITICAL_TONE: Tone = { text: 'text-on-accent', fill: 'bg-act-now', soft: 'bg-act-now', border: 'border-act-now' }
+/** Over the limit is the one state that must never be missed: dark red, white text, striped ground. */
+export const CRITICAL_TONE: Tone = { text: 'text-on-accent', fill: 'bg-act-now', soft: 'bg-act-now', border: 'border-act-now', pattern: 'critical-alert-stripe' }
 export const INFO_TONE: Tone = { text: 'text-muted', fill: 'bg-offline-fill', soft: 'bg-well', border: 'border-line' }
 export const LOOKOUT_TONE: Tone = { text: 'text-lookout-strong', fill: 'bg-lookout', soft: 'bg-lookout-soft', border: 'border-lookout' }
 

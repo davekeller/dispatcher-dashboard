@@ -42,12 +42,15 @@ export default function RecommendationCard({ view, card, pinned = false, compact
           <Link to={`/routes/${view.driver.id}`} title={`Open ${view.driver.name}'s route`} className="shrink-0">
             <DriverAvatar driver={view.driver} size={26} />
           </Link>
-          <div className="min-w-0 flex-1 py-px">
-            {card.alerts.map((a) => (
-              <p key={a.id} className="text-[12px] leading-snug">
-                <span className="font-semibold text-ink">{a.title}</span> <span className="text-muted">{a.body}</span>
-              </p>
-            ))}
+          <div className="min-w-0 flex-1 py-px font-lookout">
+            <div className="space-y-2">
+              {card.alerts.map((a) => (
+                <div key={a.id} className="text-[12px] leading-snug">
+                  <p className="font-semibold text-ink">{a.title}</p>
+                  <p className="mt-1 text-muted">{a.body}</p>
+                </div>
+              ))}
+            </div>
             {(stale || hasStatus) && (
               <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[10px] text-muted">
                 {stale && <Chip tone={STALENESS_TONE[view.staleness]} dashed={offline} className="px-1.5 py-0 text-[9px] leading-4">{fmtAge(view.pingAgeMin)}</Chip>}
@@ -56,7 +59,7 @@ export default function RecommendationCard({ view, card, pinned = false, compact
             )}
           </div>
         </div>
-        <div className="border-t border-line/80 px-2.5 py-1.5">{actions}</div>
+        <div className="border-t border-line/80 px-2.5 py-2">{actions}</div>
       </article>
     )
   }
@@ -78,7 +81,7 @@ export default function RecommendationCard({ view, card, pinned = false, compact
           </div>
           <ul>
             {card.alerts.map((a) => (
-              <li key={a.id} className="border-t border-line/80 px-2.5 py-2 text-[12px] leading-snug">
+              <li key={a.id} className="border-t border-line/80 px-2.5 py-2 font-lookout text-[12px] leading-snug">
                 {!PRIORITY_RULES.has(a.ruleId) && <span className={`mb-1 block text-[9px] font-semibold uppercase tracking-[0.04em] ${severityTone(a.severity).text}`}>{a.label}</span>}
                 <p><span className="font-semibold text-ink">{a.title}</span> <span className="text-muted">{a.body}</span></p>
               </li>

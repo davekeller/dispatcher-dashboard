@@ -12,11 +12,12 @@ const VARIANT: Record<Variant, string> = {
 }
 const SIZE: Record<Size, string> = { sm: 'h-7 px-2.5 text-[12px]', md: 'h-9 px-3.5 text-[13px]' }
 
-export default function Button({ variant = 'secondary', size = 'md', className = '', ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: Size }) {
+export default function Button({ variant = 'secondary', size = 'md', iconOnly = false, className = '', ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: Size; iconOnly?: boolean }) {
+  const sizing = iconOnly ? (size === 'sm' ? 'h-7 w-7 p-0' : 'h-9 w-9 p-0') : SIZE[size]
   return (
     <button
       type="button"
-      className={`inline-flex items-center justify-center gap-1.5 rounded-control font-semibold transition disabled:cursor-not-allowed disabled:opacity-40 ${VARIANT[variant]} ${SIZE[size]} ${className}`}
+      className={`inline-flex items-center justify-center gap-1.5 rounded-control font-semibold transition disabled:cursor-not-allowed disabled:opacity-40 ${VARIANT[variant]} ${sizing} ${className}`}
       {...props}
     />
   )

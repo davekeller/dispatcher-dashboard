@@ -16,7 +16,7 @@ Dispatch combines three layers:
 2. **Strict operational color.** Red, amber, green, slate, and blue describe route state. These colors carry meaning and never become decoration.
 3. **A distinct AI signature.** Lookout owns accessible orange plus a restrained ember → gold → rose → violet → blue spectrum. The spectrum identifies AI entry points and focus, never risk.
 
-The product bar adds one industrial counterweight to those lighter surfaces: the truck logo is an icon-only warm near-black `ink` tile, followed by the Dispatch wordmark as dark text on the white bar. Board remains a lightweight dark text-and-icon navigation item with no resting fill, so it does not compete with the product mark.
+The product bar adds one industrial counterweight to those lighter surfaces: the truck logo is an icon-only warm near-black `ink` tile, followed by the Dispatch wordmark as dark text on the white bar. Board and Map use a quiet warm-neutral fill, inset keyline, and stronger text/icon weight for the selected item. A driver/route detail is a child of Board, so Board remains selected while its route breadcrumb is visible. Lookout's Chat and Timeline tabs use this exact same selected-state pattern instead of a separate underline language.
 
 The result should read as product software, not a marketing page placed around a dashboard.
 
@@ -92,13 +92,13 @@ The board uses one intentionally vivid wash per status lane—Act now `#f8d6df`,
 | `ai-violet` | `#8259d6` | Cool bridge |
 | `ai-cool` | `#4f7cdd` | Decorative gradient end |
 
-Lookout's circular agent mark may deliberately escape these shared tokens. Its current mesh field maps electric cyan, cobalt, violet, hot pink, orange, and acid green through a lightly warped surface beneath the two white insight sparkles. The broader range belongs only inside the avatar, where it makes the agent feel alive without recoloring surrounding product chrome.
+Lookout's circular agent mark may deliberately escape these shared tokens. Its crisp spectrum disc maps electric cyan, cobalt, violet, hot pink, orange, and acid green beneath a simple white pixel face. The broader range belongs only inside the avatar, where it makes the agent feel alive without recoloring surrounding product chrome.
 
 The shift instrument is deliberately outside the AI spectrum. It uses a fully desaturated city photograph beneath a single 70%-opacity warm-black overlay. The five status readings reuse their board-header wash colors as high-contrast foregrounds; throughput remains white and translucent white. This keeps the hero neutral and distinct from Lookout's decorative branding while preserving the board-to-hero status mapping.
 
 The spectrum may appear in:
 
-- Lookout’s mesh-mapped avatar field;
+- Lookout’s spectrum-disc avatar field;
 - the AI ordering control and composer outline;
 - the thin active-tab indicator and softly washed recommendation header;
 - the border of a pinned Lookout recommendation.
@@ -118,8 +118,11 @@ Do not use it for status, charts, full card fills, body text, or routine control
 - route-detail metric values;
 - compact product identity.
 
+**IBM Plex Mono** is Lookout's agent voice. Use it for Lookout-authored recommendations and chat replies, the agent header and tabs, timeline entries, composer text, and branded entry points such as Lookout ordering and pick labels. Shared route cards, evidence values, and action buttons remain in Inter/Bricolage so the underlying operations layer stays consistent.
+
 Rules:
 
+- Apply antialiased font smoothing and optimized legibility at the document root so Inter, Bricolage, IBM Plex Mono, and their fallbacks render consistently throughout the app.
 - Every duration and operational count uses tabular numerals (`.tnum`).
 - Body copy generally sits between 11px and 13px in this desktop-only prototype.
 - Micro-labels use 8–10px, semibold, uppercase, and modest tracking.
@@ -171,42 +174,47 @@ Route cards use the same distinct title row as Lookout recommendations. A compac
 - red circle: failed, past due, or beyond projected HOS;
 - red cross-tick: the HOS boundary.
 
-The spine stays narrow and every stop keeps one evenly spaced position on a single route scale, so a 15–20-stop route remains a literal sequence. Successfully completed deliveries recede into 5px green connective nodes; pending, failed, late, and post-HOS nodes use one fixed 6px size. There is no history compression, percentage-based allocation, or progressive magnification. Emphasis comes only from the small completed-versus-open size step and semantic color. The remainder of the card is one flat structure. Its first row follows a strict four-unit grid: driver assignment spans two units, Stops one, and Up next one. The primary 50% divider therefore continues through the second row's equal HOS fit and Route risk columns, while the additional 75% divider belongs only to the two compact progress readings. Stops and Up next share the same right alignment and cell padding. The truck license identifier moves beneath the driver name in the same micro-label style as Stops and Up next, eliminating the loose inline gap. Ping age remains quiet gray title metadata, never a badge; it compacts to `Now`, `1m ago`, or `25m ago` at board width while the tooltip uses full wording. Both rows use only the card's own dividers—no inset box, extra background, or padded wrapper. Repetitive headings such as "Assigned driver" and "Route progress" are omitted. Lookout’s pick may add a small orange chip; it must not recolor the card.
+The spine stays narrow and every stop keeps one evenly spaced position on a single route scale, so a 15–20-stop route remains a literal sequence. Successfully completed deliveries recede into 5px green connective nodes; pending, failed, late, and post-HOS nodes use one fixed 6px size. There is no history compression, percentage-based allocation, or progressive magnification. Emphasis comes only from the small completed-versus-open size step and semantic color. The remainder of the card is one flat structure. Its first row follows a strict four-unit grid: driver assignment spans two units, Stops one, and Up next one. The primary 50% divider therefore continues through the second row's equal HOS fit and Route risk columns, while the additional 75% divider belongs only to the two compact progress readings. Stops and Up next use slightly larger 13px values, align left with compact equal 4px cell padding, tighten the value-to-label gap to 2px, and omit spaces around the stop-count slash so two-digit values remain distinct at the narrowest lane width. The truck license identifier moves beneath the driver name in the same micro-label style as Stops and Up next, eliminating the loose inline gap. Ping age remains quiet gray title metadata, never a badge; it compacts to `Now`, `1m ago`, or `25m ago` at board width while the tooltip uses full wording. Over-limit cards use the same critical red keyline as the route-detail alert card; approaching-limit cards use a lighter red mix. Other reasons retain the neutral border even when they share an Act Now or Watch lane. Both rows use only the card's own dividers—no inset box, extra background, or padded wrapper. Repetitive headings such as "Assigned driver" and "Route progress" are omitted. Lookout’s pick may add a small orange chip; it must not recolor the card.
 
 ### Route file
 
-The top-level driver header is one card, not a stack of similar containers. Its padded identity and live-countdown section sits above a full-width five-column grid for Driving today, On duty, Break, Stops, and Driving left vs. limit. The grid touches the card edges, uses one horizontal boundary plus simple vertical dividers, and gives every cell the same padding and vertical centering—no nested metric cards or gutters. Active alerts continue below as flat, divided message-and-action rows inside this same shell. An over-limit driver adds a 3px Act now red left border across the complete card, reinforcing the badge and countdown without tinting the surface. The Stops section begins beneath the unified header rather than after a separate alert card.
+The top-level driver header keeps two layers inside one card: its padded identity and live-countdown section above a full-width five-column grid for Driving today, On duty, Break, Stops, and Driving left vs. limit. The grid touches the card edges, uses one horizontal boundary plus simple vertical dividers, and gives every cell the same padding and vertical centering—no nested metric cards or gutters. Active alerts move into a separate card directly below. Every alert is one horizontal row with an icon in a narrow first column, status and explanation in the flexible middle, and a no-wrap action group aligned to the right; multiple alerts share the card and divide into rows. Critical alert cards receive a restrained red keyline around the full card. An over-limit driver also adds a 3px Act now red left border across the two-layer driver card, reinforcing the badge and countdown without tinting the surface.
+
+The Stops section begins with a compact white instrument bar: icon and delivered count on the left, route actions and List/Map mode on the right. It remains sticky at the top of the route workspace beneath the product bar, keeping selection and mode controls available while the receipts scroll.
+
+Route details use the same cool `board` canvas as the dispatch board, with white cards as the foreground plane. Neutral controls and receipt fact bands use translucent board gray instead of the warmer page `canvas`; route alerts, stale banners, and late rail rows use the same stronger `*-board` status washes as the board lane headers. Chips retain their softer fills so compact labels remain distinct from structural surfaces.
 
 The expanded detail rail uses the same light-to-dark completed-path gradient and subtle next-stop marker emphasis as the mini timeline. Completed rows tighten from 40px to 32px, but retain their time, stop number, name, full click target, and one-to-one receipt mapping; failed stops remain full-size and red.
 
-The left rail and the receipt list are literal counterparts: one timeline node per receipt. Timeline entries read marker → time → stop number and name. The rail uses the same light, flat grid grammar as the rest of the product: Route status expands to a 2×2 divider grid for Progress, Remaining, Schedule, and HOS fit; Route timeline expands beneath it. Each section collapses independently, and neither introduces an inset card or dark header block.
+The left rail and the receipt list are literal counterparts: one timeline node per receipt. The rail sits flush against the left edge of the route view and defaults collapsed, preserving the full stop spine while giving the detail grid the working width. Timeline entries read marker → time → stop number and name. Expanded, the rail uses the same light, flat grid grammar as the rest of the product: Route status opens to a 2×2 divider grid for Progress, Remaining, Schedule, and HOS fit; Route timeline opens beneath it. Each section collapses independently, and neither introduces an inset card or dark header block.
 
 Each stop receipt applies the same case-file grammar as four clear columns:
 
-- the first narrow column centers a large bare stop number, without a number sign, beside the exact semantic marker used by the corresponding route-rail node;
+- a dedicated 16px gutter outside the cards carries the shared semantic markers and a continuous one-pixel spine across card gaps, grading completed history green before continuing gray or red with the same semantics as the route rail;
+- the card itself begins with a compact bare-number column, using a restrained sans-serif number with the rail sequence's semibold weight;
 - the second column stacks the stop name, address, status, and instructions;
 - the third column is a compact horizontal event track with equal lanes for each label and time or result;
 - completed event spines read Arrived → Left → Signed;
 - pending event spines read Planned → Projected → Window;
 - the remaining right side is a compact, single-row grid of four scan metrics rather than a sentence of metadata;
 - a vertical ellipsis floats at the far right without a cell or divider and opens stop-level Reassign, Add/edit note, and Cancel actions;
-- status chips remain beside identity, not inside the metric cells.
+- operational status chips remain beside identity; the delivery-priority badge appears only in the dedicated Priority metric cell.
 
 All receipt sections center vertically across the row. Dispatcher notes are neutral supporting text, not alert red. This keeps identity easy to read, chronology left-to-right, and measurements comparable in one scan.
 
 ### Lookout
 
-Lookout is visually related to the main product but clearly has a separate role. Its original mark maps six vivid color regions through a lightly warped mesh behind one large and one small white line sparkle:
+Lookout is visually related to the main product but clearly has a separate role. Its original mark maps six vivid color regions into a clean clipped circle with no outline, behind a small white pixel face:
 
 - orange active tab and name;
-- freeform cyan-to-lime mesh avatar with a centered two-sparkle white line foreground;
+- cyan-to-lime spectrum-disc avatar with a centered, friendly white pixel face;
 - softly washed recommendation header;
 - one pill-shaped composer with the mark inset left, a five-stop gradient outline, and a dark circular send action;
 - gradient outline around a pinned recommendation and a thin spectral active-tab underline;
 - white recommendation cards with normal operational severity inside them;
 - the same flat route-card shell: route/status header, miniature stop spine, centered driver row, full-width explanation rows, and a divided action footer.
 
-Recommendation cards preserve their explanation and actions instead of repeating the board's four scan metrics. They follow the same priority-badge and plain-text freshness rules as board cards; secondary reason labels are text, not chips. Lookout never replaces status color with its own gradient and never hides the underlying evidence.
+Recommendation cards preserve their explanation and actions instead of repeating the board's four scan metrics. Compact recommendations give each alert three explicit beats: the bold directive on its own line, muted supporting evidence beneath it with a small gap, and the divided action row below. They follow the same priority-badge and plain-text freshness rules as board cards; secondary reason labels are text, not chips. Lookout never replaces status color with its own gradient and never hides the underlying evidence.
 
 ---
 
@@ -224,7 +232,7 @@ Disabled controls keep their label visible and use reduced opacity. Every positi
 
 ### Chips
 
-Chips label state; they do not behave like buttons unless explicitly wired as filters. Critical Over limit chips use dark red with white text. Other status chips use strong text on their matching soft ground.
+Chips label state; they do not behave like buttons unless explicitly wired as filters. Critical Over limit chips use dark red with white text and a subtle 1px vertical stripe pattern to separate the hard limit from other red statuses. Other status chips use strong text on their matching soft ground.
 
 ### Inputs and focus
 
