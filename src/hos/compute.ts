@@ -8,11 +8,13 @@ export type Staleness = 'fresh' | 'stale' | 'offline'
 
 /** Where the truck's telematics last reached us. Online drivers ping continuously
  *  (derived, not mutated), so scrubbing the clock or leaving a tab open never blacks
- *  out the fleet. Planted stale/offline drivers keep their stored ping. */
+ *  out the fleet. Planted stale/offline drivers keep their stored ping, until the clock
+ *  is scrubbed back before it. */
 export function effectiveLastPingAt(driver: Driver, now: number): number {
-  if (driver.pingsSuspended) return driver.lastPingAt
+  // Never in the future: scrubbed back before a stored ping, the truck had simply pinged by then.
+  if (driver.pingsSuspended) return Math.min(driver.lastPingAt, now)
   const jitter = hashString(driver.id) % PING_JITTER_MS
-  return Math.max(driver.lastPingAt, now - jitter)
+  return Math.min(now, Math.max(driver.lastPingAt, now - jitter))
 }
 
 /** The segments as they were known at `at`: started by then, with any segment that
