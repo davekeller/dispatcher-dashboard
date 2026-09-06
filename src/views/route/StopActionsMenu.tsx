@@ -1,4 +1,5 @@
 import { ArrowsLeftRight, DotsThreeVertical, NotePencil, Prohibit } from '@phosphor-icons/react'
+import type { ReactNode } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useActions } from '../../actions/ActionContext'
@@ -10,7 +11,7 @@ import Modal from '../../ui/Modal'
 
 type Dialog = 'note' | 'cancel' | null
 
-export default function StopActionsMenu({ stop, view, customer }: { stop: Stop; view: DriverView; customer: string }) {
+export default function StopActionsMenu({ stop, view, customer, selectionControl }: { stop: Stop; view: DriverView; customer: string; selectionControl?: ReactNode }) {
   const { open: openAction } = useActions()
   const updateStopNote = useStore((state) => state.updateStopNote)
   const cancelStop = useStore((state) => state.cancelStop)
@@ -63,10 +64,11 @@ export default function StopActionsMenu({ stop, view, customer }: { stop: Stop; 
 
   return (
     <>
-      <div className="absolute right-0.5 top-1.5 z-20 lg:top-1/2 lg:-translate-y-1/2">
+      <div className="absolute right-1 top-1.5 z-20 flex items-center gap-1 lg:top-1/2 lg:-translate-y-1/2">
         <button ref={buttonRef} type="button" onClick={toggleMenu} aria-haspopup="menu" aria-expanded={open} aria-label={`More actions for stop ${stop.seq}, ${customer}`} title="More stop actions" className="flex h-7 w-5 items-center justify-center rounded-control text-muted transition hover:bg-well hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/15">
           <DotsThreeVertical size={17} weight="bold" />
         </button>
+        {selectionControl}
       </div>
 
       {open && createPortal(
