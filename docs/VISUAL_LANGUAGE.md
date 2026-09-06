@@ -199,7 +199,8 @@ Each stop receipt applies the same case-file grammar as four clear columns:
 - completed event spines read Arrived → Left → Signed;
 - pending event spines read Planned → Projected → Window;
 - the remaining right side is a compact, single-row grid of four scan metrics rather than a sentence of metadata;
-- a vertical ellipsis floats at the far right without a cell or divider and opens stop-level Reassign, Add/edit note, and Cancel actions; unresolved stops place their batch-selection checkbox immediately to its left, so the eye reads pick, then act;
+- a vertical ellipsis floats at the far right without a cell or divider and opens stop-level Reassign, Add/edit note, and Cancel actions;
+- unresolved receipts are directly selectable across the full card surface and use the shared pale slate selection wash; a plain click toggles one receipt and Shift-click adds the contiguous visible range, while the ellipsis remains an independent target;
 - operational status chips remain beside identity; the delivery-priority badge appears only in the dedicated Priority metric cell.
 
 All receipt sections center vertically across the row. Dispatcher notes are neutral supporting text, not alert red. This keeps identity easy to read, chronology left-to-right, and measurements comparable in one scan.

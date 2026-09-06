@@ -35,7 +35,7 @@ function stopOutcome(stop: Stop): string {
 
 /** A receipt follows the same file pattern as the surrounding route: identity first,
  * a small horizontal event track second, then a compact one-row fact grid. */
-export default function StopReceipt({ stop, delivery, view, selected, onToggle, pastLimit = false }: { stop: Stop; delivery: Delivery | undefined; view: DriverView; selected: boolean; onToggle: () => void; pastLimit?: boolean }) {
+export default function StopReceipt({ stop, delivery, view, selected, onSelect, pastLimit = false }: { stop: Stop; delivery: Delivery | undefined; view: DriverView; selected: boolean; onSelect: (extendRange: boolean) => void; pastLimit?: boolean }) {
   const isNext = view.next?.id === stop.id
   const pending = stop.status === 'pending'
   const eta = pending ? projectedEta(stop, view.driftMin) : undefined
@@ -94,7 +94,20 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
         <span aria-hidden="true" className={`pointer-events-none absolute left-1/2 w-px -translate-x-1/2 ${timelineTone} ${firstStop ? 'top-1/2' : '-top-1'} ${lastStop ? 'bottom-1/2' : '-bottom-1'}`} style={timelineStyle} />
         <StopStatusMarker stop={stop} pastLimit={pastLimit} late={pastWindow} className="h-3.5 w-3.5" style={timelineStyle} />
       </div>
-      <article className={`relative grid overflow-hidden rounded-card border bg-panel shadow-card lg:grid-cols-[2.5rem_minmax(8.75rem,0.72fr)_minmax(9.75rem,0.95fr)_minmax(16rem,1.55fr)] ${isNext ? 'border-break' : pastLimit || pastWindow ? 'border-act-now/50' : 'border-line'} ${stop.status === 'unassigned' ? 'border-dashed' : ''}`}>
+      <div className="relative">
+        <article
+          role={selectable ? 'checkbox' : undefined}
+          aria-checked={selectable ? selected : undefined}
+          aria-label={selectable ? `${selected ? 'Deselect' : 'Select'} stop ${stop.seq}, ${delivery?.customer ?? stop.deliveryId}` : undefined}
+          tabIndex={selectable ? 0 : undefined}
+          onClick={selectable ? (event) => onSelect(event.shiftKey) : undefined}
+          onKeyDown={selectable ? (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return
+            event.preventDefault()
+            onSelect(event.shiftKey)
+          } : undefined}
+          className={`relative grid overflow-hidden rounded-card border shadow-card transition-colors lg:grid-cols-[2.5rem_minmax(8.75rem,0.72fr)_minmax(9.75rem,0.95fr)_minmax(16rem,1.55fr)] ${isNext ? 'border-break' : pastLimit || pastWindow ? 'border-act-now/50' : 'border-line'} ${stop.status === 'unassigned' ? 'border-dashed' : ''} ${selected ? 'bg-nav-selected ring-1 ring-inset ring-nav-selected-line' : 'bg-panel'} ${selectable ? 'cursor-pointer hover:bg-nav-selected/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nav-selected-line focus-visible:ring-offset-2' : ''}`}
+        >
         <div className="flex min-h-16 items-center justify-center border-b border-line px-1 lg:min-h-0 lg:border-b-0 lg:border-r">
           <span className="tnum min-w-0 text-center text-xl font-semibold leading-none tracking-[-0.025em] text-ink/80">{stop.seq}</span>
         </div>
@@ -122,7 +135,7 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
           </ol>
         </div>
 
-        <dl className={`grid grid-cols-4 bg-board/45 ${selectable ? 'pr-14' : 'pr-8'}`}>
+        <dl className={`grid grid-cols-4 pr-8 ${selected ? 'bg-nav-selected/70' : 'bg-board/45'}`}>
           {facts.map((fact, index) => (
             <div key={fact.label} className={`flex min-w-0 flex-col justify-center px-2.5 py-3 ${index < facts.length - 1 ? 'border-r border-line' : ''}`}>
               <dt className="truncate text-[8px] font-semibold uppercase tracking-[0.04em] text-label" title={fact.label}>{fact.label}</dt>
@@ -145,13 +158,9 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
             </span>
           </div>
         )}
-        <StopActionsMenu
-          stop={stop}
-          view={view}
-          customer={delivery?.customer ?? stop.deliveryId}
-          selectionControl={selectable ? <input type="checkbox" checked={selected} onChange={onToggle} aria-label={`Select stop ${stop.seq} to reassign`} className="h-3.5 w-3.5 shrink-0 accent-ink" /> : undefined}
-        />
-      </article>
+        </article>
+        <StopActionsMenu stop={stop} view={view} customer={delivery?.customer ?? stop.deliveryId} />
+      </div>
     </div>
   )
 }
