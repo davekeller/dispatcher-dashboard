@@ -179,11 +179,11 @@ The top-level driver header is one card, not a stack of similar containers. Its 
 
 The expanded detail rail uses the same light-to-dark completed-path gradient and subtle next-stop marker emphasis as the mini timeline. Completed rows tighten from 40px to 32px, but retain their time, stop number, name, full click target, and one-to-one receipt mapping; failed stops remain full-size and red.
 
-The left rail and the receipt list are literal counterparts: one timeline node per receipt. Timeline entries read marker → time → stop number and name. The rail uses the same light, flat grid grammar as the rest of the product: Route status expands to a 2×2 divider grid for Progress, Remaining, Schedule, and HOS fit; Route timeline expands beneath it. Each section collapses independently, and neither introduces an inset card or dark header block.
+The left rail and the receipt list are literal counterparts: one timeline node per receipt. The rail sits flush against the left edge of the route view and defaults collapsed, preserving the full stop spine while giving the detail grid the working width. Timeline entries read marker → time → stop number and name. Expanded, the rail uses the same light, flat grid grammar as the rest of the product: Route status opens to a 2×2 divider grid for Progress, Remaining, Schedule, and HOS fit; Route timeline opens beneath it. Each section collapses independently, and neither introduces an inset card or dark header block.
 
 Each stop receipt applies the same case-file grammar as four clear columns:
 
-- the first narrow column centers a large bare stop number, without a number sign, beside the exact semantic marker used by the corresponding route-rail node;
+- the first narrow column gives the shared semantic marker and bare stop number fixed internal slots, with a restrained sans-serif number using the rail sequence's semibold weight;
 - the second column stacks the stop name, address, status, and instructions;
 - the third column is a compact horizontal event track with equal lanes for each label and time or result;
 - completed event spines read Arrived → Left → Signed;

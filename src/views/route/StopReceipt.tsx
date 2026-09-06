@@ -81,10 +81,12 @@ export default function StopReceipt({ stop, delivery, view, selected, onToggle, 
   ]
 
   return (
-    <article className={`relative grid overflow-hidden rounded-card border bg-panel shadow-card lg:grid-cols-[3.75rem_minmax(7rem,0.8fr)_minmax(9rem,1fr)_minmax(14rem,1.35fr)] ${isNext ? 'border-break' : pastLimit || pastWindow ? 'border-act-now/50' : 'border-line'} ${stop.status === 'unassigned' ? 'border-dashed' : ''}`}>
-      <div className="flex min-h-16 items-center justify-center gap-1.5 border-b border-line px-1 lg:min-h-0 lg:border-b-0 lg:border-r">
-        <StopStatusMarker stop={stop} pastLimit={pastLimit} late={pastWindow} className="h-4 w-4" style={stop.status === 'done' ? stopHistoryStyle(stopIndex, lastCompleteIndex) : undefined} />
-        <span className="tnum font-display text-[2rem] font-semibold leading-none tracking-[-0.055em] text-ink/80">{stop.seq}</span>
+    <article className={`relative grid overflow-hidden rounded-card border bg-panel shadow-card lg:grid-cols-[3.5rem_minmax(7rem,0.8fr)_minmax(9rem,1fr)_minmax(14rem,1.35fr)] ${isNext ? 'border-break' : pastLimit || pastWindow ? 'border-act-now/50' : 'border-line'} ${stop.status === 'unassigned' ? 'border-dashed' : ''}`}>
+      <div className="grid min-h-16 grid-cols-[0.875rem_minmax(0,1fr)] items-center gap-1.5 border-b border-line px-1.5 lg:min-h-0 lg:border-b-0 lg:border-r">
+        <span className="flex items-center justify-center">
+          <StopStatusMarker stop={stop} pastLimit={pastLimit} late={pastWindow} className="h-3.5 w-3.5" style={stop.status === 'done' ? stopHistoryStyle(stopIndex, lastCompleteIndex) : undefined} />
+        </span>
+        <span className="tnum min-w-0 text-center text-[1.625rem] font-semibold leading-none tracking-[-0.035em] text-ink/80">{stop.seq}</span>
       </div>
 
       <div className="relative flex min-w-0 flex-col justify-center border-b border-line p-3 lg:border-b-0 lg:border-r">
