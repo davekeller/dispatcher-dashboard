@@ -81,8 +81,8 @@ export default function RouteFilePage() {
                 <ListBullets size={15} weight="bold" />
               </span>
               <div className="min-w-0">
-                <h2 className="text-[12px] font-semibold uppercase leading-none tracking-[0.07em] text-ink">Stops</h2>
-                <p className="tnum mt-1 whitespace-nowrap text-[10px] leading-none text-muted">{view.done} of {view.total} delivered</p>
+                <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">Stops</p>
+                <h2 className="tnum mt-1 whitespace-nowrap text-[13px] font-semibold leading-none text-ink">{view.done}/{view.total} delivered</h2>
               </div>
             </div>
             <div className="ml-auto flex gap-2">
