@@ -203,7 +203,7 @@ All receipt sections center vertically across the row. Dispatcher notes are neut
 
 ### Lookout
 
-Lookout is visually related to the main product but clearly has a separate role. Its original mark maps six vivid color regions inside a precise circular edge behind a small white pixel face:
+Lookout is visually related to the main product but clearly has a separate role. Its original mark maps six vivid color regions into a clean clipped circle with no outline, behind a small white pixel face:
 
 - orange active tab and name;
 - cyan-to-lime spectrum-disc avatar with a centered, friendly white pixel face;

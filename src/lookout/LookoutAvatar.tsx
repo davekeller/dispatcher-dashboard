@@ -49,7 +49,6 @@ export default function LookoutAvatar({ size = 28, className = '' }: { size?: nu
         <circle cx="16" cy="16" r="15" fill={`url(#${orangeId})`} />
         <circle cx="16" cy="16" r="15" fill={`url(#${limeId})`} />
       </g>
-      <circle cx="16" cy="16" r="14.6" fill="none" className="stroke-on-accent" strokeWidth=".8" opacity=".72" vectorEffect="non-scaling-stroke" />
       <g className="fill-on-accent" shapeRendering="crispEdges">
         <rect x="9" y="10" width="4" height="4" />
         <rect x="19" y="10" width="4" height="4" />
