@@ -1,3 +1,4 @@
+import { SCRUB_MIN_MS } from '../time/clock'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { remainingDriveMinutes } from '../hos/compute'
 import { useStore } from './store'
@@ -37,12 +38,12 @@ describe('store', () => {
     expect(until - s.now()).toBeGreaterThan(9 * 60_000)
   })
 
-  it('the scrubber sets an absolute offset and never goes before the anchor', () => {
+  it('the scrubber sets an absolute offset and never goes before 6:00 AM', () => {
     const t0 = useStore.getState().now()
     useStore.getState().setScrubOffset(90 * 60_000)
     expect(useStore.getState().now() - t0).toBeGreaterThanOrEqual(90 * 60_000)
-    useStore.getState().setScrubOffset(-5)
-    expect(useStore.getState().scrubOffsetMs).toBe(0)
+    useStore.getState().setScrubOffset(-99 * 60 * 60_000)
+    expect(useStore.getState().scrubOffsetMs).toBe(SCRUB_MIN_MS)
   })
 
   it('scrub moves the simulated clock', () => {

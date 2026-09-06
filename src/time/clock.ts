@@ -15,6 +15,20 @@ export function scenarioAnchor(from: Date = new Date()): number {
 export const ANCHOR = scenarioAnchor()
 export const LOADED_AT = Date.now()
 
+// The simulated day is Lena's shift with the evening the routes run into: 6:00 AM to
+// 6:00 PM. The scrubber covers all of it, in both directions, around the 2:47 anchor.
+export const DAY_START_HOUR = 6
+export const DAY_END_HOUR = 18
+export const DAY_START = scenarioAnchor(new Date(ANCHOR)) - (ANCHOR_HOUR - DAY_START_HOUR) * 60 * MIN - ANCHOR_MINUTE * MIN
+export const DAY_END = DAY_START + (DAY_END_HOUR - DAY_START_HOUR) * 60 * MIN
+export const SCRUB_MIN_MS = DAY_START - ANCHOR
+export const SCRUB_MAX_MS = DAY_END - ANCHOR
+
+/** Keep the scrub offset inside the simulated day. */
+export function clampScrub(ms: number): number {
+  return Math.min(SCRUB_MAX_MS, Math.max(SCRUB_MIN_MS, ms))
+}
+
 export function simNow(scrubOffsetMs: number, wall: number = Date.now(), loadedAt: number = LOADED_AT, anchor: number = ANCHOR): number {
   return anchor + (wall - loadedAt) + scrubOffsetMs
 }

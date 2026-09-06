@@ -5,7 +5,7 @@ import type { Fleet, StopOutcome } from '../data/types'
 import type { GroupingId } from '../groupBy'
 import { minutesUntilLimit } from '../hos/compute'
 import { SNOOZE_MIN } from '../hos/constants'
-import { ANCHOR, MIN, simNow } from '../time/clock'
+import { ANCHOR, MIN, clampScrub, simNow } from '../time/clock'
 import * as A from './actions'
 
 export interface LastAction {
@@ -53,6 +53,7 @@ export interface State {
   undo: () => void
   scrub: (ms: number) => void
   setScrubOffset: (ms: number) => void
+  setClock: (t: number) => void
   resetClock: () => void
   resetFleet: () => void
   setGroupBy: (id: GroupingId) => void
@@ -124,11 +125,16 @@ export const useStore = create<State>()((set, get) => {
       log('undo', undone ? `Undone: ${undone}` : 'Undone')
     },
     scrub: (ms) => {
-      set((s) => ({ scrubOffsetMs: Math.max(0, s.scrubOffsetMs + ms) }))
+      set((s) => ({ scrubOffsetMs: clampScrub(s.scrubOffsetMs + ms) }))
       get().advanceWorld()
     },
     setScrubOffset: (ms) => {
-      set({ scrubOffsetMs: Math.max(0, ms) })
+      set({ scrubOffsetMs: clampScrub(ms) })
+      get().advanceWorld()
+    },
+    setClock: (t) => {
+      // An absolute time of day: the offset that lands the live clock on it.
+      set({ scrubOffsetMs: clampScrub(t - simNow(0)) })
       get().advanceWorld()
     },
     resetClock: () => {
