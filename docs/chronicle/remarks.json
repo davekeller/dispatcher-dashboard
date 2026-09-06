@@ -1,7 +1,7 @@
 {
   "2026-09-03": {
     "headline": "Design docs at five, a running board by seven",
-    "body": "The brief, layout, flows and architecture spec land first, then a fresh Vite scaffold — Meridian's patterns ported by hand rather than forked, so reviewers reading package.json find no baggage (decision 14). The whole vertical slice follows in ninety minutes: seeded PRNG and a simulated clock, pure HOS math with boundary tests, fifty drivers with ten planted scenarios, rules and filters as config arrays, the three-pane shell, the Lookout rail, and the route file. Two fixes that night were the interesting ones — limit rules were speaking for drivers who had gone dark, and rank was jostling cards on sub-minute ties. A late pass tore out the left nav for a product bar and stood the route file's stops up on a vertical spine."
+    "body": "The brief, layout, flows and architecture spec land first, then a fresh Vite scaffold — earlier patterns ported by hand rather than forked, so reviewers reading package.json find no baggage (decision 14). The whole vertical slice follows in ninety minutes: seeded PRNG and a simulated clock, pure HOS math with boundary tests, fifty drivers with ten planted scenarios, rules and filters as config arrays, the three-pane shell, the Lookout rail, and the route file. Two fixes that night were the interesting ones — limit rules were speaking for drivers who had gone dark, and rank was jostling cards on sub-minute ties. A late pass tore out the left nav for a product bar and stood the route file's stops up on a vertical spine."
   },
   "2026-09-04": {
     "headline": "Lookout gets a face, then a voice",

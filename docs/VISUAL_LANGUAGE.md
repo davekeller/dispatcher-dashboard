@@ -192,12 +192,12 @@ Each stop receipt applies the same case-file grammar as four clear columns:
 
 - a dedicated 16px gutter outside the cards carries the shared semantic markers and a continuous one-pixel spine across card gaps, grading completed history green before continuing gray or red with the same semantics as the route rail;
 - the card itself begins with a compact bare-number column, using a 20px sans-serif number with the rail sequence's semibold weight;
-- the second column stacks the stop name, address, status, and instructions;
+- the second column stacks the stop name, address, and status; delivery instructions, the dispatcher note, and the notified stamp sit in their own Notes strip along the bottom of the card;
 - the third column is a compact horizontal event track with equal lanes for each label and time or result;
 - completed event spines read Arrived → Left → Signed;
 - pending event spines read Planned → Projected → Window;
 - the remaining right side is a compact, single-row grid of four scan metrics rather than a sentence of metadata;
-- a vertical ellipsis floats at the far right without a cell or divider and opens stop-level Reassign, Add/edit note, and Cancel actions; unresolved stops place their batch-selection checkbox immediately after it at the outer edge;
+- a vertical ellipsis floats at the far right without a cell or divider and opens stop-level Reassign, Add/edit note, and Cancel actions; unresolved stops place their batch-selection checkbox immediately to its left, so the eye reads pick, then act;
 - operational status chips remain beside identity; the delivery-priority badge appears only in the dedicated Priority metric cell.
 
 All receipt sections center vertically across the row. Dispatcher notes are neutral supporting text, not alert red. This keeps identity easy to read, chronology left-to-right, and measurements comparable in one scan.
