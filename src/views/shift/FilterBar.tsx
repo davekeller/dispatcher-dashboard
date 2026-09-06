@@ -2,6 +2,7 @@ import { Columns, MagnifyingGlass, MapPin, X } from '@phosphor-icons/react'
 import { EMPTY_FILTERS, FILTERS, isFiltering, type FilterState } from '../../filters'
 import { GROUPINGS, type GroupingId } from '../../groupBy'
 import Button from '../../ui/Button'
+import { navigationItemState } from '../../ui/navigation'
 import FiltersDropdown from './FiltersDropdown'
 import OrderDropdown, { BOARD_ORDERS } from './OrderDropdown'
 import type { BoardSort } from './boardSort'
@@ -31,7 +32,7 @@ export default function FilterBar({ filters, onChange, sort, onSortChange, group
             const selected = groupBy === grouping.id
             const Glyph = grouping.id === 'band' ? Columns : MapPin
             return (
-              <button key={grouping.id} type="button" aria-pressed={selected} onClick={() => onGroupByChange(grouping.id)} className={`inline-flex h-7 items-center gap-1.5 rounded-[6px] px-2.5 text-[11px] font-semibold transition ${selected ? 'bg-well text-ink' : 'text-muted hover:text-ink'}`}>
+              <button key={grouping.id} type="button" aria-pressed={selected} onClick={() => onGroupByChange(grouping.id)} className={`inline-flex h-7 items-center gap-1.5 rounded-[6px] px-2.5 text-[11px] font-semibold transition ${navigationItemState(selected)}`}>
                 <Glyph size={14} weight={selected ? 'fill' : 'regular'} /> {grouping.label}
               </button>
             )
