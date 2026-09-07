@@ -27,7 +27,9 @@ export default function RecommendationCard({ view, card, pinned = false, compact
   const staleReason = stale ? `Last ping ${fmtAge(view.pingAgeMin)}. Position-dependent actions are disabled until the truck reports in.` : undefined
   const snoozedUntil = card.snoozed ? Math.max(...card.alerts.map((a) => snoozes[a.id] ?? 0)) : undefined
   const hasStatus = view.driver.contactAttemptedAt !== undefined || snoozedUntil !== undefined || hasCorrection
-  const surface = `overflow-hidden rounded-card border-[1.5px] bg-panel shadow-card ${pinned ? 'lookout-card-ring' : 'border-line'} ${card.snoozed ? 'opacity-60' : ''}`
+  const surface = compact
+    ? `overflow-hidden rounded-control border bg-panel/70 ${pinned ? 'lookout-card-ring' : 'border-line/60'} ${card.snoozed ? 'opacity-60' : ''}`
+    : `overflow-hidden rounded-card border-[1.5px] bg-panel shadow-card ${pinned ? 'lookout-card-ring' : 'border-line'} ${card.snoozed ? 'opacity-60' : ''}`
   const actions = <AlertActions driverId={view.driver.id} actions={card.alerts.flatMap((a) => a.actions)} alertIds={card.alerts.map((a) => a.id)} positionDependentDisabled={staleReason} resetScheduledAt={view.plannedResetAt} />
   const status = (
     <>
@@ -61,7 +63,7 @@ export default function RecommendationCard({ view, card, pinned = false, compact
             )}
           </div>
         </div>
-        <div className="border-t border-line/80 px-2.5 py-2">{actions}</div>
+        <div className="border-t border-line/50 px-2.5 py-1.5">{actions}</div>
       </article>
     )
   }
