@@ -214,10 +214,10 @@ Lookout is visually related to the main product but clearly has a separate role.
 - softly washed recommendation header;
 - one pill-shaped composer with the mark inset left, a five-stop gradient outline, and a dark circular send action;
 - gradient outline around a pinned recommendation and a thin spectral active-tab underline;
-- white recommendation cards with normal operational severity inside them;
+- translucent white recommendation rows with restrained keylines and normal operational severity inside them;
 - the same flat route-card shell: route/status header, miniature stop spine, centered driver row, full-width explanation rows, and a divided action footer.
 
-Recommendation cards preserve their explanation and actions instead of repeating the board's four scan metrics. Compact recommendations give each alert three explicit beats: the bold directive on its own line, muted supporting evidence beneath it with a small gap, and the divided action row below. They follow the same priority-badge and plain-text freshness rules as board cards; secondary reason labels are text, not chips. Lookout never replaces status color with its own gradient and never hides the underlying evidence.
+Recommendation cards preserve their explanation and actions instead of repeating the board's four scan metrics. Inside the already-colored Recommends panel, compact recommendations use a translucent white surface, one subtle keyline, a control-sized radius, and no shadow. Tighter gaps keep the group reading as a recommendation list rather than a stack of dashboard cards. Each alert still has three explicit beats: the bold directive on its own line, muted supporting evidence beneath it with a small gap, and a lightly divided action row below. They follow the same priority-badge and plain-text freshness rules as board cards; secondary reason labels are text, not chips. Lookout never replaces status color with its own gradient and never hides the underlying evidence.
 
 ---
 

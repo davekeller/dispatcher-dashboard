@@ -15,7 +15,7 @@ export default function RecommendationsBar({ open, onToggle, summary, children }
         <span className="ml-auto truncate text-[11px] text-lookout-strong/80">{summary}</span>
         {open ? <CaretUp size={14} className="shrink-0 text-lookout-strong" /> : <CaretDown size={14} className="shrink-0 text-lookout-strong" />}
       </button>
-      {open && <div className="lookout-soft-surface flex flex-col gap-3 border-b border-lookout/15 p-3">{children}</div>}
+      {open && <div className="lookout-soft-surface flex flex-col gap-2 border-b border-lookout/15 p-2.5">{children}</div>}
     </section>
   )
 }

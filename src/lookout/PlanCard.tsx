@@ -18,7 +18,7 @@ export default function PlanCard({ plan, view }: { plan: Plan; view: DriverView 
   const blockedReason = blocked ? `Last ping ${fmtAge(view.pingAgeMin)}. Position-dependent actions are disabled until the truck reports in.` : undefined
   const action = plan.action
   return (
-    <article className="rounded-card border border-line bg-panel px-3 py-2.5 shadow-card">
+    <article className="rounded-control border border-line/60 bg-panel/70 px-2.5 py-2">
       <div className="flex items-start gap-2">
         <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${plan.severity === 'none' ? 'bg-clear-fill' : tone.fill}`} aria-hidden="true" />
         <div className="min-w-0 flex-1">
@@ -27,7 +27,7 @@ export default function PlanCard({ plan, view }: { plan: Plan; view: DriverView 
         </div>
       </div>
       {(action || plan.call) && (
-        <div className="mt-2 flex flex-wrap gap-1.5 pl-4">
+        <div className="mt-1.5 flex flex-wrap gap-1.5 pl-4">
           {action && (
             <Button size="sm" variant={plan.kind === 'reassign' || plan.kind === 'assign' ? 'primary' : 'secondary'} disabled={blocked} title={blockedReason} onClick={() => open(action.action, view.driver.id, { stopIds: action.stopIds, toId: action.toId, afterStopId: action.afterStopId })}>
               {action.label}
