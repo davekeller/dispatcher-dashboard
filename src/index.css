@@ -175,6 +175,22 @@ body { @apply bg-canvas text-ink font-sans; }
   border-color: color-mix(in srgb, var(--color-act-now) 42%, var(--color-line));
 }
 
+/* The route file scrolls over one fixed depth field: open and light near the header, then
+   gradually deeper slate toward the continued route history below. */
+.route-workspace {
+  background-color: var(--color-board);
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-panel) 38%, var(--color-board)) 0%,
+    var(--color-board) 38%,
+    color-mix(in srgb, var(--color-offline-board) 68%, var(--color-board)) 100%
+  );
+  background-attachment: fixed;
+  background-position: left top;
+  background-repeat: no-repeat;
+  background-size: 100% 100vh;
+}
+
 @keyframes lane-content-enter {
   from { opacity: 0; transform: translateY(3px); }
   to { opacity: 1; transform: translateY(0); }

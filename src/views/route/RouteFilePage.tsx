@@ -80,7 +80,7 @@ export default function RouteFilePage() {
   const seg = (on: boolean) => `inline-flex h-7 items-center gap-1.5 rounded-[6px] px-2.5 text-[11px] font-semibold transition ${on ? 'bg-board text-ink' : 'text-muted hover:bg-board/60 hover:text-ink'}`
 
   return (
-    <div className="flex min-h-full items-start gap-5 bg-board py-5 pr-5">
+    <div className="route-workspace flex min-h-full items-start gap-5 py-5 pr-5">
       <RouteRail view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} collapsed={railCollapsed} onCollapsedChange={setRailCollapsed} activeStopId={mode === 'map' ? mapSelection : undefined} onSelectStop={mode === 'map' ? setSelectedStop : undefined} />
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         <DriverCard view={view} card={card} />
