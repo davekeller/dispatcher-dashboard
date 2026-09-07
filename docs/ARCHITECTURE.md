@@ -298,7 +298,7 @@ Every action follows the same protocol: **preview → confirm → commit → rec
 
 ## 8. Shell and routes
 
-The truck logo is an icon-only `ink` tile; the Dispatch wordmark remains separate dark text on the white product bar. Board and Map share a compact filled selected state using `well`, an inset `line` keyline, and stronger ink text. Route files remain within the Board workspace, so Board keeps that selected state beside the route breadcrumb. The same shared state helper styles Chat and Artifacts in Lookout so top-level and panel navigation do not drift.
+The truck logo is an icon-only `ink` tile; the Dispatch wordmark remains separate dark text on the white, shadowless product bar. Board and Map share one compact segmented shell with an outer slate keyline and a single internal divider. Each link reaches the shell edges, and the selected view fills its full segment with `nav-selected`—no inner padding, radius, ring, or shadow. Route files remain within the Board workspace, so Board keeps that selected state beside the route breadcrumb. The same shared state helper gives Chat and Artifacts the flat fill treatment without introducing another shadow language.
 
 Two panes. The product bar reads **Dispatch**, then the active **Board** workspace, the shift clock, and the dev toggle; on a route file a breadcrumb continues with "RT-01 · Marcus R." There is no left nav: the board is the whole product for now. The Status/Region lens lives with the board controls. Main outlet. Lookout sidebar mounted once at app level, reading derived state directly; pages set the focus driver through context. Collapsed, it becomes a rail with the act-now count as a badge.
 

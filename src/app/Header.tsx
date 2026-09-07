@@ -18,19 +18,19 @@ export default function Header() {
   const onMap = pathname === '/map' || origin?.view === 'map'
   const onBoard = !onMap
   const mapTo = origin?.view === 'map' ? origin.to : '/map'
-  const segment = (on: boolean) => `flex h-7 items-center gap-1.5 rounded-[6px] px-2.5 text-[12px] font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 ${navigationItemState(on)}`
+  const segment = (on: boolean) => `flex h-full items-center gap-1.5 px-3 text-[12px] font-semibold transition focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ink/40 ${navigationItemState(on)}`
 
   return (
     <header className="flex h-14 shrink-0 items-center gap-0.5 border-b border-line bg-panel px-5">
-      <Link to="/" aria-label="Open the Dispatch board" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control bg-ink text-on-accent shadow-sm transition hover:bg-ink/90">
+      <Link to="/" aria-label="Open the Dispatch board" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control bg-ink text-on-accent transition hover:bg-ink/90">
         <TruckTrailer size={17} weight="fill" />
       </Link>
       <Link to="/" className="ml-2 whitespace-nowrap font-display text-[17px] font-semibold tracking-[-0.02em] text-ink">Dispatch</Link>
-      <nav aria-label="Workspace view" className="ml-4 flex shrink-0 items-center gap-0.5 rounded-control border border-line bg-panel p-0.5 shadow-sm">
+      <nav aria-label="Workspace view" className="ml-4 flex h-8 shrink-0 items-stretch overflow-hidden rounded-control border border-nav-selected-line bg-panel">
         <Link to="/" aria-current={onBoard ? 'page' : undefined} className={segment(onBoard)}>
           <SquaresFour size={14} weight={onBoard ? 'fill' : 'regular'} /> Board
         </Link>
-        <Link to={mapTo} aria-current={onMap ? 'page' : undefined} className={segment(onMap)}>
+        <Link to={mapTo} aria-current={onMap ? 'page' : undefined} className={`${segment(onMap)} border-l border-nav-selected-line`}>
           <MapTrifold size={14} weight={onMap ? 'fill' : 'regular'} /> Map
         </Link>
       </nav>
