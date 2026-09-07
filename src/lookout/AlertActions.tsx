@@ -13,26 +13,35 @@ const LABEL: Record<ActionId, string> = {
   acknowledge: 'Snooze 10 min',
 }
 
+const COMPACT_LABEL: Record<ActionId, string> = {
+  reassign: 'Reassign',
+  schedule_reset: 'Reset',
+  notify_customer: 'Notify',
+  call_driver: 'Call',
+  acknowledge: 'Snooze',
+}
+
 /** The one place action buttons are rendered. The rail and the route file both use it, so
  *  the same handler runs from either surface. Dialog actions open a dialog; the two light
  *  actions confirm inline. `positionDependentDisabled` carries the stale-data reason. */
-export default function AlertActions({ driverId, actions, alertIds, positionDependentDisabled, resetScheduledAt, singleLine = false }: { driverId: string; actions: ActionId[]; alertIds: string[]; positionDependentDisabled?: string; resetScheduledAt?: number; singleLine?: boolean }) {
+export default function AlertActions({ driverId, actions, alertIds, positionDependentDisabled, resetScheduledAt, singleLine = false, compact = false }: { driverId: string; actions: ActionId[]; alertIds: string[]; positionDependentDisabled?: string; resetScheduledAt?: number; singleLine?: boolean; compact?: boolean }) {
   const { open } = useActions()
   const callDriver = useStore((s) => s.callDriver)
   const acknowledge = useStore((s) => s.acknowledge)
   const unique = [...new Set(actions)]
+  const labels = compact ? COMPACT_LABEL : LABEL
   return (
     <div className={`flex gap-1.5 ${singleLine ? 'flex-nowrap whitespace-nowrap' : 'flex-wrap'}`}>
       {unique.map((a) => {
-        if (a === 'call_driver') return <ActionConfirm key={a} label={LABEL[a]} confirmLabel="Place call" doneLabel="Call logged" onConfirm={() => callDriver(driverId)} />
-        if (a === 'acknowledge') return <ActionConfirm key={a} label={LABEL[a]} confirmLabel="Snooze" doneLabel="Snoozed" onConfirm={() => alertIds.forEach((id) => acknowledge(id))} />
+        if (a === 'call_driver') return <ActionConfirm key={a} label={labels[a]} confirmLabel="Place call" doneLabel="Call logged" compact={compact} onConfirm={() => callDriver(driverId)} />
+        if (a === 'acknowledge') return <ActionConfirm key={a} label={labels[a]} confirmLabel="Snooze" doneLabel="Snoozed" compact={compact} onConfirm={() => alertIds.forEach((id) => acknowledge(id))} />
         const stale = positionDependentDisabled !== undefined && (a === 'reassign' || a === 'notify_customer')
         const resetDone = a === 'schedule_reset' && resetScheduledAt !== undefined
         const disabled = stale || resetDone
         const title = stale ? positionDependentDisabled : resetDone ? `Reset already scheduled for ${fmtClock(resetScheduledAt)}` : undefined
         return (
-          <Button key={a} size="sm" variant={a === 'reassign' ? 'primary' : 'secondary'} disabled={disabled} title={title} onClick={() => open(a, driverId)}>
-            {LABEL[a]}
+          <Button key={a} size="sm" variant={a === 'reassign' ? 'primary' : 'secondary'} className={compact ? 'h-6 px-2 text-[10px]' : ''} disabled={disabled} title={title} onClick={() => open(a, driverId)}>
+            {labels[a]}
           </Button>
         )
       })}

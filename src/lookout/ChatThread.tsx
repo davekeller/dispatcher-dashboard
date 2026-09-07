@@ -34,7 +34,7 @@ export default function ChatThread({ messages, d, onExample }: { messages: Messa
                   {m.reply.driverIds.slice(0, 3).map((id) => {
                     const view = d.byId.get(id)
                     const card = d.cardById.get(id)
-                    return view && card ? <RecommendationCard key={id} view={view} card={card} /> : null
+                    return view && card ? <RecommendationCard key={id} view={view} card={card} compact /> : null
                   })}
                   {m.reply.driverIds.length > 3 && <p className="font-lookout text-[11px] text-muted">and {m.reply.driverIds.length - 3} more on the board.</p>}
                 </div>
