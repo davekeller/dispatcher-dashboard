@@ -11,6 +11,7 @@ import RouteHeader, { PRIORITY_RULES } from '../ui/RouteHeader'
 import { STALENESS_TONE, severityTone } from '../ui/tones'
 import RouteTimelineMini from '../views/shift/RouteTimelineMini'
 import AlertActions from './AlertActions'
+import { recommendationSummary } from './recommendationSummary'
 import { LOOKOUT } from './voice'
 
 /** One card per driver, every reason on it, 2–3 actions. Same handlers as the route file.
@@ -30,7 +31,16 @@ export default function RecommendationCard({ view, card, pinned = false, compact
   const surface = compact
     ? `overflow-hidden rounded-control border bg-panel/70 ${pinned ? 'lookout-card-ring' : 'border-line/60'} ${card.snoozed ? 'opacity-60' : ''}`
     : `overflow-hidden rounded-card border-[1.5px] bg-panel shadow-card ${pinned ? 'lookout-card-ring' : 'border-line'} ${card.snoozed ? 'opacity-60' : ''}`
-  const actions = <AlertActions driverId={view.driver.id} actions={card.alerts.flatMap((a) => a.actions)} alertIds={card.alerts.map((a) => a.id)} positionDependentDisabled={staleReason} resetScheduledAt={view.plannedResetAt} />
+  const actions = <AlertActions driverId={view.driver.id} actions={card.alerts.flatMap((a) => a.actions)} alertIds={card.alerts.map((a) => a.id)} positionDependentDisabled={staleReason} resetScheduledAt={view.plannedResetAt} compact={compact} />
+  const summaryContext = {
+    minutesUntilLimit: view.minutesUntilLimit,
+    remainingStops: view.remaining.length,
+    remainingDriveMin: view.remainingDriveMin,
+    driftMin: view.driftMin,
+    unnotifiedLateStops: view.unnotifiedLateStops.length,
+    unassignedStops: view.unassigned.length,
+    pingAgeMin: view.pingAgeMin,
+  }
   const status = (
     <>
       {view.driver.contactAttemptedAt !== undefined && <span>{LOOKOUT.called(fmtClock(view.driver.contactAttemptedAt))}</span>}
@@ -42,19 +52,20 @@ export default function RecommendationCard({ view, card, pinned = false, compact
     return (
       <article className={surface}>
         <RouteHeader view={view} card={card} />
-        <div className="flex items-start gap-2 px-2.5 py-2">
-          <Link to={`/routes/${view.driver.id}`} state={{ from }} title={`Open ${view.driver.name}'s route`} className="shrink-0">
-            <DriverAvatar driver={view.driver} size={26} />
+        <div className="flex items-start gap-2 px-2.5 py-1.5">
+          <Link to={`/routes/${view.driver.id}`} state={{ from }} title={`Open ${view.driver.name}'s route`} className="mt-0.5 shrink-0">
+            <DriverAvatar driver={view.driver} size={24} />
           </Link>
           <div className="min-w-0 flex-1 py-px font-lookout">
-            <div className="space-y-2">
+            <Link to={`/routes/${view.driver.id}`} state={{ from }} className="block truncate text-[11px] font-semibold text-ink hover:underline">{view.driver.name}</Link>
+            <ul className="mt-1 space-y-0.5">
               {card.alerts.map((a) => (
-                <div key={a.id} className="text-[12px] leading-snug">
-                  <p className="font-semibold text-ink">{a.title}</p>
-                  <p className="mt-1 text-muted">{a.body}</p>
-                </div>
+                <li key={a.id} className="flex items-start gap-1.5 text-[11px] leading-snug text-muted">
+                  <span className={`mt-[0.38rem] h-1 w-1 shrink-0 rounded-full ${severityTone(a.severity).fill}`} aria-hidden="true" />
+                  <span>{recommendationSummary(a.ruleId, summaryContext, a.title)}</span>
+                </li>
               ))}
-            </div>
+            </ul>
             {(stale || hasStatus) && (
               <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[10px] text-muted">
                 {stale && <Chip tone={STALENESS_TONE[view.staleness]} dashed={offline} className="px-1.5 py-0 text-[9px] leading-4">{fmtAge(view.pingAgeMin)}</Chip>}
@@ -63,7 +74,7 @@ export default function RecommendationCard({ view, card, pinned = false, compact
             )}
           </div>
         </div>
-        <div className="border-t border-line/50 px-2.5 py-1.5">{actions}</div>
+        <div className="border-t border-line/40 px-2.5 py-1.5">{actions}</div>
       </article>
     )
   }
