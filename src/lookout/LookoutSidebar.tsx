@@ -2,9 +2,9 @@ import { CaretDoubleLeft, CaretDoubleRight } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { useActions } from '../actions/ActionContext'
 import { useDerived } from '../store/hooks'
-import { useStore } from '../store/store'
 import Button from '../ui/Button'
 import { NAV_ITEM_BASE, navigationItemState } from '../ui/navigation'
+import ArtifactsPanel from './ArtifactsPanel'
 import ChatThread, { type Message } from './ChatThread'
 import Composer from './Composer'
 import { INTENTS, matchIntent } from './intents'
@@ -14,21 +14,18 @@ import PlanCard from './PlanCard'
 import { routePlans } from './plans'
 import RecommendationCard from './RecommendationCard'
 import RecommendationsBar from './RecommendationsBar'
-import TimelinePanel from './TimelinePanel'
 import { LOOKOUT } from './voice'
 
 const TOP_N = 3
 
-/** Lookout never has its own data. It reads `ranked` and nothing else. Two tabs: Chat, with the
- *  recommendations as a sticky bar over the conversation, and Timeline, the shift's log. The
- *  composer is on both; sending from the timeline lands in the chat. */
+/** Lookout never has its own data. It reads `ranked` and nothing else. Chat carries the live
+ * recommendations; Artifacts is deliberately reserved as an empty workspace for later. */
 export default function LookoutSidebar() {
   const { collapsed, setCollapsed, focusDriverId } = useLookout()
   const { open } = useActions()
   const d = useDerived()
-  const events = useStore((s) => s.events)
   const { ranked, byId } = d
-  const [tab, setTab] = useState<'chat' | 'timeline'>('chat')
+  const [tab, setTab] = useState<'chat' | 'artifacts'>('chat')
   const [recOpen, setRecOpen] = useState(true)
   const [showAll, setShowAll] = useState(false)
   const [messages, setMessages] = useState<Message[]>([{ role: 'lookout', text: LOOKOUT.chatIntro, reply: { text: '', examples: INTENTS.map((i) => i.example) } }])
@@ -70,7 +67,7 @@ export default function LookoutSidebar() {
     <aside className="lookout-panel flex w-[26rem] shrink-0 flex-col border-l border-line" aria-label={`${LOOKOUT.name}, the shift co-pilot`}>
       <header className="flex h-14 shrink-0 items-center gap-2 border-b border-line bg-panel/90 pl-2 pr-1.5 backdrop-blur">
         <div className="flex items-center gap-0.5" role="tablist" aria-label={`${LOOKOUT.name} views`}>
-          {(['chat', 'timeline'] as const).map((t) => (
+          {(['chat', 'artifacts'] as const).map((t) => (
             <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`${NAV_ITEM_BASE} font-lookout text-[12px] capitalize ${navigationItemState(tab === t)}`}>
               {t}
               {t === 'chat' && urgentCards.length > 0 && <span className="tnum rounded-full bg-act-now px-1.5 text-[10px] font-semibold leading-4 text-on-accent" title={`${urgentCards.length} need action now`}>{urgentCards.length}</span>}
@@ -104,7 +101,7 @@ export default function LookoutSidebar() {
           <ChatThread messages={messages} d={d} onExample={send} />
         </div>
       ) : (
-        <TimelinePanel events={events} />
+        <ArtifactsPanel />
       )}
       <Composer onSend={send} />
     </aside>
