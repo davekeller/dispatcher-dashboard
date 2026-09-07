@@ -1,8 +1,9 @@
 import { ArrowsOutSimple, MagnifyingGlass, X } from '@phosphor-icons/react'
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
-import { Link, useSearchParams } from 'react-router'
+import { Link, useLocation, useSearchParams } from 'react-router'
 import { BAND_LABEL } from '../../bands'
 import { applyFilters, EMPTY_FILTERS, FILTERS, isFiltering, type FilterState } from '../../filters'
+import { originFor } from '../../app/origin'
 import { fleetMarkers } from '../../geo/fleet'
 import { useLookout } from '../../lookout/LookoutContext'
 import { stopsPastLimit } from '../../store/actions'
@@ -27,6 +28,7 @@ export default function MapPage() {
   const [filters, setFilters] = useState<FilterState>(EMPTY_FILTERS)
   const [fitKey, setFitKey] = useState(0)
   const [params, setParams] = useSearchParams()
+  const location = useLocation()
   const selectedId = params.get('driver')
   const select = (id: string | null) => setParams((prev) => {
     const q = new URLSearchParams(prev)
@@ -96,7 +98,7 @@ export default function MapPage() {
               <span>{selectedView.remaining.length} stops left</span>
               {selectedView.staleness !== 'fresh' && <span className="text-watch">last known position</span>}
             </div>
-            <Link to={`/routes/${selectedView.driver.id}`} className="mt-3 block">
+            <Link to={`/routes/${selectedView.driver.id}`} state={{ from: originFor(location) }} className="mt-3 block">
               <Button size="sm" variant="primary" className="w-full">Open route file</Button>
             </Link>
           </aside>

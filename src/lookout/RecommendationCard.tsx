@@ -1,5 +1,6 @@
-import { Link } from 'react-router'
+import { Link, useLocation } from 'react-router'
 import type { DriverCard } from '../alerts/types'
+import { originFor } from '../app/origin'
 import { fmtAge, fmtClock } from '../lib/format'
 import { useStore } from '../store/store'
 import type { DriverView } from '../store/view'
@@ -19,6 +20,7 @@ import { LOOKOUT } from './voice'
  *  the directive already carries the name. */
 export default function RecommendationCard({ view, card, pinned = false, compact = false }: { view: DriverView; card: DriverCard; pinned?: boolean; compact?: boolean }) {
   const snoozes = useStore((s) => s.snoozes)
+  const from = originFor(useLocation())
   const hasCorrection = useStore((s) => Boolean(s.corrections[view.driver.id]))
   const stale = view.staleness !== 'fresh'
   const offline = view.staleness === 'offline'
@@ -39,7 +41,7 @@ export default function RecommendationCard({ view, card, pinned = false, compact
       <article className={surface}>
         <RouteHeader view={view} card={card} />
         <div className="flex items-start gap-2 px-2.5 py-2">
-          <Link to={`/routes/${view.driver.id}`} title={`Open ${view.driver.name}'s route`} className="shrink-0">
+          <Link to={`/routes/${view.driver.id}`} state={{ from }} title={`Open ${view.driver.name}'s route`} className="shrink-0">
             <DriverAvatar driver={view.driver} size={26} />
           </Link>
           <div className="min-w-0 flex-1 py-px font-lookout">
@@ -73,7 +75,7 @@ export default function RecommendationCard({ view, card, pinned = false, compact
             <DriverAvatar driver={view.driver} size={26} />
             <div className="min-w-0 flex-1">
               <div className="flex min-w-0 items-center gap-2">
-                <Link to={`/routes/${view.driver.id}`} className="min-w-0 flex-1 truncate text-[12px] font-semibold leading-4 text-ink hover:underline">{view.driver.name}</Link>
+                <Link to={`/routes/${view.driver.id}`} state={{ from }} className="min-w-0 flex-1 truncate text-[12px] font-semibold leading-4 text-ink hover:underline">{view.driver.name}</Link>
                 <span className="tnum shrink-0 text-[9px] leading-4 text-muted" title="Age of the last telematics ping">{fmtAge(view.pingAgeMin)}</span>
               </div>
               <span className="block truncate text-[10px] leading-4 text-muted">{view.truck.plate} · {view.driver.region}</span>
