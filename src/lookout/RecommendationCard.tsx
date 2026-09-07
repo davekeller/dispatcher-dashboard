@@ -12,6 +12,7 @@ import { STALENESS_TONE, severityTone } from '../ui/tones'
 import RouteTimelineMini from '../views/shift/RouteTimelineMini'
 import AlertActions from './AlertActions'
 import { recommendationSummary } from './recommendationSummary'
+import { recommendationBorder } from './recommendationTone'
 import { LOOKOUT } from './voice'
 
 /** One card per driver, every reason on it, 2–3 actions. Same handlers as the route file.
@@ -29,7 +30,7 @@ export default function RecommendationCard({ view, card, pinned = false, compact
   const snoozedUntil = card.snoozed ? Math.max(...card.alerts.map((a) => snoozes[a.id] ?? 0)) : undefined
   const hasStatus = view.driver.contactAttemptedAt !== undefined || snoozedUntil !== undefined || hasCorrection
   const surface = compact
-    ? `overflow-hidden rounded-control border bg-panel/70 ${pinned ? 'lookout-card-ring' : 'border-line/60'} ${card.snoozed ? 'opacity-60' : ''}`
+    ? `overflow-hidden rounded-control border bg-panel/70 ${pinned ? 'lookout-card-ring' : recommendationBorder(card.severity)} ${card.snoozed ? 'opacity-60' : ''}`
     : `overflow-hidden rounded-card border-[1.5px] bg-panel shadow-card ${pinned ? 'lookout-card-ring' : 'border-line'} ${card.snoozed ? 'opacity-60' : ''}`
   const actions = <AlertActions driverId={view.driver.id} actions={card.alerts.flatMap((a) => a.actions)} alertIds={card.alerts.map((a) => a.id)} positionDependentDisabled={staleReason} resetScheduledAt={view.plannedResetAt} compact={compact} />
   const summaryContext = {
