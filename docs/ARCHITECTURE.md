@@ -313,6 +313,8 @@ The board groups by **Status** by default, Act now leftmost, because that is whe
 
 ---
 
+**Board and Map are one segmented control** in the product bar. A route file is one level in from whichever of them it was opened from: the link into it carries that origin as router state (`app/origin.ts`), the origin's segment stays selected with the `RT-01 · Marcus R.` crumb after it, the Map segment returns to the map with its pick intact, and the rail's back arrow reads "Back to the map" or "Back to the board" accordingly. A deep link or a reload defaults to the board.
+
 ## 9. Views
 
 ### Active Shift

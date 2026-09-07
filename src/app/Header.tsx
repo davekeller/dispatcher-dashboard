@@ -1,18 +1,24 @@
 import { CaretRight, MapTrifold, SquaresFour, TruckTrailer } from '@phosphor-icons/react'
 import { Link, useLocation } from 'react-router'
 import { useDerived } from '../store/hooks'
-import { NAV_ITEM_BASE, navigationItemState } from '../ui/navigation'
+import { navigationItemState } from '../ui/navigation'
+import { originOf } from './origin'
 import SimulatedShift from './SimulatedShift'
 
-/** The product bar. Dispatch is the product; the board is its home; a route file is one level in. */
+/** The product bar. Dispatch is the product; Board and Map are one segmented view switch; a route file is
+ *  one level in from whichever of them it was opened from, and reads that way. */
 export default function Header() {
-  const { pathname } = useLocation()
+  const location = useLocation()
+  const { pathname } = location
   const { byId } = useDerived()
   const routeMatch = pathname.match(/^\/routes\/(drv-\d+)$/)
   const focused = routeMatch ? byId.get(routeMatch[1]) : undefined
-  const onMap = pathname === '/map'
-  const onBoard = pathname === '/' || routeMatch !== null
-  const tab = (on: boolean) => `${NAV_ITEM_BASE} text-[13px] ${navigationItemState(on)}`
+  // On a route file the segment of the view it was opened from stays selected, and Map returns to that pick.
+  const origin = routeMatch ? originOf(location) : null
+  const onMap = pathname === '/map' || origin?.view === 'map'
+  const onBoard = !onMap
+  const mapTo = origin?.view === 'map' ? origin.to : '/map'
+  const segment = (on: boolean) => `flex h-7 items-center gap-1.5 rounded-[6px] px-2.5 text-[12px] font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 ${navigationItemState(on)}`
 
   return (
     <header className="flex h-14 shrink-0 items-center gap-0.5 border-b border-line bg-panel px-5">
@@ -21,12 +27,12 @@ export default function Header() {
       </Link>
       <Link to="/" className="ml-2 whitespace-nowrap font-display text-[17px] font-semibold tracking-[-0.02em] text-ink">Dispatch</Link>
       <span aria-hidden="true" className="ml-5 mr-3 h-5 w-px shrink-0 bg-line" />
-      <nav aria-label="Workspace navigation" className="flex items-center gap-0.5">
-        <Link to="/" aria-current={onBoard ? 'page' : undefined} className={tab(onBoard)}>
-          <SquaresFour size={15} weight={onBoard ? 'fill' : 'regular'} /> Board
+      <nav aria-label="Workspace view" className="flex shrink-0 items-center gap-0.5 rounded-control border border-line bg-panel p-0.5 shadow-sm">
+        <Link to="/" aria-current={onBoard ? 'page' : undefined} className={segment(onBoard)}>
+          <SquaresFour size={14} weight={onBoard ? 'fill' : 'regular'} /> Board
         </Link>
-        <Link to="/map" aria-current={onMap ? 'page' : undefined} className={tab(onMap)}>
-          <MapTrifold size={15} weight={onMap ? 'fill' : 'regular'} /> Map
+        <Link to={mapTo} aria-current={onMap ? 'page' : undefined} className={segment(onMap)}>
+          <MapTrifold size={14} weight={onMap ? 'fill' : 'regular'} /> Map
         </Link>
       </nav>
       {focused && (
