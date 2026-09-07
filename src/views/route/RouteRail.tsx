@@ -1,11 +1,12 @@
 import { ArrowLeft, CaretDown, Check, SidebarSimple } from '@phosphor-icons/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useLocation } from 'react-router'
 import type { Delivery, Stop } from '../../data/types'
 import { projectedEta } from '../../hos/compute'
 import { fmtAge, fmtClock } from '../../lib/format'
 import { routeHosSignal, routeScheduleSignal, type RouteSignalTone } from '../../lib/routeProgress'
 import type { DriverView } from '../../store/view'
+import { originOf } from '../../app/origin'
 import StopStatusMarker, { stopHistoryStyle } from './StopStatusMarker'
 
 interface Node {
@@ -60,6 +61,7 @@ function stopState(node: Node, nextId: string | undefined, pastLimitIds: Set<str
  * remaining and newly reassigned work leads, while the source route order stays intact. */
 export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed, onCollapsedChange, activeStopId, onSelectStop }: { view: DriverView; deliveryById: Map<string, Delivery>; pastLimitIds: Set<string>; activeStopId?: string | null; onSelectStop?: (id: string) => void; collapsed: boolean; onCollapsedChange: (c: boolean) => void }) {
   const { route, now } = view
+  const origin = originOf(useLocation())
   const schedule = routeScheduleSignal(view)
   const hos = routeHosSignal(view)
   const nextId = view.next?.id
@@ -143,7 +145,7 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
   return (
     <nav aria-label="Route" className={`sticky left-0 top-0 z-20 flex h-[calc(100vh-3.5rem-2.5rem)] shrink-0 flex-col overflow-hidden rounded-r-card border-y border-r border-line bg-panel shadow-card transition-[width] duration-200 ${collapsed ? 'w-16' : 'w-64'}`}>
       <div className={`flex shrink-0 items-center border-b border-line px-2 py-2 ${collapsed ? 'flex-col gap-1' : 'gap-2'}`}>
-        <Link to="/" title="Back to the board" aria-label="Back to the board" className="flex h-7 w-7 shrink-0 items-center justify-center rounded-control text-muted transition hover:bg-board hover:text-ink">
+        <Link to={origin.to} title={`Back to the ${origin.view}`} aria-label={`Back to the ${origin.view}`} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-control text-muted transition hover:bg-board hover:text-ink">
           <ArrowLeft size={16} />
         </Link>
         {!collapsed && (
