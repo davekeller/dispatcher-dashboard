@@ -108,8 +108,13 @@ body { @apply bg-canvas text-ink font-sans; }
   z-index: 1;
 }
 
-.lookout-soft-surface {
-  background: linear-gradient(105deg, #fff3eb 0%, #fff8e8 26%, #fff1f6 52%, #f7f1ff 76%, #edf5ff 100%);
+.lookout-recommendations-surface {
+  background:
+    radial-gradient(ellipse 72% 42% at -4% 0%, rgb(56 246 255 / 0.16), transparent 72%),
+    radial-gradient(ellipse 66% 44% at 104% 8%, rgb(255 101 230 / 0.15), transparent 72%),
+    radial-gradient(ellipse 78% 48% at -6% 84%, rgb(255 106 36 / 0.13), transparent 72%),
+    radial-gradient(ellipse 64% 42% at 102% 100%, rgb(80 233 161 / 0.11), transparent 72%),
+    linear-gradient(145deg, rgb(18 43 115 / 0.06), rgb(90 37 207 / 0.09) 48%, rgb(255 255 255 / 0.86));
 }
 
 .lookout-panel {

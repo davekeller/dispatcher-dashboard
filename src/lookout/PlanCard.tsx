@@ -19,7 +19,7 @@ export default function PlanCard({ plan, view }: { plan: Plan; view: DriverView 
   const blockedReason = blocked ? `Last ping ${fmtAge(view.pingAgeMin)}. Position-dependent actions are disabled until the truck reports in.` : undefined
   const action = plan.action
   return (
-    <article className={`rounded-control border bg-panel/70 px-2.5 py-2 ${recommendationBorder(plan.severity)}`}>
+    <article className={`rounded-control border bg-panel px-2.5 py-2 ${recommendationBorder(plan.severity)}`}>
       <div className="flex items-start gap-2">
         <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${plan.severity === 'none' ? 'bg-clear-fill' : tone.fill}`} aria-hidden="true" />
         <div className="min-w-0 flex-1">
