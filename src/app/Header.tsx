@@ -1,4 +1,4 @@
-import { CaretRight, MapTrifold, SquaresFour, TruckTrailer } from '@phosphor-icons/react'
+import { CaretRight, MapTrifold, SquaresFour } from '@phosphor-icons/react'
 import { Link, useLocation } from 'react-router'
 import { DISPATCHER } from '../data/dispatcher'
 import LookoutAvatar from '../lookout/LookoutAvatar'
@@ -7,6 +7,7 @@ import { LOOKOUT } from '../lookout/voice'
 import { useDerived } from '../store/hooks'
 import DispatcherAvatar from '../ui/DispatcherAvatar'
 import { navigationItemState } from '../ui/navigation'
+import DispatchMark from './DispatchMark'
 import { originOf } from './origin'
 import SimulatedShift from './SimulatedShift'
 
@@ -33,13 +34,13 @@ export default function Header() {
 
   return (
     <header className={`relative z-30 flex h-14 shrink-0 items-center gap-0.5 border-b border-line bg-panel pr-3.5 ${lowestNav ? 'nav-shadow-below' : ''}`}>
-      {/* The tile sits centered in a cell the width of the collapsed route rail, so it lines up over the route file's back arrow. */}
+      {/* The brand tile sits centered over the route file's 64px back-arrow cell. */}
       <div className="flex w-16 shrink-0 items-center justify-center">
-        <Link to="/" aria-label="Open the Dispatch board" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control text-nav-selected-ink transition hover:bg-well">
-          <TruckTrailer size={22} weight="fill" />
+        <Link to="/" aria-label="Open the Dispatch board" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control bg-nav-selected-ink text-on-accent transition hover:bg-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-nav-selected-ink/40">
+          <DispatchMark className="h-[25px] w-[25px]" />
         </Link>
       </div>
-      <Link to="/" className="-ml-3 whitespace-nowrap font-display text-[17px] font-semibold tracking-[-0.02em] text-nav-selected-ink">Dispatch</Link>
+      <Link to="/" className="-ml-1 whitespace-nowrap font-display text-[15px] font-bold uppercase leading-none tracking-[0.08em] text-nav-selected-ink">Dispatch</Link>
       <nav aria-label="Workspace view" className="ml-4 flex h-8 shrink-0 items-stretch overflow-hidden rounded-control border border-nav-selected-ink bg-panel">
         <Link to="/" aria-current={onBoard ? 'page' : undefined} className={segment(onBoard)}>
           <SquaresFour size={14} weight={onBoard ? 'fill' : 'regular'} /> Board
