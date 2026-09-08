@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import type { DriverCard } from '../../alerts/types'
-import { BAND_LABEL, BAND_ORDER } from '../../bands'
+import { BAND_LABEL, BAND_ORDER, type Band } from '../../bands'
 import { EMPTY_FILTERS, type FilterState } from '../../filters'
 import { LIMIT_MIN } from '../../hos/constants'
 import { fmtClock, fmtCountdown, fmtHm, fmtMinutes } from '../../lib/format'
@@ -25,6 +25,15 @@ import {
 
 function sameFilters(a: FilterState, b: FilterState): boolean {
   return JSON.stringify(a) === JSON.stringify(b)
+}
+
+// A chart filter keeps the status hue it selects; slate is reserved for lens navigation.
+const METRIC_STATUS_SELECTED: Record<Band, string> = {
+  act_now: 'border-act-now bg-act-now text-on-accent',
+  watch: 'border-watch bg-watch text-on-accent',
+  break: 'border-break bg-break text-on-accent',
+  offline: 'border-offline bg-offline text-on-accent',
+  clear: 'border-clear bg-clear text-on-accent',
 }
 
 /** The Metrics lens: the shift as charts. It reads the same filtered cards the board would show,
@@ -125,7 +134,7 @@ export default function MetricsView({ cards, d, filters, onPreset }: { cards: Dr
               const preset: FilterState = { ...EMPTY_FILTERS, band: [band.band] }
               const on = sameFilters(filters, preset)
               return (
-                <button key={band.band} type="button" aria-pressed={on} onClick={() => onPreset(on ? EMPTY_FILTERS : preset)} className={`inline-flex h-8 items-center gap-1.5 rounded-control border px-2.5 text-[11px] font-semibold transition ${on ? 'border-nav-selected-ink bg-nav-selected-ink text-on-accent' : 'border-line bg-panel text-ink hover:border-nav-selected-line hover:bg-board/50'}`}>
+                <button key={band.band} type="button" aria-pressed={on} onClick={() => onPreset(on ? EMPTY_FILTERS : preset)} className={`inline-flex h-8 items-center gap-1.5 rounded-control border px-2.5 text-[11px] font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-nav-selected-ink ${on ? `${METRIC_STATUS_SELECTED[band.band]} shadow-sm` : 'border-line bg-panel text-ink hover:border-nav-selected-line hover:bg-board/50'}`}>
                   <span className={`h-2 w-2 rounded-full ${on ? 'bg-on-accent/85' : BAND_TONE[band.band].fill}`} />
                   {band.label}
                   <span className={`tnum font-medium ${on ? 'text-on-accent/75' : 'text-label'}`}>{band.count}</span>
