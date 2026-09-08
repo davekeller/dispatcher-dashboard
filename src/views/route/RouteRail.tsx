@@ -3,8 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router'
 import type { Delivery, Stop } from '../../data/types'
 import { projectedEta } from '../../hos/compute'
-import { fmtAge, fmtClock } from '../../lib/format'
-import { routeHosSignal, routeScheduleSignal, type RouteSignalTone } from '../../lib/routeProgress'
+import { fmtClock } from '../../lib/format'
 import type { DriverView } from '../../store/view'
 import { originOf } from '../../app/origin'
 import StopStatusMarker, { stopHistoryStyle } from './StopStatusMarker'
@@ -15,20 +14,6 @@ interface Node {
   t: number
   customer: string
   late: boolean
-}
-
-const DOT: Record<RouteSignalTone, string> = {
-  clear: 'bg-clear-fill',
-  watch: 'bg-watch-fill',
-  act_now: 'bg-act-now-fill',
-  offline: 'bg-offline-fill',
-}
-
-const SIGNAL_TEXT: Record<RouteSignalTone, string> = {
-  clear: 'text-clear',
-  watch: 'text-watch',
-  act_now: 'text-act-now',
-  offline: 'text-offline',
 }
 
 const TIMELINE_COLUMNS = { gridTemplateColumns: '1.25rem minmax(0, 1fr)' }
@@ -62,14 +47,10 @@ function stopState(node: Node, nextId: string | undefined, pastLimitIds: Set<str
 export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed, onCollapsedChange, activeStopId, onSelectStop }: { view: DriverView; deliveryById: Map<string, Delivery>; pastLimitIds: Set<string>; activeStopId?: string | null; onSelectStop?: (id: string) => void; collapsed: boolean; onCollapsedChange: (c: boolean) => void }) {
   const { route, now } = view
   const origin = originOf(useLocation())
-  const schedule = routeScheduleSignal(view)
-  const hos = routeHosSignal(view)
   const nextId = view.next?.id
-  const progress = view.total === 0 ? 1 : view.done / view.total
   const [active, setActive] = useState<string | null>(nextId ?? route.stops.at(-1)?.id ?? null)
   // In map mode the page owns the selection; in list mode the receipt being read does.
   const shownActive = activeStopId !== undefined ? activeStopId : active
-  const [summaryOpen, setSummaryOpen] = useState(true)
   const [timelineOpen, setTimelineOpen] = useState(true)
   const timelineRef = useRef<HTMLDivElement>(null)
   const nodeRefs = useRef(new Map<string, HTMLButtonElement>())
@@ -100,7 +81,6 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
   }, [nextId, route.id, route.stops])
 
   useEffect(() => {
-    setSummaryOpen(true)
     setTimelineOpen(true)
   }, [route.id])
 
@@ -158,50 +138,6 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
           <SidebarSimple size={16} className={collapsed ? '-scale-x-100' : ''} />
         </button>
       </div>
-
-      <section aria-label={`Route progress: ${view.done} of ${view.total} stops complete`} className="shrink-0 border-b border-line">
-        {collapsed ? (
-          <div className="px-1.5 py-3">
-            <p className="tnum text-center font-display text-lg font-semibold leading-none text-ink">{Math.round(progress * 100)}%</p>
-            <p className="tnum mt-1 text-center text-[8px] text-muted">{view.done}/{view.total}</p>
-            <div className="mt-2 flex justify-center gap-1.5">
-              <span title={`${schedule.label}: ${schedule.value}`} className={`h-2 w-2 rounded-full ${DOT[schedule.tone]}`} />
-              <span title={`${hos.label}: ${hos.value}`} className={`h-2 w-2 rounded-full ${DOT[hos.tone]}`} />
-            </div>
-          </div>
-        ) : (
-          <>
-            <button type="button" onClick={() => setSummaryOpen((open) => !open)} aria-expanded={summaryOpen} className="flex w-full items-center gap-2 px-3 py-2 text-left transition hover:bg-board/70">
-              <span className="text-[9px] font-semibold uppercase tracking-[0.08em] text-label">Route status</span>
-              <span className="ml-auto text-[9px] text-muted">4 metrics</span>
-              <CaretDown size={12} className={`shrink-0 text-muted transition-transform ${summaryOpen ? '' : '-rotate-90'}`} />
-            </button>
-            {summaryOpen && (
-              <dl className="grid grid-cols-2 border-t border-line bg-board/45">
-                <div className="min-w-0 border-b border-r border-line px-3 py-2.5">
-                  <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">Progress</dt>
-                  <dd className="tnum mt-1 font-display text-[1.35rem] font-semibold leading-none tracking-[-0.035em] text-ink">{view.done} <span className="text-[11px] font-medium tracking-normal text-muted">of {view.total}</span></dd>
-                  <dd className="tnum mt-1 text-[9px] text-muted">{Math.round(progress * 100)}% complete</dd>
-                </div>
-                <div className="min-w-0 border-b border-line px-3 py-2.5">
-                  <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">Remaining</dt>
-                  <dd className="tnum mt-1 font-display text-[1.35rem] font-semibold leading-none tracking-[-0.035em] text-ink">{view.remaining.length}</dd>
-                  <dd className="mt-1 truncate text-[9px] text-muted" title={`Updated ${fmtAge(view.pingAgeMin)}`}>updated {fmtAge(view.pingAgeMin)}</dd>
-                </div>
-                {[schedule, hos].map((signal, index) => (
-                  <div key={signal.label} className={`min-w-0 px-3 py-2.5 ${index === 0 ? 'border-r border-line' : ''}`}>
-                    <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">{signal.label}</dt>
-                    <dd className={`mt-1 flex min-w-0 items-center gap-1.5 text-[10px] font-semibold ${SIGNAL_TEXT[signal.tone]}`}>
-                      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${DOT[signal.tone]}`} />
-                      <span className="truncate" title={signal.value}>{signal.value}</span>
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            )}
-          </>
-        )}
-      </section>
 
       {!collapsed && (
         <button type="button" onClick={() => setTimelineOpen((open) => !open)} aria-expanded={timelineOpen} className="flex w-full shrink-0 items-center gap-2 px-3 py-2 text-left transition hover:bg-board/70">

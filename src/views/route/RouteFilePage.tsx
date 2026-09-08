@@ -4,6 +4,8 @@ import { Link, useParams, useSearchParams } from 'react-router'
 import { useActions } from '../../actions/ActionContext'
 import { stopsPastLimit } from '../../store/actions'
 import { useLookout } from '../../lookout/LookoutContext'
+import { fmtAge } from '../../lib/format'
+import { routeHosSignal, routeScheduleSignal, type RouteSignalTone } from '../../lib/routeProgress'
 import { useDerived } from '../../store/hooks'
 import { useStore } from '../../store/store'
 import Button from '../../ui/Button'
@@ -19,6 +21,20 @@ import { nextStopSelection } from './stopSelection'
 const RouteMap = lazy(() => import('./map/RouteMap'))
 
 type StopsMode = 'list' | 'map'
+
+const SIGNAL_DOT: Record<RouteSignalTone, string> = {
+  clear: 'bg-clear-fill',
+  watch: 'bg-watch-fill',
+  act_now: 'bg-act-now-fill',
+  offline: 'bg-offline-fill',
+}
+
+const SIGNAL_TEXT: Record<RouteSignalTone, string> = {
+  clear: 'text-clear',
+  watch: 'text-watch',
+  act_now: 'text-act-now',
+  offline: 'text-offline',
+}
 
 /** A file for one driver's day, in the case-file shape: the route rail down the left, then one
  *  driver-and-alert header card followed by the stop list or map. Lookout stays focused here. */
@@ -65,6 +81,8 @@ export default function RouteFilePage() {
 
   const stale = view.staleness !== 'fresh'
   const staleReason = stale ? 'Position unknown. This action is disabled until the truck reports in.' : undefined
+  const progress = view.total === 0 ? 100 : Math.round((view.done / view.total) * 100)
+  const routeSignals = [routeScheduleSignal(view), routeHosSignal(view)]
   const selectableStopIds = [...view.route.stops]
     .reverse()
     .filter((stop) => stop.status === 'pending' || stop.status === 'unassigned')
@@ -87,17 +105,35 @@ export default function RouteFilePage() {
         {card.alerts.length > 0 && <AlertStrip view={view} card={card} />}
         {stale && <StaleBanner view={view} />}
         <section>
-          <header className="sticky top-0 z-30 mb-3 flex min-h-12 w-full items-center gap-3 border-y border-nav-selected-line/70 bg-nav-selected/55 px-3 py-2 backdrop-blur">
-            <div className="flex min-w-0 items-center gap-2.5">
+          <header className={`sticky top-0 z-30 mb-3 flex min-h-14 w-full items-stretch border-y border-nav-selected-line/70 bg-nav-selected/55 px-3 backdrop-blur ${railCollapsed ? '' : 'flex-wrap'}`}>
+            <div className={`flex min-w-0 shrink-0 items-center gap-2.5 py-2 pr-3 ${railCollapsed ? '' : 'order-1 flex-1'}`}>
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] bg-ink text-on-accent shadow-sm" aria-hidden="true">
                 <ListBullets size={15} weight="bold" />
               </span>
               <div className="min-w-0">
-                <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">Stops</p>
+                <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">Stops · {progress}% complete</p>
                 <h2 className="tnum mt-1 whitespace-nowrap text-[13px] font-semibold leading-none text-ink">{view.done}/{view.total} delivered</h2>
               </div>
             </div>
-            <div className="ml-auto flex gap-2">
+            <dl aria-label="Route status" className={`grid min-w-0 flex-1 grid-cols-3 divide-x divide-nav-selected-line/70 ${railCollapsed ? 'border-l border-nav-selected-line/70' : 'order-3 basis-full border-t border-nav-selected-line/70'}`}>
+              <div className="flex min-w-0 flex-col justify-center px-3 py-2">
+                <dt className="flex min-w-0 items-center gap-1.5 text-[8px] font-semibold uppercase tracking-[0.06em] text-label">
+                  <span>Remaining</span>
+                  <span className="truncate font-medium normal-case tracking-normal text-muted" title={`Updated ${fmtAge(view.pingAgeMin)}`}>· {fmtAge(view.pingAgeMin)}</span>
+                </dt>
+                <dd className="tnum mt-1 text-[12px] font-semibold leading-none text-ink">{view.remaining.length} <span className="text-[9px] font-medium text-muted">stops</span></dd>
+              </div>
+              {routeSignals.map((signal) => (
+                <div key={signal.label} className="flex min-w-0 flex-col justify-center px-3 py-2">
+                  <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">{signal.label}</dt>
+                  <dd className={`mt-1 flex min-w-0 items-center gap-1.5 text-[11px] font-semibold leading-none ${SIGNAL_TEXT[signal.tone]}`}>
+                    <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${SIGNAL_DOT[signal.tone]}`} />
+                    <span className="truncate" title={signal.value}>{signal.value}</span>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <div className={`ml-auto flex items-center gap-2 py-2 pl-3 ${railCollapsed ? '' : 'order-2'}`}>
               {selected.length > 0 && (
                 <Button size="sm" variant="primary" disabled={stale} title={staleReason} onClick={() => open('reassign', view.driver.id, { stopIds: selected })}>
                   Reassign selected ({selected.length})
