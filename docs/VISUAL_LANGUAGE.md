@@ -200,7 +200,7 @@ Each stop receipt applies the same case-file grammar as four clear columns:
 - pending event spines read Planned → Projected → Window;
 - the remaining right side is a compact, single-row grid of four scan metrics rather than a sentence of metadata;
 - a vertical ellipsis floats at the far right without a cell or divider and opens stop-level Reassign, Add/edit note, and Cancel actions;
-- unresolved receipts are directly selectable across the full card surface and use the shared pale slate selection wash; a plain click toggles one receipt and Shift-click adds the contiguous visible range, while the ellipsis remains an independent target;
+- unresolved receipts are directly selectable across the full card surface; hover uses a very light slate wash and selected uses only a slightly stronger version, with a stable 2px interaction keyline in both states. The keyline retains blue for Next and red for late or post-HOS work instead of obscuring operational meaning. A plain click toggles one receipt and Shift-click adds the contiguous visible range, while the ellipsis remains an independent target;
 - operational status chips remain beside identity; the delivery-priority badge appears only in the dedicated Priority metric cell.
 
 All receipt sections center vertically across the row. Dispatcher notes are neutral supporting text, not alert red. This keeps identity easy to read, chronology left-to-right, and measurements comparable in one scan.
