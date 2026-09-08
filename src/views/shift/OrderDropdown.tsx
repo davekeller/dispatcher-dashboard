@@ -11,7 +11,7 @@ export interface OrderOption<T extends string> {
 }
 
 export const BOARD_ORDERS: OrderOption<BoardSort>[] = [
-  { id: 'lookout', label: 'Lookout orders', description: 'Urgency first, then time to violation and data freshness.', Glyph: Sparkle },
+  { id: 'lookout', label: 'Ordered by Lookout', description: 'Urgency first, then time to violation and data freshness.', Glyph: Sparkle },
   { id: 'limit', label: 'Closest to HOS limit', description: 'Least drive time remaining appears first.', Glyph: ClockCountdown },
   { id: 'stops', label: 'Most stops remaining', description: 'Routes with the most work left appear first.', Glyph: ListNumbers },
   { id: 'data_age', label: 'Oldest data first', description: 'The least recent telematics pings appear first.', Glyph: WifiSlash },
@@ -52,7 +52,7 @@ export default function OrderDropdown<T extends string>({ value, onChange, optio
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={`${label}: ${selected.label}`}
-        className={`inline-flex h-9 min-w-52 items-center gap-2 rounded-control border px-3 text-[12px] font-semibold shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-lookout/30 ${lookout ? 'lookout-input-ring border-transparent font-lookout text-lookout-strong hover:text-lookout' : 'border-line bg-panel text-ink hover:border-ink/25'}`}
+        className={`inline-flex h-9 min-w-52 items-center gap-2 rounded-control border px-3 text-[12px] font-semibold shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-lookout/30 ${lookout ? 'lookout-input-wash border-transparent font-lookout text-lookout-strong hover:text-lookout' : 'border-line bg-panel text-ink hover:border-ink/25'}`}
       >
         {lookout ? <LookoutAvatar size={17} className="shrink-0" /> : <SelectedGlyph size={16} weight="regular" className="shrink-0" />}
         <span className="min-w-0 flex-1 truncate text-left">{selected.label}</span>
