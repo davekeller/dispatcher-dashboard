@@ -118,12 +118,23 @@ body { @apply bg-canvas text-ink font-sans; }
 }
 
 .lookout-panel {
+  position: relative;
+  z-index: 40;
   background:
     radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--color-ai-cool) 5%, transparent), transparent 24rem),
     linear-gradient(180deg, #ffffff 0%, #ffffff 62%, #fff9f5 100%);
-  box-shadow:
-    -1px 0 3px rgb(42 48 61 / 0.05),
-    -10px 0 26px rgb(66 76 96 / 0.07);
+}
+
+.lookout-panel::before {
+  content: '';
+  position: absolute;
+  top: 3.5rem;
+  bottom: 0;
+  left: 0;
+  width: 1.25rem;
+  transform: translateX(-100%);
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent 0%, rgb(48 57 76 / 0.035) 36%, rgb(48 57 76 / 0.12) 100%);
 }
 
 .stops-navbar {
