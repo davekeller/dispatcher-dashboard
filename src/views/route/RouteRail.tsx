@@ -48,6 +48,7 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
   const { route, now } = view
   const origin = originOf(useLocation())
   const nextId = view.next?.id
+  const progress = view.total === 0 ? 100 : Math.round((view.done / view.total) * 100)
   const [active, setActive] = useState<string | null>(nextId ?? route.stops.at(-1)?.id ?? null)
   // In map mode the page owns the selection; in list mode the receipt being read does.
   const shownActive = activeStopId !== undefined ? activeStopId : active
@@ -138,6 +139,27 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
           <SidebarSimple size={16} className={collapsed ? '-scale-x-100' : ''} />
         </button>
       </div>
+
+      <section aria-label={`${progress}% complete; ${view.done} completed and ${view.remaining.length} remaining`} className="shrink-0 border-b border-line bg-board/45">
+        {collapsed ? (
+          <div className="px-1 py-2.5 text-center">
+            <p className="tnum font-display text-lg font-semibold leading-none tracking-tight text-ink">{progress}%</p>
+            <p className="tnum mt-1.5 text-[9px] font-semibold leading-none text-ink">{view.done} / {view.remaining.length}</p>
+            <p className="mt-1 text-[7px] font-semibold uppercase leading-none tracking-[0.04em] text-label">done / left</p>
+          </div>
+        ) : (
+          <dl className="grid grid-cols-2 divide-x divide-line">
+            <div className="flex min-w-0 flex-col justify-center px-3 py-2.5">
+              <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">% complete</dt>
+              <dd className="tnum mt-1 font-display text-xl font-semibold leading-none tracking-tight text-ink">{progress}%</dd>
+            </div>
+            <div className="flex min-w-0 flex-col justify-center px-3 py-2.5">
+              <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">Done / remaining</dt>
+              <dd className="tnum mt-1 font-display text-xl font-semibold leading-none tracking-tight text-ink">{view.done} / {view.remaining.length}</dd>
+            </div>
+          </dl>
+        )}
+      </section>
 
       {!collapsed && (
         <button type="button" onClick={() => setTimelineOpen((open) => !open)} aria-expanded={timelineOpen} className="flex w-full shrink-0 items-center gap-2 px-3 py-2 text-left transition hover:bg-board/70">

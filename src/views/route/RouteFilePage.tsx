@@ -81,7 +81,6 @@ export default function RouteFilePage() {
 
   const stale = view.staleness !== 'fresh'
   const staleReason = stale ? 'Position unknown. This action is disabled until the truck reports in.' : undefined
-  const progress = view.total === 0 ? 100 : Math.round((view.done / view.total) * 100)
   const routeSignals = [routeScheduleSignal(view), routeHosSignal(view)]
   const selectableStopIds = [...view.route.stops]
     .reverse()
@@ -103,35 +102,35 @@ export default function RouteFilePage() {
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         <DriverCard view={view} card={card} />
         <section>
-          <header className={`sticky top-0 z-30 mb-3 flex min-h-14 w-full items-stretch border-y border-nav-selected-line/70 bg-nav-selected/55 px-3 backdrop-blur ${railCollapsed ? '' : 'flex-wrap'}`}>
-            <div className={`flex min-w-0 shrink-0 items-center gap-2.5 py-2 pr-3 ${railCollapsed ? '' : 'order-1 flex-1'}`}>
+          <header className="sticky top-0 z-30 mb-3 flex min-h-14 w-full flex-wrap items-stretch border-y border-nav-selected-line/70 bg-nav-selected/55 px-3 backdrop-blur">
+            <div className="order-1 flex min-w-0 flex-1 items-center gap-2.5 py-2 pr-3">
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] bg-ink text-on-accent shadow-sm" aria-hidden="true">
                 <ListBullets size={15} weight="bold" />
               </span>
               <div className="min-w-0">
-                <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">Stops · {progress}% complete</p>
-                <h2 className="tnum mt-1 whitespace-nowrap text-[15px] font-semibold leading-none text-ink">{view.done}/{view.total} delivered</h2>
+                <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">Stops</p>
+                <h2 className="tnum mt-1 whitespace-nowrap font-display text-2xl font-semibold leading-none tracking-tight text-ink">{view.done}/{view.total} delivered</h2>
               </div>
             </div>
-            <dl aria-label="Route status" className={`grid min-w-0 flex-1 grid-cols-3 divide-x divide-nav-selected-line/70 ${railCollapsed ? 'border-l border-nav-selected-line/70' : 'order-3 basis-full border-t border-nav-selected-line/70'}`}>
+            <dl aria-label="Route status" className="order-3 grid min-w-0 basis-full grid-cols-3 divide-x divide-nav-selected-line/70 border-t border-nav-selected-line/70">
               <div className="flex min-w-0 flex-col justify-center px-3 py-2">
                 <dt className="flex min-w-0 items-center gap-1.5 text-[8px] font-semibold uppercase tracking-[0.06em] text-label">
                   <span>Remaining</span>
                   <span className="truncate font-medium normal-case tracking-normal text-muted" title={`Updated ${fmtAge(view.pingAgeMin)}`}>· {fmtAge(view.pingAgeMin)}</span>
                 </dt>
-                <dd className="tnum mt-1 text-[14px] font-semibold leading-none text-ink">{view.remaining.length} <span className="text-[9px] font-medium text-muted">stops</span></dd>
+                <dd className="tnum mt-1 font-display text-[22px] font-semibold leading-none tracking-tight text-ink">{view.remaining.length} <span className="font-sans text-[10px] font-medium tracking-normal text-muted">stops</span></dd>
               </div>
               {routeSignals.map((signal) => (
                 <div key={signal.label} className="flex min-w-0 flex-col justify-center px-3 py-2">
                   <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">{signal.label}</dt>
-                  <dd className={`mt-1 flex min-w-0 items-center gap-1.5 text-[14px] font-semibold leading-none ${SIGNAL_TEXT[signal.tone]}`}>
+                  <dd className={`mt-1 flex min-w-0 items-center gap-1.5 font-display text-[22px] font-semibold leading-none tracking-tight ${SIGNAL_TEXT[signal.tone]}`}>
                     <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${SIGNAL_DOT[signal.tone]}`} />
                     <span className="truncate" title={signal.value}>{signal.value}</span>
                   </dd>
                 </div>
               ))}
             </dl>
-            <div className={`ml-auto flex items-center gap-2 py-2 pl-3 ${railCollapsed ? '' : 'order-2'}`}>
+            <div className="order-2 ml-auto flex items-center gap-2 py-2 pl-3">
               {selected.length > 0 && (
                 <Button size="sm" variant="primary" disabled={stale} title={staleReason} onClick={() => open('reassign', view.driver.id, { stopIds: selected })}>
                   Reassign selected ({selected.length})
