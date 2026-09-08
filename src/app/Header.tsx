@@ -30,7 +30,7 @@ export default function Header() {
     <header className={`relative z-30 flex h-14 shrink-0 items-center gap-0.5 border-b border-line bg-panel pr-3.5 ${lowestNav ? 'nav-shadow-below' : ''}`}>
       {/* The tile sits centered in a cell the width of the collapsed route rail, so it lines up over the route file's back arrow. */}
       <div className="flex w-16 shrink-0 items-center justify-center">
-        <Link to="/" aria-label="Open the Dispatch board" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control bg-ink text-on-accent transition hover:bg-ink/90">
+        <Link to="/" aria-label="Open the Dispatch board" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control bg-nav-selected-ink text-on-accent transition hover:bg-nav-selected-ink/90">
           <TruckTrailer size={17} weight="fill" />
         </Link>
       </div>
