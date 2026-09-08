@@ -30,18 +30,18 @@ export default function Header() {
   const mapTo = origin?.view === 'map' ? origin.to : '/map'
   // The nav shadow belongs under the lowest nav layer: on a route file the Stops bar casts it, so the product bar does not.
   const lowestNav = !focused
-  const segment = (on: boolean) => `flex h-full items-center gap-1.5 px-3 text-[12px] font-semibold transition focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ink/40 ${navigationItemState(on)}`
+  const segment = (on: boolean) => `flex h-full flex-1 items-center justify-center gap-1.5 px-3 text-[12px] font-semibold transition focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ink/40 ${navigationItemState(on)}`
 
   return (
     <header className={`relative z-30 flex h-14 shrink-0 items-center gap-0.5 border-b border-line bg-panel pr-3.5 ${lowestNav ? 'nav-shadow-below' : ''}`}>
-      {/* The brand tile sits centered over the route file's 64px back-arrow cell. */}
+      {/* The standalone brand mark sits centered over the route file's 64px back-arrow cell. */}
       <div className="flex w-16 shrink-0 items-center justify-center">
-        <Link to="/" aria-label="Open the Dispatch board" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control bg-nav-selected-ink text-on-accent transition hover:bg-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-nav-selected-ink/40">
-          <DispatchMark className="h-[25px] w-[25px]" />
+        <Link to="/" aria-label="Open the Dispatch board" className="flex h-9 w-9 shrink-0 items-center justify-center text-nav-selected-ink transition-colors hover:text-ink focus-visible:rounded-control focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-nav-selected-ink/40">
+          <DispatchMark className="h-[29px] w-[29px]" />
         </Link>
       </div>
-      <Link to="/" className="-ml-1 whitespace-nowrap font-display text-[15px] font-bold uppercase leading-none tracking-[0.08em] text-nav-selected-ink">Dispatch</Link>
-      <nav aria-label="Workspace view" className="ml-4 flex h-8 shrink-0 items-stretch overflow-hidden rounded-control border border-nav-selected-ink bg-panel">
+      <Link to="/" className="-ml-2 whitespace-nowrap font-display text-[16px] font-bold uppercase leading-none tracking-[0.075em] text-nav-selected-ink">Dispatch</Link>
+      <nav aria-label="Workspace view" className="absolute left-1/2 top-1/2 z-10 flex h-8 w-44 -translate-x-1/2 -translate-y-1/2 items-stretch overflow-hidden rounded-control border border-nav-selected-ink bg-panel">
         <Link to="/" aria-current={onBoard ? 'page' : undefined} className={segment(onBoard)}>
           <SquaresFour size={14} weight={onBoard ? 'fill' : 'regular'} /> Board
         </Link>
@@ -50,7 +50,7 @@ export default function Header() {
         </Link>
       </nav>
       {focused && (
-        <div className="ml-1 flex min-w-0 items-center gap-1.5 text-[12px] text-muted" aria-label={`Route Details: ${focused.route.id.toUpperCase()}`}>
+        <div className="ml-4 flex min-w-0 items-center gap-1.5 text-[12px] text-muted" aria-label={`Route Details: ${focused.route.id.toUpperCase()}`}>
           <CaretRight size={13} className="shrink-0" />
           <span className="whitespace-nowrap font-medium">Route Details</span>
           <span aria-hidden="true" className="text-label">·</span>
