@@ -9,6 +9,11 @@ export interface RouteSignal {
   tone: RouteSignalTone
 }
 
+/** Completion as a whole percentage. An empty route counts as complete. The rail and the Stops bar both read this. */
+export function routeCompletionPct(done: number, total: number): number {
+  return total === 0 ? 100 : Math.round((done / total) * 100)
+}
+
 export type RouteProgressView = Pick<DriverView, 'driftMin' | 'minutesUntilLimit' | 'remaining' | 'remainingDriveMin' | 'staleness'>
 
 export function routeScheduleSignal(view: RouteProgressView): RouteSignal {
