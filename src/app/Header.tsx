@@ -40,7 +40,7 @@ export default function Header() {
           <DispatchMark className="h-[29px] w-[29px]" />
         </Link>
       </div>
-      <Link to="/" className="-ml-2 whitespace-nowrap font-display text-[16px] font-bold uppercase leading-none tracking-[0.075em] text-nav-selected-ink">Dispatch</Link>
+      <Link to="/" className="-ml-2 whitespace-nowrap font-brand text-[17px] font-bold leading-none tracking-[-0.035em] text-nav-selected-ink">Dispatch</Link>
       <nav aria-label="Workspace view" className="absolute left-1/2 top-1/2 z-10 flex h-8 w-44 -translate-x-1/2 -translate-y-1/2 items-stretch overflow-hidden rounded-control border border-nav-selected-ink bg-panel">
         <Link to="/" aria-current={onBoard ? 'page' : undefined} className={segment(onBoard)}>
           <SquaresFour size={14} weight={onBoard ? 'fill' : 'regular'} /> Board
