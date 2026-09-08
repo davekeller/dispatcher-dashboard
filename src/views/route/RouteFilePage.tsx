@@ -133,15 +133,11 @@ export default function RouteFilePage() {
           <ArrowLeft size={16} weight="bold" />
         </Link>
         <div className="flex shrink-0 items-center gap-2.5 border-r border-line pl-4 pr-5">
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center text-ink" aria-hidden="true">
-            <ListBullets size={15} weight="bold" />
-          </span>
+          {/* The route's band, as the cell's leading mark: the first thing the bar says about the route. */}
+          <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${BAND_TONE[card.band].fill}`} role="img" aria-label={BAND_LABEL[card.band]} title={BAND_LABEL[card.band]} />
           <div className="min-w-0">
             <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">Route</p>
-            <h2 className="mt-1 flex items-center gap-2 whitespace-nowrap font-display text-[16px] font-semibold leading-none tracking-tight text-ink">
-              {view.route.id.toUpperCase()}
-              <span className={`h-2 w-2 shrink-0 rounded-full ${BAND_TONE[card.band].fill}`} role="img" aria-label={BAND_LABEL[card.band]} title={BAND_LABEL[card.band]} />
-            </h2>
+            <h2 className="mt-1 whitespace-nowrap font-display text-[16px] font-semibold leading-none tracking-tight text-ink">{view.route.id.toUpperCase()}</h2>
           </div>
         </div>
         <div className="flex min-w-[13rem] shrink-0 items-center border-r border-line px-4">
