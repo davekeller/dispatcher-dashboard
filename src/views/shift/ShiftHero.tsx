@@ -66,7 +66,11 @@ export default function ShiftHero({ metrics, ranked, filters, onPreset }: { metr
           })}
         </dl>
 
-        <dl className="ml-4 grid w-80 shrink-0 grid-cols-4 divide-x divide-white/15 border-l border-white/15" aria-label={`${metrics.stopsDelivered} delivered today, ${toDeliver} to deliver, ${totalStops} total stops, ${deliveredPercent}% delivered`}>
+        <dl className="ml-4 grid w-96 shrink-0 grid-cols-5 divide-x divide-white/15 border-l border-white/15" aria-label={`${metrics.trucks} trucks, ${metrics.stopsDelivered} delivered today, ${toDeliver} to deliver, ${totalStops} total stops, ${deliveredPercent}% delivered`}>
+          <div className="flex min-w-0 flex-col justify-center px-3">
+            <dt className="whitespace-nowrap text-[8px] font-semibold uppercase tracking-[0.04em] text-white/70">Trucks</dt>
+            <dd className="tnum mt-1.5 font-display text-[1.65rem] font-semibold leading-none tracking-[-0.04em] text-on-accent">{metrics.trucks}</dd>
+          </div>
           <div className="flex min-w-0 flex-col justify-center px-3">
             <dt className="whitespace-nowrap text-[8px] font-semibold uppercase tracking-[0.04em] text-white/70">Delivered</dt>
             <dd className="tnum mt-1.5 font-display text-[1.65rem] font-semibold leading-none tracking-[-0.04em] text-on-accent">{metrics.stopsDelivered}</dd>
