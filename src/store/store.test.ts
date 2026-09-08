@@ -51,4 +51,16 @@ describe('store', () => {
     useStore.getState().scrub(15 * 60_000)
     expect(useStore.getState().now() - t0).toBeGreaterThanOrEqual(15 * 60_000)
   })
+
+  it('plays the same day against the real clock, until the next scrub', () => {
+    useStore.getState().setLiveClock(true)
+    expect(Math.abs(useStore.getState().now() - Date.now())).toBeLessThan(1000)
+    expect(useStore.getState().liveClock).toBe(true)
+    useStore.getState().scrub(15 * 60_000)
+    expect(useStore.getState().liveClock).toBe(false)
+    useStore.getState().setLiveClock(true)
+    useStore.getState().resetClock()
+    expect(useStore.getState().liveClock).toBe(false)
+    expect(useStore.getState().scrubOffsetMs).toBe(0)
+  })
 })

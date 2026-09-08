@@ -5,7 +5,7 @@ import type { Fleet, StopOutcome } from '../data/types'
 import type { GroupingId } from '../groupBy'
 import { minutesUntilLimit } from '../hos/compute'
 import { SNOOZE_MIN } from '../hos/constants'
-import { ANCHOR, MIN, clampScrub, simNow } from '../time/clock'
+import { ANCHOR, LIVE_OFFSET_MS, MIN, clampScrub, simNow } from '../time/clock'
 import * as A from './actions'
 
 export interface LastAction {
@@ -32,6 +32,8 @@ export interface ShiftEvent {
 export interface State {
   fleet: Fleet
   scrubOffsetMs: number
+  /** The same day against the real clock: simulated time equals wall time. */
+  liveClock: boolean
   snoozes: Record<string, number>
   corrections: Record<string, Correction>
   events: ShiftEvent[]
@@ -54,6 +56,7 @@ export interface State {
   scrub: (ms: number) => void
   setScrubOffset: (ms: number) => void
   setClock: (t: number) => void
+  setLiveClock: (on: boolean) => void
   resetClock: () => void
   resetFleet: () => void
   setGroupBy: (id: GroupingId) => void
@@ -81,6 +84,7 @@ export const useStore = create<State>()((set, get) => {
   return {
     fleet: makeFleet(ANCHOR),
     scrubOffsetMs: 0,
+    liveClock: false,
     snoozes: {},
     corrections: {},
     events: opening(),
@@ -125,27 +129,32 @@ export const useStore = create<State>()((set, get) => {
       log('undo', undone ? `Undone: ${undone}` : 'Undone')
     },
     scrub: (ms) => {
-      set((s) => ({ scrubOffsetMs: clampScrub(s.scrubOffsetMs + ms) }))
+      set((s) => ({ scrubOffsetMs: clampScrub(s.scrubOffsetMs + ms), liveClock: false }))
       get().advanceWorld()
     },
     setScrubOffset: (ms) => {
-      set({ scrubOffsetMs: clampScrub(ms) })
+      set({ scrubOffsetMs: clampScrub(ms), liveClock: false })
       get().advanceWorld()
     },
     setClock: (t) => {
       // An absolute time of day: the offset that lands the live clock on it.
-      set({ scrubOffsetMs: clampScrub(t - simNow(0)) })
+      set({ scrubOffsetMs: clampScrub(t - simNow(0)), liveClock: false })
+      get().advanceWorld()
+    },
+    setLiveClock: (on) => {
+      // Real time is a fixed offset, not a clamp: before 6:00 AM the shift has not started, after 6:00 PM it is over.
+      set({ liveClock: on, scrubOffsetMs: on ? LIVE_OFFSET_MS : 0 })
       get().advanceWorld()
     },
     resetClock: () => {
-      set({ scrubOffsetMs: 0 })
+      set({ scrubOffsetMs: 0, liveClock: false })
       get().advanceWorld()
     },
     advanceWorld: () => {
       const next = materialize(get().fleet, get().now())
       if (next !== get().fleet) set({ fleet: next })
     },
-    resetFleet: () => set({ fleet: makeFleet(ANCHOR), snoozes: {}, corrections: {}, events: opening(), undoSnapshot: undefined, lastAction: undefined, scrubOffsetMs: 0 }),
+    resetFleet: () => set({ fleet: makeFleet(ANCHOR), snoozes: {}, corrections: {}, events: opening(), undoSnapshot: undefined, lastAction: undefined, scrubOffsetMs: 0, liveClock: false }),
     setGroupBy: (groupBy) => set({ groupBy }),
     toggleDev: () => set((s) => ({ devOpen: !s.devOpen })),
   }
