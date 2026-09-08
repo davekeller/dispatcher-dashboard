@@ -1,12 +1,15 @@
 import { CaretRight, MapTrifold, SquaresFour, TruckTrailer } from '@phosphor-icons/react'
 import { Link, useLocation } from 'react-router'
+import { DISPATCHER } from '../data/dispatcher'
 import { useDerived } from '../store/hooks'
+import DispatcherAvatar from '../ui/DispatcherAvatar'
 import { navigationItemState } from '../ui/navigation'
 import { originOf } from './origin'
 import SimulatedShift from './SimulatedShift'
 
 /** The product bar. Dispatch is the product; Board and Map are one segmented view switch; a route file is
- *  one level in from whichever of them it was opened from, and reads that way. */
+ *  one level in from whichever of them it was opened from, and reads that way. The bar ends with the
+ *  dispatcher's own mark, which opens her settings. */
 export default function Header() {
   const location = useLocation()
   const { pathname } = location
@@ -16,7 +19,8 @@ export default function Header() {
   // On a route file the segment of the view it was opened from stays selected, and Map returns to that pick.
   const origin = routeMatch ? originOf(location) : null
   const onMap = pathname === '/map' || origin?.view === 'map'
-  const onBoard = !onMap
+  const onSettings = pathname === '/settings'
+  const onBoard = !onMap && !onSettings
   const mapTo = origin?.view === 'map' ? origin.to : '/map'
   const segment = (on: boolean) => `flex h-full items-center gap-1.5 px-3 text-[12px] font-semibold transition focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ink/40 ${navigationItemState(on)}`
 
@@ -42,6 +46,15 @@ export default function Header() {
       )}
       <div className="ml-auto flex items-center gap-3">
         <SimulatedShift />
+        <Link
+          to="/settings"
+          aria-label={`${DISPATCHER.name}: open settings`}
+          aria-current={onSettings ? 'page' : undefined}
+          title={`${DISPATCHER.name} · ${DISPATCHER.role}`}
+          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40 ${onSettings ? 'ring-2 ring-ink ring-offset-2 ring-offset-panel' : 'hover:ring-2 hover:ring-ink/25 hover:ring-offset-2 hover:ring-offset-panel'}`}
+        >
+          <DispatcherAvatar dispatcher={DISPATCHER} size={36} />
+        </Link>
       </div>
     </header>
   )

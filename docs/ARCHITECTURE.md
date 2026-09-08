@@ -43,7 +43,7 @@ The dependency list is read as closely as the code. Nothing else goes in without
 src/
   main.tsx · App.tsx (routes) · index.css (tokens)
   app/          Layout.tsx · Header.tsx · SimulatedShift.tsx
-  data/         types.ts · prng.ts · seed.ts · planted.ts · regions.ts
+  data/         types.ts · prng.ts · seed.ts · planted.ts · regions.ts · dispatcher.ts (Lena, as data)
   time/         clock.ts · useNow.ts
   hos/          constants.ts · compute.ts · compute.test.ts
   alerts/       types.ts · rules.ts · rank.ts · rank.test.ts
@@ -58,7 +58,8 @@ src/
     route/map/  RouteMap.tsx                                  (lazy chunk: the route file's map)
     driver/     DriverPhoneView.tsx · PhoneFrame.tsx        (Phase 2)
     map/        MapPage.tsx · FleetMap.tsx (lazy) · RouteOverlay.tsx (one route in the rail's states, both maps) · leaflet.tsx (tiles, fit, fly)
-  ui/           Chip · Button · Card · Modal · Toast · Countdown · Bar · Avatar · EmptyState · CorrectionChip
+    settings/   SettingsPage.tsx                             (the dispatcher's page: profile, the desk today, the clock preference, the rules on the desk)
+  ui/           Chip · Button · Card · Modal · Toast · Countdown · Bar · Avatar · DispatcherAvatar · EmptyState · CorrectionChip
   lib/          format.ts (clock times, durations, tilde precision)
 ```
 
@@ -301,7 +302,7 @@ Every action follows the same protocol: **preview → confirm → commit → rec
 
 The truck logo is an icon-only `ink` tile; the Dispatch wordmark remains separate dark text on the white, shadowless product bar. Board and Map share one compact segmented shell with an outer slate keyline and a single internal divider. Each link reaches the shell edges, and the selected view fills its full segment with `nav-selected`—no inner padding, radius, ring, or shadow. Route files remain within the Board workspace, so Board keeps that selected state beside the route breadcrumb. The same shared state helper gives Chat and Artifacts the flat fill treatment without introducing another shadow language.
 
-Two panes. The product bar reads **Dispatch**, then the active **Board** workspace, the shift clock, and the dev toggle; on a route file a breadcrumb continues with "RT-01 · Marcus R." There is no left nav: the board is the whole product for now. The Status/Region lens lives with the board controls. Main outlet. Lookout sidebar mounted once at app level, reading derived state directly; pages set the focus driver through context. Collapsed, it becomes a rail with the act-now count as a badge.
+Two panes. The product bar reads **Dispatch**, then the active **Board** workspace, the shift clock, and the dev toggle; on a route file a breadcrumb continues with "RT-01 · Marcus R." The bar ends with Lena's avatar, her initials on the nav's slate, which opens her settings page. There is no left nav: the board is the whole product for now. The Status/Region lens lives with the board controls. Main outlet. Lookout sidebar mounted once at app level, reading derived state directly; pages set the focus driver through context. Collapsed, it becomes a rail with the act-now count as a badge.
 
 | Route | View | Phase |
 |---|---|---|
@@ -309,6 +310,7 @@ Two panes. The product bar reads **Dispatch**, then the active **Board** workspa
 | `/routes/:driverId` | Route file | 1 |
 | `/driver/:driverId` | Driver phone | 2 |
 | `/map` | Map | 2 |
+| `/settings` | Dispatcher settings | 1 |
 
 The board groups by **Status** by default, Act now leftmost, because that is where Lena acts; Region is one click away.
 
@@ -369,6 +371,10 @@ Mobile-first. Header collapses to the driver's avatar and their own countdown ch
 The fleet on one map, a Map tab beside Board in the product bar. It reads the same ranked list as the board and takes the board's filters (status, data, region, search), so "37 of 50 trucks" means the same thing on both. The attention rule applies: clear and on-break trucks are small neutral dots, dark and unmistakable but colorless, with a hover tooltip; act-now, watch, and offline trucks carry their band color and a name-and-countdown pill ("Marcus R. · 0:12", "Dre W. · ~0:40 · last seen 25 min ago"); a dark truck is hollow and dashed whatever its band, because its fix is last known, not live. Every fix comes from `geo/truckPosition.ts`, so the trucks move with the same tick as everything else. Picking a truck (or arriving at `/map?driver=drv-01`) puts a small card over the map (name, route, plate, region, band, countdown, stops left, "Open route file"), draws that driver's whole route in the rail's states (delivered stops in the completion gradient, undelivered outlined, late and past-limit stops red with dashed legs, the next stop larger), frames the route, and focuses Lookout on that driver so its card and actions are one glance to the right. "Fit all" re-frames every visible truck. `geo/fleet.ts` turns views into markers and is tested against the seeded fleet, so the map view holds no logic. The route file's own map is the List | Map toggle described above.
 
 ---
+
+### Settings
+
+Lena's page, reached from her avatar at the end of the product bar. Who she is comes from `data/dispatcher.ts`, the one record every surface that names her reads. The desk she is running today (trucks, regions, stops delivered, the clock) is read from derived state, never restated. The one preference the product has, the real-clock toggle, calls the same store action as the shift panel. The alert rules on the desk render straight from the rules array with their severities, so a rule added live shows up here too. Deliberately basic: the persona needed a home in the product, not an admin surface.
 
 ## 10. Edge paths
 
