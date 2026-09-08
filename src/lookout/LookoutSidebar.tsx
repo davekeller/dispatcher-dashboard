@@ -54,7 +54,7 @@ export default function LookoutSidebar() {
 
   return (
     // Collapsed, the slot closes to zero and the panel slides off to the right; the product bar's Ask Lookout pill brings it back.
-    <div className={`lookout-slot shrink-0 ${collapsed ? 'is-closed w-0' : 'w-[26rem]'}`} aria-hidden={collapsed}>
+    <div className={`lookout-slot min-w-0 shrink-0 ${collapsed ? 'is-closed w-0' : 'w-[26rem]'}`} aria-hidden={collapsed}>
     <aside className="lookout-panel flex h-full w-[26rem] shrink-0 flex-col border-l border-line" aria-label={`${LOOKOUT.name}, the shift co-pilot`} inert={collapsed || undefined}>
       <header className="flex h-14 shrink-0 items-center gap-2 border-b border-line bg-panel/90 pl-2 pr-1.5 backdrop-blur">
         <div className="flex items-center gap-0.5" role="tablist" aria-label={`${LOOKOUT.name} views`}>
