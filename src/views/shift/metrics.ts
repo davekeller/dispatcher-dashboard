@@ -65,9 +65,15 @@ export interface LimitMark {
   name: string
   routeId: string
   band: Band
+  /** Legal driving balance at this moment; negative means already over. */
+  minutesUntilLimit: number
+  /** A stale vehicle makes both the balance and projected clock time approximate. */
+  estimated: boolean
   /** When the limit lands; for a driver already over it, now. */
   at: number
   over: boolean
+  /** Whether the projected limit falls inside the chart's visible shift window. */
+  withinWindow: boolean
   /** Position on the rest of the day: 0 is now, 1 is the end of the day. */
   x: number
 }
@@ -80,7 +86,18 @@ export function limitTimeline(rows: MetricRow[], now: number, dayEnd: number): L
     .map((r) => {
       const over = r.view.minutesUntilLimit <= 0
       const at = over ? now : r.view.limitHitAt
-      return { driverId: r.view.driver.id, name: r.view.driver.name, routeId: r.view.route.id, band: r.card.band, at, over, x: over ? 0 : Math.min(1, Math.max(0, (at - now) / span)) }
+      return {
+        driverId: r.view.driver.id,
+        name: r.view.driver.name,
+        routeId: r.view.route.id,
+        band: r.card.band,
+        minutesUntilLimit: r.view.minutesUntilLimit,
+        estimated: r.view.staleness !== 'fresh',
+        at,
+        over,
+        withinWindow: at <= dayEnd,
+        x: over ? 0 : Math.min(1, Math.max(0, (at - now) / span)),
+      }
     })
     .sort((a, b) => a.at - b.at)
 }

@@ -30,9 +30,12 @@ describe('metrics lens', () => {
     const marks = limitTimeline(rows, anchor, dayEnd)
     expect(marks[0].over).toBe(true)
     expect(marks[0].x).toBe(0)
+    expect(marks[0].minutesUntilLimit).toBeLessThanOrEqual(0)
+    expect(marks[0].withinWindow).toBe(true)
     for (let i = 1; i < marks.length; i += 1) expect(marks[i].at).toBeGreaterThanOrEqual(marks[i - 1].at)
     for (const m of marks) expect(m.x).toBeGreaterThanOrEqual(0)
     for (const m of marks) expect(m.x).toBeLessThanOrEqual(1)
+    for (const m of marks.filter((mark) => !mark.withinWindow)) expect(m.x).toBe(1)
   })
 
   it('ranks the closest to the limit with the over-limit driver first', () => {
