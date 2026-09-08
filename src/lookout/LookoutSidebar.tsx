@@ -70,7 +70,7 @@ export default function LookoutSidebar() {
           {(['chat', 'artifacts'] as const).map((t) => (
             <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`${NAV_ITEM_BASE} font-lookout text-[12px] capitalize ${navigationItemState(tab === t)}`}>
               {t}
-              {t === 'chat' && urgentCards.length > 0 && <span className="tnum rounded-full bg-act-now px-1.5 text-[10px] font-semibold leading-4 text-on-accent" title={`${urgentCards.length} need action now`}>{urgentCards.length}</span>}
+              {t === 'chat' && urgentCards.length > 0 && <span className={`tnum rounded-full px-1.5 text-[10px] font-semibold leading-4 ${tab === t ? 'bg-on-accent text-act-now' : 'bg-act-now text-on-accent'}`} title={`${urgentCards.length} need action now`}>{urgentCards.length}</span>}
             </button>
           ))}
         </div>
