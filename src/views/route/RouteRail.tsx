@@ -176,7 +176,7 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
         </button>
       )}
 
-      {(collapsed || timelineOpen) && <div ref={timelineRef} data-collapsed={collapsed} className={`route-timeline-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain ${collapsed ? 'px-1 py-2' : 'px-2 pb-2'}`}>
+      {(collapsed || timelineOpen) && <div ref={timelineRef} data-collapsed={collapsed} className={`route-timeline-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain ${collapsed ? 'px-1 py-2' : 'pb-2 pl-2 pr-3'}`}>
         <ol>
           {displayedNodes.map((node) => {
             const { stop } = node
@@ -210,7 +210,7 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
                     <StopStatusMarker stop={stop} pastLimit={pastLimitIds.has(stop.id)} late={node.late} active={isActive} className={`motion-safe:transition-[width,height] motion-safe:duration-150 ${detailNodeSize(index, firstRemainingIndex, stop.status)}`} style={completed ? stopHistoryStyle(index, lastCompleteIndex) : undefined} />
                   </span>
                   {!collapsed && (
-                    <span className="min-w-0 py-1 pl-2 pr-2">
+                    <span className="min-w-0 py-1 pl-2 pr-3">
                       <span className={`tnum block text-[8px] ${isRed ? 'font-semibold text-act-now' : 'text-label'}`}>{timePrefix}{fmtClock(node.t)}</span>
                       <span className="mt-0.5 flex min-w-0 items-baseline gap-1.5">
                         <span className={`tnum shrink-0 text-[9px] font-semibold ${isRed ? 'text-act-now' : 'text-muted'}`}>{stop.seq}</span>

@@ -133,8 +133,8 @@ export default function RouteFilePage() {
           <ArrowLeft size={16} weight="bold" />
         </Link>
         <div className="flex shrink-0 items-center gap-2.5 border-r border-line pl-4 pr-5">
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-control bg-nav-selected-ink text-on-accent" aria-hidden="true">
-            <ListBullets size={12} weight="bold" />
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center text-ink" aria-hidden="true">
+            <ListBullets size={15} weight="bold" />
           </span>
           <div className="min-w-0">
             <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">Route</p>
