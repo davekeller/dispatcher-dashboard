@@ -157,7 +157,7 @@ Selected workspace, board-lens, and Lookout tab controls use one slate treatment
 The hero is not a hero in the marketing sense. It is a compact, two-sided instrument:
 
 - **Left:** Act now, Watch, On break, Offline, and Clear—ordered by dispatch priority and matched exactly to the board lanes.
-- **Right:** Delivered, To deliver, Total stops, and Delivered percentage as four equally aligned facts in the same row.
+- **Right:** Trucks, Delivered, To deliver, Total stops, and Delivered percentage as five equally aligned facts in the same row.
 
 An original, brand-free photograph of a fictional Midwestern skyline and road network gives the instrument operational atmosphere. The photograph is completely desaturated before a warm near-black layer is applied at 70% opacity. Each status label, value, detail, and dot uses the same light color as its board-lane header background; the four throughput metrics remain white. Status figures remain interactive filter shortcuts.
 
