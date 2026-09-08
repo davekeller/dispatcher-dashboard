@@ -30,7 +30,7 @@ export default function PlanCard({ plan, view }: { plan: Plan; view: DriverView 
       {(action || plan.call) && (
         <div className="mt-1.5 flex flex-wrap gap-1.5 pl-4">
           {action && (
-            <Button size="sm" variant={plan.kind === 'reassign' || plan.kind === 'assign' ? 'primary' : 'secondary'} disabled={blocked} title={blockedReason} onClick={() => open(action.action, view.driver.id, { stopIds: action.stopIds, toId: action.toId, afterStopId: action.afterStopId })}>
+            <Button size="sm" variant={plan.kind === 'reassign' || plan.kind === 'assign' ? 'danger' : 'secondary'} disabled={blocked} title={blockedReason} onClick={() => open(action.action, view.driver.id, { stopIds: action.stopIds, toId: action.toId, afterStopId: action.afterStopId })}>
               {action.label}
             </Button>
           )}

@@ -17,6 +17,7 @@ import StaleBanner from './StaleBanner'
 import RouteRail from './RouteRail'
 import StopReceipt from './StopReceipt'
 import { applyStopFilter, isStopFilterId, STOP_FILTERS, stopFilterCounts, stopsNearLimit, type StopFilterId } from './stopFilters'
+import SectionHeading from './SectionHeading'
 import { nextStopSelection } from './stopSelection'
 import StopsTitleRow from './StopsTitleRow'
 
@@ -121,23 +122,23 @@ export default function RouteFilePage() {
   const stopFilterLabel = STOP_FILTERS.find((f) => f.id === stopFilter)?.label ?? 'All'
   // On the map the rail's selection is the page's; it starts on the next stop, like the rail does when reading.
   const mapSelection = selectedStop ?? view.next?.id ?? null
-  const seg = (on: boolean) => `inline-flex h-6 items-center gap-1 rounded-[6px] px-2 text-[11px] font-semibold transition ${on ? 'bg-nav-selected text-nav-selected-ink' : 'text-muted hover:bg-nav-selected/45 hover:text-ink'}`
+  const seg = (on: boolean) => `inline-flex h-6 items-center gap-1 rounded-[6px] px-2 text-[11px] font-semibold transition ${on ? 'bg-nav-selected-ink text-on-accent' : 'text-muted hover:bg-nav-selected/45 hover:text-ink'}`
 
   return (
     <div className="route-workspace flex h-full min-h-0 flex-col">
       {/* The secondary nav: part of the chrome, not the scroll. Back is its first column; the rail has no arrow of its own. */}
-      <nav aria-label="Route" className="stops-navbar flex h-[3.25rem] shrink-0 items-stretch border-b border-line">
-        <Link to={origin.to} title={`Back to the ${origin.view}`} aria-label={`Back to the ${origin.view}`} className="flex w-[3.25rem] shrink-0 items-center justify-center border-r border-line text-muted transition hover:bg-board hover:text-ink">
+      <nav aria-label="Route" className="stops-navbar nav-shadow-below relative z-20 flex h-[3.25rem] shrink-0 items-stretch border-b border-line">
+        <Link to={origin.to} title={`Back to the ${origin.view}`} aria-label={`Back to the ${origin.view}`} className="flex w-16 shrink-0 items-center justify-center border-r border-line text-muted transition hover:bg-board hover:text-ink">
           <ArrowLeft size={16} weight="bold" />
         </Link>
-        <div className="flex min-w-[13rem] shrink-0 items-center gap-2.5 border-r border-line pl-4 pr-6">
+        <div className="flex min-w-[15rem] shrink-0 items-center gap-2.5 border-r border-line pl-4 pr-7">
           <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-control bg-ink text-on-accent" aria-hidden="true">
             <ListBullets size={12} weight="bold" />
           </span>
           <div className="min-w-0">
             <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">{view.route.id.toUpperCase()} · Stops</p>
             <h2 className="tnum mt-1 whitespace-nowrap font-display text-[16px] font-semibold leading-none tracking-tight text-ink">
-              {view.done}/{view.total} delivered <span className="font-sans text-[11px] font-medium tracking-normal text-muted">· {progress}%</span>
+              {view.done}/{view.total} delivered <span className="font-sans text-[14px] font-medium tracking-normal text-muted">· {progress}%</span>
             </h2>
           </div>
         </div>
@@ -161,7 +162,7 @@ export default function RouteFilePage() {
         </dl>
         <div className="ml-auto flex shrink-0 items-center gap-2 border-l border-line pl-4 pr-5">
           {selected.length > 0 && (
-            <Button size="sm" variant="primary" disabled={stale} title={staleReason} onClick={() => open('reassign', view.driver.id, { stopIds: selected })}>
+            <Button size="sm" variant="danger" disabled={stale} title={staleReason} onClick={() => open('reassign', view.driver.id, { stopIds: selected })}>
               Reassign selected ({selected.length})
             </Button>
           )}
@@ -180,13 +181,16 @@ export default function RouteFilePage() {
         {/* The scroll box is a plain block so nothing inside it can flex-shrink; the column of cards sits one level down. */}
         <div className="min-w-0 flex-1 overflow-y-auto">
           <div className="flex flex-col gap-3">
-          <DriverCard view={view} card={card} />
+          <section className="flex flex-col gap-2">
+            <SectionHeading>Assigned driver</SectionHeading>
+            <DriverCard view={view} card={card} />
           {(card.alerts.length > 0 || stale) && (
             <div className="flex flex-col gap-3">
               {card.alerts.length > 0 && <AlertStrip view={view} card={card} />}
               {stale && <StaleBanner view={view} />}
             </div>
           )}
+          </section>
           <section>
             {mode === 'map' ? (
               <Suspense fallback={<div className="flex h-[22rem] items-center justify-center rounded-card border border-line bg-panel text-[12px] text-muted">Loading the map…</div>}>

@@ -39,7 +39,6 @@ export default function DriverCard({ view, card }: { view: DriverView; card: Ran
       <div className="flex items-center gap-5 px-5 py-4">
         <DriverAvatar driver={view.driver} size={56} />
         <div className="min-w-0">
-          <p className="mb-1 text-[9px] font-semibold uppercase leading-none tracking-[0.06em] text-label">Assigned driver</p>
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-display text-2xl font-semibold tracking-tight">{view.driver.name}</h2>
             <Chip tone={card.severity === 'critical' ? CRITICAL_TONE : tone} dashed={offline}>{card.severity === 'critical' ? 'Over limit' : BAND_LABEL[card.band]}</Chip>
