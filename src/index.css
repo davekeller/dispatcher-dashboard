@@ -157,6 +157,25 @@ body { @apply bg-canvas text-ink font-sans; }
   background: var(--color-panel);
 }
 
+.settings-page {
+  background:
+    radial-gradient(circle at 82% 0%, color-mix(in srgb, var(--color-break-board) 34%, transparent), transparent 28rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-panel) 26%, var(--color-board)) 0%, var(--color-board) 44%, color-mix(in srgb, var(--color-offline-board) 28%, var(--color-board)) 100%);
+}
+
+.settings-section-enter {
+  animation: settings-section-enter 200ms var(--ease-out-soft) both;
+}
+
+@keyframes settings-section-enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-section-enter { animation: none; }
+}
+
 /* One nav shadow: the same 16px slate wash Lookout casts leftward, cast downward under whichever nav row is lowest: the product bar, the Stops bar, or the map controls. */
 .nav-shadow-below::after {
   content: '';

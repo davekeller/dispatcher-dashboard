@@ -20,6 +20,8 @@ The product bar adds one industrial counterweight to those lighter surfaces: an 
 
 The result should read as product software, not a marketing page placed around a dashboard.
 
+The Settings project file uses that same discipline for a case-study surface. A full-height white rail stays fixed at the left of the scrolling view while a centered 54rem reading column carries the active chapter. The default Project chapter begins with one deep-slate cover panel over three edge-to-edge live instruments—fleet status, delivery progress, and HOS exposure—using the same derived figures and semantic colors as the board. Subsequent evidence is organized in white sections with quiet tinted headers, gapless fact grids, and numbered rows rather than nested promotional cards. Chapter changes use one short four-pixel fade-and-rise on the shared motion curve and disappear entirely under reduced motion.
+
 ### Identity boundary
 
 The product intentionally avoids third-party logos, names, illustrations, exact colors, and page compositions. The influence is expressed through general qualities—warmth, plain language, confident typography, friendly geometry, and a chromatic AI accent—while Dispatch keeps its own mark, information architecture, and interaction patterns.
