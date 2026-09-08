@@ -246,11 +246,12 @@ Routine inputs use a neutral border. The Lookout composer and AI ordering contro
 Motion is functional and brief:
 
 - 180–200ms lane expand/collapse and content entry;
+- a route-card press compresses to 98.5%, then the selected card expands into the route's driver summary over 380ms while the remaining workspace fades up behind it;
 - live countdown updates without layout shift;
 - timeline selection follows the receipt in view;
 - no ambient gradient motion, bounce, or decorative shimmer.
 
-Honor `prefers-reduced-motion`.
+The shared-element route transition uses the native View Transitions API when available. Unsupported browsers fall back to a 280ms route-workspace fade and lift; `prefers-reduced-motion` removes both paths and leaves ordinary client-side navigation.
 
 ---
 

@@ -316,6 +316,8 @@ The board groups by **Status** by default, Act now leftmost, because that is whe
 
 **Board and Map are one segmented control** in the product bar. A route file is one level in from whichever of them it was opened from: the link into it carries that origin as router state (`app/origin.ts`), the origin's segment stays selected with the `RT-01 · Marcus R.` crumb after it, the Map segment returns to the map with its pick intact, and the rail's back arrow reads "Back to the map" or "Back to the board" accordingly. A deep link or a reload defaults to the board.
 
+Opening a board route card is progressive enhancement over that same client-side navigation. On a plain primary click, a supported browser snapshots only the selected card, names it `route-card-expand`, and morphs it into the route file's driver summary over 380ms; the rest of the route workspace enters 55ms later with a short fade and lift. The root snapshot does not crossfade, so the product bar and Lookout rail remain visually stationary. Modified clicks, new tabs, unsupported browsers, and reduced-motion users keep normal link behavior; unsupported motion-capable browsers receive only the route workspace's 280ms CSS entrance. This stays on `BrowserRouter` and adds no animation runtime.
+
 ## 9. Views
 
 ### Active Shift
@@ -433,7 +435,7 @@ Over the limit is the one state that must never be missed: its chip is dark red 
 
 **Type.** Bricolage Grotesque Variable for display: page titles, the large countdown, metric numbers. Inter Variable for the operational interface, `font-variant-numeric: tabular-nums` on every countdown and duration so rows never jitter. IBM Plex Mono distinguishes Lookout-authored language and agent chrome, while shared evidence cards and actions stay in the operational faces. Three faces, no serif.
 
-**Shape and rhythm.** 10px radius on cards, 8px on controls, pill chips. Rows ~40px, cards compact, whitespace spent on grouping. Quiet keylines, one diffused shadow level. Phosphor duotone icons. Motion: countdown ticks and a subtle band-change transition only. Light only.
+**Shape and rhythm.** 10px radius on cards, 8px on controls, pill chips. Rows ~40px, cards compact, whitespace spent on grouping. Quiet keylines, one diffused shadow level. Phosphor duotone icons. Motion stays functional: countdown ticks, subtle band changes, and the selected board card expanding into its route summary; reduced motion disables spatial transitions. Light only.
 
 **Illustration (Phase 2 polish).** A custom two-tone truck mark can replace the Phosphor glyph without touching layout. "Cards shaped like trucks with a trailer" is an experiment to try once the board works, kept only if it costs no scanability.
 
