@@ -52,7 +52,7 @@ export default function OrderDropdown<T extends string>({ value, onChange, optio
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={`${label}: ${selected.label}`}
-        className={`inline-flex h-9 min-w-52 items-center gap-2 rounded-control border px-3 text-[12px] font-semibold shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-lookout/30 ${lookout ? 'lookout-input-wash border-transparent font-lookout text-ink hover:text-lookout' : 'border-line bg-panel text-ink hover:border-ink/25'}`}
+        className={`inline-flex h-9 min-w-52 items-center gap-2 rounded-control border px-3 text-[12px] font-semibold shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 ${lookout ? 'lookout-input-wash border-transparent font-lookout text-ink hover:text-ink/80' : 'border-line bg-panel text-ink hover:border-ink/25'}`}
       >
         {lookout ? <LookoutAvatar size={17} className="shrink-0" /> : <SelectedGlyph size={16} weight="regular" className="shrink-0" />}
         <span className="min-w-0 flex-1 truncate text-left">{selected.label}</span>
@@ -73,7 +73,7 @@ export default function OrderDropdown<T extends string>({ value, onChange, optio
                   onChange(option.id)
                   setOpen(false)
                 }}
-                className={`grid w-full grid-cols-[2rem_minmax(0,1fr)_1rem] items-start gap-3 rounded-control px-3 py-2.5 text-left transition ${isSelected ? 'bg-lookout-soft/55' : 'hover:bg-canvas'}`}
+                className={`grid w-full grid-cols-[2rem_minmax(0,1fr)_1rem] items-start gap-3 rounded-control px-3 py-2.5 text-left transition ${isSelected ? 'bg-nav-selected/60' : 'hover:bg-canvas'}`}
               >
                 <span className={`flex h-8 w-8 items-center justify-center rounded-control ${isLookout(option.id) ? 'bg-lookout-soft text-ink' : 'bg-well text-ink'}`}>
                   {isLookout(option.id) ? <LookoutAvatar size={20} /> : <Glyph size={16} weight={isSelected ? 'fill' : 'regular'} />}

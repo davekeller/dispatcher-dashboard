@@ -4,7 +4,7 @@ import { fmtClock, fmtMinutes } from '../../lib/format'
 import type { DriverView } from '../../store/view'
 import { MIN } from '../../time/clock'
 import Chip from '../../ui/Chip'
-import { BAND_TONE } from '../../ui/tones'
+import { BAND_TONE, PRIORITY_TONE } from '../../ui/tones'
 import StopActionsMenu from './StopActionsMenu'
 import StopStatusMarker, { stopHistoryStyle } from './StopStatusMarker'
 
@@ -73,7 +73,7 @@ export default function StopReceipt({ stop, delivery, view, selected, onSelect, 
   const priorityFact: StopFact = { label: 'Priority', value: delivery?.priority === 'priority' ? 'Priority' : 'Standard', badge: delivery?.priority === 'priority' }
   const facts: StopFact[] = complete ? [
     { label: 'On-site', value: dwell },
-    { label: 'Outcome', value: outcome, tone: stop.status === 'failed' ? 'text-act-now' : stop.outcome === 'partial' ? 'text-watch' : 'text-clear' },
+    { label: 'Outcome', value: outcome, tone: stop.status === 'failed' ? 'text-act-now' : stop.outcome === 'partial' ? 'text-ink' : 'text-clear' },
     { label: 'Load', value: delivery?.items.join(', ') ?? '—' },
     priorityFact,
   ] : stop.status === 'in_progress' ? [
@@ -141,7 +141,7 @@ export default function StopReceipt({ stop, delivery, view, selected, onSelect, 
             <div key={fact.label} className={`flex min-w-0 flex-col justify-center px-2.5 py-3 ${index < facts.length - 1 ? 'border-r border-line' : ''}`}>
               <dt className="truncate text-[8px] font-semibold uppercase tracking-[0.04em] text-label" title={fact.label}>{fact.label}</dt>
               {fact.badge ? (
-                <dd className="mt-1 min-w-0" title={fact.value}><Chip tone={BAND_TONE.watch} className="max-w-full px-1.5 py-0 text-[10px]">priority</Chip></dd>
+                <dd className="mt-1 min-w-0" title={fact.value}><Chip tone={PRIORITY_TONE} className="max-w-full px-1.5 py-0 text-[10px]">priority</Chip></dd>
               ) : (
                 <dd className={`tnum mt-0.5 truncate text-[12px] font-semibold leading-tight ${fact.tone ?? 'text-ink'}`} title={fact.value}>{fact.value}</dd>
               )}

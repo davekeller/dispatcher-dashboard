@@ -7,7 +7,7 @@ const VARIANT: Record<Variant, string> = {
   primary: 'bg-ink text-on-accent hover:bg-ink/90',
   secondary: 'bg-panel text-ink border border-line hover:bg-well',
   danger: 'bg-act-now text-on-accent hover:bg-act-now/90',
-  lookout: 'bg-lookout text-on-accent hover:bg-lookout-strong',
+  lookout: 'bg-nav-selected-ink text-on-accent hover:bg-ink',
   ghost: 'bg-transparent text-muted hover:bg-well hover:text-ink',
 }
 const SIZE: Record<Size, string> = { sm: 'h-7 px-2.5 text-[12px]', md: 'h-9 px-3.5 text-[13px]' }
