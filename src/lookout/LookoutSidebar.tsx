@@ -98,7 +98,8 @@ export default function LookoutSidebar() {
             {showAll && rest.length > TOP_N && <Button size="sm" variant="ghost" onClick={() => setShowAll(false)}>Show fewer</Button>}
             {withAlerts.length === 0 && !focusView && <p className="font-lookout text-[12px] text-muted">{LOOKOUT.allClear(d.metrics.onShift)}</p>}
           </RecommendationsBar>
-          <ChatThread messages={messages} d={d} onExample={send} />
+          {/* The intro and its example prompts are the chat's empty state: shown only once the recommendations are collapsed, so an open rail is not two things asking for attention. */}
+          <ChatThread messages={recOpen && messages.length === 1 ? [] : messages} d={d} onExample={send} />
         </div>
       ) : (
         <ArtifactsPanel />
