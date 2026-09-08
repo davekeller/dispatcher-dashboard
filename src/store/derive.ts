@@ -4,6 +4,7 @@ import type { Delivery, Fleet } from '../data/types'
 import { buildViews, type DriverView } from './view'
 
 export interface Metrics {
+  trucks: number
   onShift: number
   approaching: number
   over: number
@@ -28,6 +29,7 @@ export interface Derived {
 
 export function computeMetrics(views: DriverView[]): Metrics {
   return {
+    trucks: views.length,
     onShift: views.filter((v) => v.status !== 'off_duty').length,
     approaching: views.filter((v) => v.hos === 'act_now' || v.hos === 'watch').length,
     over: views.filter((v) => v.hos === 'over').length,
