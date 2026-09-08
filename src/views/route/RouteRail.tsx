@@ -146,7 +146,7 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
     <nav aria-label="Route" className={`sticky left-0 top-0 z-20 flex h-[calc(100vh-3.5rem-2.5rem)] shrink-0 flex-col overflow-hidden rounded-r-card border-y border-r border-line bg-panel shadow-card transition-[width] duration-200 ${collapsed ? 'w-16' : 'w-64'}`}>
       <div className={`flex shrink-0 items-center border-b border-line px-2 py-2 ${collapsed ? 'flex-col gap-1' : 'gap-2'}`}>
         <Link to={origin.to} title={`Back to the ${origin.view}`} aria-label={`Back to the ${origin.view}`} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-control text-muted transition hover:bg-board hover:text-ink">
-          <ArrowLeft size={16} />
+          <ArrowLeft size={16} weight="bold" />
         </Link>
         {!collapsed && (
           <div className="min-w-0 flex-1">
