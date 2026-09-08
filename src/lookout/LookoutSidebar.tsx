@@ -17,6 +17,8 @@ import RecommendationsBar from './RecommendationsBar'
 import { LOOKOUT } from './voice'
 
 const TOP_N = 3
+/** On a route file the focused route's plans are the point; everyone else gets one card and a count. */
+const FOCUS_TOP_N = 1
 
 /** Lookout never has its own data. It reads `ranked` and nothing else. Chat carries the live
  * recommendations; Artifacts is deliberately reserved as an empty workspace for later. */
@@ -37,7 +39,8 @@ export default function LookoutSidebar() {
   const focusCard = focusDriverId ? d.cardById.get(focusDriverId) : undefined
   const plans = focusView && focusCard ? routePlans(focusView, focusCard, d) : []
   const rest = focusDriverId ? withAlerts.filter((c) => c.driverId !== focusDriverId) : withAlerts
-  const shown = showAll ? rest : rest.slice(0, TOP_N)
+  const topN = focusView ? FOCUS_TOP_N : TOP_N
+  const shown = showAll ? rest : rest.slice(0, topN)
   const hidden = rest.length - shown.length
   const first = urgentCards[0] ? byId.get(urgentCards[0].driverId)?.driver.name : undefined
   const summary = LOOKOUT.summary(urgentCards.length, first)
@@ -86,7 +89,7 @@ export default function LookoutSidebar() {
             )}
             {shown.map((c) => <RecommendationCard key={c.driverId} view={byId.get(c.driverId)!} card={c} compact />)}
             {hidden > 0 && <Button size="sm" variant="ghost" onClick={() => setShowAll(true)}>Show {hidden} more</Button>}
-            {showAll && rest.length > TOP_N && <Button size="sm" variant="ghost" onClick={() => setShowAll(false)}>Show fewer</Button>}
+            {showAll && rest.length > topN && <Button size="sm" variant="ghost" onClick={() => setShowAll(false)}>Show fewer</Button>}
             {withAlerts.length === 0 && !focusView && <p className="font-lookout text-[12px] text-muted">{LOOKOUT.allClear(d.metrics.onShift)}</p>}
           </RecommendationsBar>
           {/* The intro and its example prompts are the chat's empty state: shown only once the recommendations are collapsed, so an open rail is not two things asking for attention. */}
