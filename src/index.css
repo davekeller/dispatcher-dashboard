@@ -167,6 +167,14 @@ body { @apply bg-canvas text-ink font-sans; }
     linear-gradient(110deg, var(--color-ai-warm), var(--color-ai-gold) 24%, var(--color-ai-rose) 50%, var(--color-ai-violet) 75%, var(--color-ai-cool)) border-box;
 }
 
+/* The ring with a muted wash of the same spectrum inside it: the board's order button when Lookout is ordering. */
+.lookout-input-wash {
+  border-color: transparent;
+  background:
+    linear-gradient(110deg, color-mix(in srgb, var(--color-ai-warm) 12%, #ffffff), color-mix(in srgb, var(--color-ai-gold) 12%, #ffffff) 24%, color-mix(in srgb, var(--color-ai-rose) 12%, #ffffff) 50%, color-mix(in srgb, var(--color-ai-violet) 12%, #ffffff) 75%, color-mix(in srgb, var(--color-ai-cool) 12%, #ffffff)) padding-box,
+    linear-gradient(110deg, var(--color-ai-warm), var(--color-ai-gold) 24%, var(--color-ai-rose) 50%, var(--color-ai-violet) 75%, var(--color-ai-cool)) border-box;
+}
+
 .lookout-composer-shell {
   border-color: transparent;
   background:
