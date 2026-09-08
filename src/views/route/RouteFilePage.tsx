@@ -81,7 +81,6 @@ export default function RouteFilePage() {
 
   const stale = view.staleness !== 'fresh'
   const staleReason = stale ? 'Position unknown. This action is disabled until the truck reports in.' : undefined
-  const progress = view.total === 0 ? 100 : Math.round((view.done / view.total) * 100)
   const routeSignals = [routeScheduleSignal(view), routeHosSignal(view)]
   const selectableStopIds = [...view.route.stops]
     .reverse()
@@ -109,7 +108,7 @@ export default function RouteFilePage() {
                 <ListBullets size={15} weight="bold" />
               </span>
               <div className="min-w-0">
-                <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">Stops · {progress}% complete</p>
+                <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">Stops</p>
                 <h2 className="tnum mt-1 whitespace-nowrap font-display text-2xl font-semibold leading-none tracking-tight text-ink">{view.done}/{view.total} delivered</h2>
               </div>
             </div>
