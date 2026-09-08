@@ -107,10 +107,8 @@ export default function RouteFilePage() {
   return (
     <div className="route-workspace flex min-h-full items-start gap-5 py-5 pr-5">
       <RouteRail view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} collapsed={railCollapsed} onCollapsedChange={setRailCollapsed} activeStopId={mode === 'map' ? mapSelection : undefined} onSelectStop={mode === 'map' ? setSelectedStop : undefined} />
-      <div className="flex min-w-0 flex-1 flex-col gap-4">
-        <DriverCard view={view} card={card} />
-        <section>
-          <header className="stops-navbar sticky top-0 z-30 -mx-5 mb-3 flex min-h-[4.75rem] flex-nowrap items-stretch border-y border-line">
+      <div className="flex min-w-0 flex-1 flex-col gap-3">
+          <header className="stops-navbar sticky top-0 z-30 -mx-5 flex min-h-[4.75rem] flex-nowrap items-stretch border-y border-line">
             <div className={`flex shrink-0 items-center gap-1.5 py-3 ${railCollapsed ? 'w-[13.5rem] pl-5 pr-4' : 'w-44 pl-4 pr-2'}`}>
               <span className={`flex shrink-0 items-center justify-center rounded-control bg-ink text-on-accent ${railCollapsed ? 'h-7 w-7' : 'h-6 w-6'}`} aria-hidden="true">
                 <ListBullets size={railCollapsed ? 14 : 12} weight="bold" />
@@ -154,12 +152,14 @@ export default function RouteFilePage() {
               </div>
             </div>
           </header>
+          <DriverCard view={view} card={card} />
           {(card.alerts.length > 0 || stale) && (
-            <div className="mb-3 flex flex-col gap-3">
+            <div className="flex flex-col gap-3">
               {card.alerts.length > 0 && <AlertStrip view={view} card={card} />}
               {stale && <StaleBanner view={view} />}
             </div>
           )}
+        <section>
           {mode === 'map' ? (
             <Suspense fallback={<div className="flex h-[22rem] items-center justify-center rounded-card border border-line bg-panel text-[12px] text-muted">Loading the map…</div>}>
               <RouteMap view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} selectedStopId={mapSelection} onSelectStop={setSelectedStop} />
