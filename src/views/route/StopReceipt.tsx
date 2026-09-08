@@ -113,13 +113,14 @@ export default function StopReceipt({ stop, delivery, view, selected, onSelect, 
         </div>
 
         <div className="relative flex min-w-0 flex-col justify-center border-b border-line p-3 lg:border-b-0 lg:border-r">
-          <h3 className="truncate text-[13px] font-semibold text-ink" title={delivery?.customer ?? stop.deliveryId}>{delivery?.customer ?? stop.deliveryId}</h3>
-          <p className="mt-0.5 truncate text-[11px] text-muted" title={delivery?.address}>{delivery?.address ?? 'Address unavailable'}</p>
-          {(statusLabel || pastLimit || pastWindow) && <div className="mt-1.5 flex min-w-0 flex-wrap items-center gap-1">
+          {/* Status leads the identity column: "next" and the risk chips read before the name. */}
+          {(statusLabel || pastLimit || pastWindow) && <div className="mb-1.5 flex min-w-0 flex-wrap items-center gap-1">
             {statusTone && statusLabel && <Chip tone={statusTone} dashed={stop.status === 'unassigned'} className="px-1.5 py-0 text-[10px]">{statusLabel}</Chip>}
             {pastLimit && stop.status !== 'unassigned' && <Chip tone={BAND_TONE.act_now} className="px-1.5 py-0 text-[10px]">past the limit</Chip>}
             {pastWindow && <Chip tone={BAND_TONE.act_now} className="px-1.5 py-0 text-[10px]">past window</Chip>}
           </div>}
+          <h3 className="truncate text-[13px] font-semibold text-ink" title={delivery?.customer ?? stop.deliveryId}>{delivery?.customer ?? stop.deliveryId}</h3>
+          <p className="mt-0.5 truncate text-[11px] text-muted" title={delivery?.address}>{delivery?.address ?? 'Address unavailable'}</p>
         </div>
 
         <div className="flex min-w-0 items-center border-b border-line px-3 py-2.5 lg:border-b-0 lg:border-r">
