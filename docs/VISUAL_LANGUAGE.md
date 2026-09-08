@@ -196,7 +196,7 @@ Above the receipts, a quiet title row doubles as the stop filter: a `Stops` head
 
 Each stop receipt applies the same case-file grammar as four clear columns:
 
-- a dedicated 16px gutter outside the cards carries the shared semantic markers and a continuous one-pixel spine across card gaps, grading completed history green before continuing gray or red with the same semantics as the route rail;
+- a dedicated 44px (2.75rem) gutter outside the cards carries the shared semantic markers and a continuous one-pixel spine across card gaps, grading completed history green before continuing gray or red with the same semantics as the route rail; the gutter matches the alert card's semantic-icon column so receipt cards begin on the alert's second-cell alignment;
 - the card itself begins with a compact bare-number column, using a 20px sans-serif number with the rail sequence's semibold weight;
 - the second column stacks the status chips (next, past the limit, past window, needs a driver) above the stop name and address; delivery instructions, the dispatcher note, and the notified stamp sit in their own Notes strip along the bottom of the card;
 - the third column is a compact horizontal event track with equal lanes for each label and time or result;
