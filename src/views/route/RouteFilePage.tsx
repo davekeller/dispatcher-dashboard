@@ -107,7 +107,9 @@ export default function RouteFilePage() {
   const pastLimitIds = new Set(stopsPastLimit(view))
   // On the map the rail's selection is the page's; it starts on the next stop, like the rail does when reading.
   const mapSelection = selectedStop ?? view.next?.id ?? null
-  const seg = (on: boolean) => `inline-flex h-7 items-center gap-1.5 rounded-[6px] px-2 text-[11px] font-semibold transition ${on ? 'bg-nav-selected text-nav-selected-ink' : 'text-muted hover:bg-nav-selected/45 hover:text-ink'}`
+  const stopMetricInset = railCollapsed ? 'px-2.5' : 'px-1.5'
+  const stopMetricSize = railCollapsed ? 'text-[20px]' : 'text-[16px]'
+  const seg = (on: boolean) => `inline-flex h-7 items-center gap-1.5 rounded-[6px] font-semibold transition ${railCollapsed ? 'px-2 text-[11px]' : 'px-1.5 text-[10px]'} ${on ? 'bg-nav-selected text-nav-selected-ink' : 'text-muted hover:bg-nav-selected/45 hover:text-ink'}`
 
   return (
     <div className="route-workspace flex min-h-full items-start gap-5 py-5 pr-5">
@@ -116,34 +118,34 @@ export default function RouteFilePage() {
         <DriverCard view={view} card={card} />
         <section>
           <header className="stops-navbar sticky top-0 z-30 -mx-5 mb-3 flex min-h-[4.5rem] flex-nowrap items-stretch border-y border-offline-fill/55 backdrop-blur">
-            <div className="flex w-52 shrink-0 items-center gap-1.5 py-2.5 pl-5 pr-3">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-control bg-ink text-on-accent" aria-hidden="true">
-                <ListBullets size={14} weight="bold" />
+            <div className={`flex shrink-0 items-center gap-1.5 py-2.5 ${railCollapsed ? 'w-52 pl-5 pr-3' : 'w-44 pl-4 pr-2'}`}>
+              <span className={`flex shrink-0 items-center justify-center rounded-control bg-ink text-on-accent ${railCollapsed ? 'h-7 w-7' : 'h-6 w-6'}`} aria-hidden="true">
+                <ListBullets size={railCollapsed ? 14 : 12} weight="bold" />
               </span>
               <div className="min-w-0">
                 <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">Stops</p>
-                <h2 className="tnum mt-1 whitespace-nowrap font-display text-[22px] font-semibold leading-none tracking-tight text-ink">{view.done}/{view.total} delivered</h2>
+                <h2 className={`tnum mt-1 whitespace-nowrap font-display font-semibold leading-none tracking-tight text-ink ${railCollapsed ? 'text-[22px]' : 'text-[18px]'}`}>{view.done}/{view.total} delivered</h2>
               </div>
             </div>
             <dl aria-label="Route status" className="grid min-w-0 flex-1 grid-cols-3 divide-x divide-nav-selected-line border-l border-nav-selected-line bg-panel/20">
-              <div className="flex min-w-0 flex-col justify-center border-t-[3px] border-t-nav-selected-ink/45 px-2.5 py-3">
+              <div className={`flex min-w-0 flex-col justify-center border-t-[3px] border-t-nav-selected-ink/45 py-3 ${stopMetricInset}`}>
                 <dt className="flex min-w-0 items-center gap-1.5 text-[8px] font-semibold uppercase tracking-[0.06em] text-label">
                   <span>Remaining</span>
                   <span className="truncate font-medium normal-case tracking-normal text-muted" title={`Updated ${fmtAge(view.pingAgeMin)}`}>· {fmtAge(view.pingAgeMin)}</span>
                 </dt>
-                <dd className="tnum mt-1 font-display text-[22px] font-semibold leading-none tracking-tight text-ink">{view.remaining.length} <span className="font-sans text-[10px] font-medium tracking-normal text-muted">stops</span></dd>
+                <dd className={`tnum mt-1 font-display font-semibold leading-none tracking-tight text-ink ${stopMetricSize}`}>{view.remaining.length} <span className="font-sans text-[9px] font-medium tracking-normal text-muted">stops</span></dd>
               </div>
               {routeSignals.map((signal) => (
-                <div key={signal.label} className={`flex min-w-0 flex-col justify-center border-t-[3px] px-2.5 py-3 ${SIGNAL_RULE[signal.tone]}`}>
+                <div key={signal.label} className={`flex min-w-0 flex-col justify-center border-t-[3px] py-3 ${stopMetricInset} ${SIGNAL_RULE[signal.tone]}`}>
                   <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">{signal.label}</dt>
-                  <dd className={`mt-1 flex min-w-0 items-center gap-1 font-display text-[22px] font-semibold leading-none tracking-tight ${SIGNAL_TEXT[signal.tone]}`}>
+                  <dd className={`mt-1 flex min-w-0 items-center gap-1 font-display font-semibold leading-none tracking-tight ${stopMetricSize} ${SIGNAL_TEXT[signal.tone]}`}>
                     <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${SIGNAL_DOT[signal.tone]}`} />
                     <span className="truncate" title={signal.value}>{compactSignalValue(signal.value)}</span>
                   </dd>
                 </div>
               ))}
             </dl>
-            <div className="ml-auto flex shrink-0 items-center gap-2 border-l border-nav-selected-line py-2.5 pl-2 pr-4">
+            <div className={`ml-auto flex shrink-0 items-center gap-2 border-l border-nav-selected-line py-2.5 ${railCollapsed ? 'pl-2 pr-4' : 'pl-1.5 pr-2.5'}`}>
               {selected.length > 0 && (
                 <Button size="sm" variant="primary" disabled={stale} title={staleReason} onClick={() => open('reassign', view.driver.id, { stopIds: selected })}>
                   Reassign selected ({selected.length})
@@ -151,10 +153,10 @@ export default function RouteFilePage() {
               )}
               <div className="ml-1 flex shrink-0 items-center gap-0.5 rounded-control border border-nav-selected-line bg-panel/85 p-0.5" role="group" aria-label="Show stops as">
                 <button type="button" aria-pressed={mode === 'list'} onClick={() => setMode('list')} className={seg(mode === 'list')} title="Stops as a list">
-                  <ListBullets size={14} weight={mode === 'list' ? 'fill' : 'regular'} /> List
+                  <ListBullets size={railCollapsed ? 14 : 12} weight={mode === 'list' ? 'fill' : 'regular'} /> List
                 </button>
                 <button type="button" aria-pressed={mode === 'map'} onClick={() => setMode('map')} className={seg(mode === 'map')} title="Stops on a map, with the truck">
-                  <MapTrifold size={14} weight={mode === 'map' ? 'fill' : 'regular'} /> Map
+                  <MapTrifold size={railCollapsed ? 14 : 12} weight={mode === 'map' ? 'fill' : 'regular'} /> Map
                 </button>
               </div>
             </div>
