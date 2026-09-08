@@ -11,6 +11,13 @@ import Countdown from '../../ui/Countdown'
 import { BAND_TONE, CRITICAL_TONE, STALENESS_TONE } from '../../ui/tones'
 
 const STATUS_LABEL: Record<DutyStatus, string> = { driving: 'driving', on_duty: 'on duty at a stop', on_break: 'on break', off_duty: 'off duty' }
+const TOP_BORDER = {
+  act_now: 'border-t-act-now-fill',
+  watch: 'border-t-watch-fill',
+  offline: 'border-t-offline-fill',
+  break: 'border-t-break-fill',
+  clear: 'border-t-nav-selected-ink',
+} as const
 
 /** The driver and the day in one card: identity and countdown above the five figures that matter. */
 export default function DriverCard({ view, card }: { view: DriverView; card: Ranked }) {
@@ -18,6 +25,7 @@ export default function DriverCard({ view, card }: { view: DriverView; card: Ran
   const stale = view.staleness !== 'fresh'
   const offline = view.staleness === 'offline'
   const overLimit = view.minutesUntilLimit <= 0
+  const topBorder = overLimit ? 'border-t-act-now' : TOP_BORDER[card.band]
   const fits = view.remainingDriveMin <= view.minutesUntilLimit
   const metrics = [
     { label: 'Driving today', value: fmtHm(view.drivingMin), sub: 'of 11:00' },
@@ -27,7 +35,7 @@ export default function DriverCard({ view, card }: { view: DriverView; card: Ran
     { label: 'Driving left vs. limit', value: `${fmtHm(view.remainingDriveMin)} vs ${fmtCountdown(view.minutesUntilLimit, stale)}`, sub: view.remaining.length === 0 ? 'route complete' : fits ? 'fits before the limit' : 'does not fit', tone: view.remaining.length === 0 ? undefined : fits ? 'text-clear' : 'text-act-now' },
   ]
   return (
-    <Card className={`route-detail-card overflow-hidden ${overLimit ? 'border-t-[3px] border-t-act-now' : ''}`}>
+    <Card className={`route-detail-card overflow-hidden border-t-[3px] ${topBorder}`}>
       <div className="flex items-center gap-5 px-5 py-4">
         <DriverAvatar driver={view.driver} size={56} />
         <div className="min-w-0">
