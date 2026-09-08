@@ -23,6 +23,7 @@ Node 20+. No backend, no keys. The shift is simulated: the clock is pinned to 2:
 4. **Lookout**, the rail on the right, reads the same ranked list the board does. If they ever disagree, that is the bug. Open a route and it turns into a plan for that driver: which stops to hand to whom and with how much room, where to put the reset, which customers to call, each button opening its dialog already filled in. Ask it "What should I do about Marcus?" and it answers with the same plans.
 5. **Map.** The Map tab shows the whole fleet: quiet trucks as small dots in their band color, the ones that need attention with a name-and-countdown pill, dark trucks hollow at their last known fix. Pick one and its whole route draws, completed stops included, with Lookout focused on that driver. On any route file, the List | Map toggle beside the stop actions puts that route on a map, stops in the rail's own colors, the truck a live fix gliding along its leg with the clock. Every position is derived from the receipts and the last ping, never stored (`src/geo/truckPosition.ts`).
 6. **`src/alerts/rules.ts`.** Every alert is one object. Adding a rule is appending one.
+7. **Lena's page.** Her avatar at the end of the product bar opens a settings view for the dispatcher and, beside it, the story of the build: project, persona, problems, solutions, why, with the design decks linked where they belong.
 
 ## How it is built
 
