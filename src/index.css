@@ -310,6 +310,23 @@ body { @apply bg-canvas text-ink font-sans; }
 .route-map-stop-dot.is-next { transform: scale(1.25); }
 .route-map-stop-dot.is-selected { box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-ink) 14%, transparent); }
 
+.stop-receipt::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: 20;
+  pointer-events: none;
+  border: 2px solid var(--color-nav-selected-line);
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.stop-receipt-next::after { border-color: var(--color-break); }
+.stop-receipt-risk::after { border-color: color-mix(in srgb, var(--color-act-now) 58%, transparent); }
+.stop-receipt[role='checkbox']:hover::after,
+.stop-receipt[aria-checked='true']::after { opacity: 1; }
+
 .route-map-leg-done { stroke: var(--color-clear-fill); }
 .route-map-leg-todo { stroke: var(--color-muted); stroke-dasharray: 1 7; stroke-linecap: round; opacity: 0.8; }
 .route-map-leg-risk { stroke: var(--color-act-now-fill); stroke-dasharray: 1 7; stroke-linecap: round; }

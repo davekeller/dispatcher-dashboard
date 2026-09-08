@@ -106,7 +106,7 @@ export default function StopReceipt({ stop, delivery, view, selected, onSelect, 
             event.preventDefault()
             onSelect(event.shiftKey)
           } : undefined}
-          className={`relative grid overflow-hidden rounded-card border shadow-card transition-colors lg:grid-cols-[2.5rem_minmax(8.75rem,0.72fr)_minmax(9.75rem,0.95fr)_minmax(16rem,1.55fr)] ${isNext ? 'border-break' : pastLimit || pastWindow ? 'border-act-now/50' : 'border-line'} ${stop.status === 'unassigned' ? 'border-dashed' : ''} ${selected ? 'bg-nav-selected ring-1 ring-inset ring-nav-selected-line' : 'bg-panel'} ${selectable ? 'cursor-pointer hover:bg-nav-selected/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nav-selected-line focus-visible:ring-offset-2' : ''}`}
+          className={`stop-receipt group relative grid overflow-hidden rounded-card border shadow-card transition-colors lg:grid-cols-[2.5rem_minmax(8.75rem,0.72fr)_minmax(9.75rem,0.95fr)_minmax(16rem,1.55fr)] ${isNext ? 'stop-receipt-next border-break' : pastLimit || pastWindow ? 'stop-receipt-risk border-act-now/50' : 'border-line'} ${stop.status === 'unassigned' ? 'border-dashed' : ''} ${selected ? 'bg-nav-selected/40' : 'bg-panel'} ${selectable ? 'cursor-pointer hover:bg-nav-selected/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nav-selected-line focus-visible:ring-offset-2' : ''}`}
         >
         <div className="flex min-h-16 items-center justify-center border-b border-line px-1 lg:min-h-0 lg:border-b-0 lg:border-r">
           <span className="tnum min-w-0 text-center text-xl font-semibold leading-none tracking-[-0.025em] text-ink/80">{stop.seq}</span>
@@ -136,7 +136,7 @@ export default function StopReceipt({ stop, delivery, view, selected, onSelect, 
           </ol>
         </div>
 
-        <dl className={`grid grid-cols-4 pr-8 ${selected ? 'bg-nav-selected/70' : 'bg-board/45'}`}>
+        <dl className={`grid grid-cols-4 pr-8 transition-colors ${selected ? 'bg-nav-selected/45' : selectable ? 'bg-board/45 group-hover:bg-nav-selected/20' : 'bg-board/45'}`}>
           {facts.map((fact, index) => (
             <div key={fact.label} className={`flex min-w-0 flex-col justify-center px-2.5 py-3 ${index < facts.length - 1 ? 'border-r border-line' : ''}`}>
               <dt className="truncate text-[8px] font-semibold uppercase tracking-[0.04em] text-label" title={fact.label}>{fact.label}</dt>
