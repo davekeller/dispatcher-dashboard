@@ -154,7 +154,7 @@ body { @apply bg-canvas text-ink font-sans; }
   background: var(--color-panel);
 }
 
-/* One nav shadow: the same 16px slate wash Lookout casts leftward, cast downward under the product bar and the Stops bar. */
+/* One nav shadow: the same 16px slate wash Lookout casts leftward, cast downward under whichever nav row is lowest: the product bar, the Stops bar, or the map controls. */
 .nav-shadow-below::after {
   content: '';
   position: absolute;
