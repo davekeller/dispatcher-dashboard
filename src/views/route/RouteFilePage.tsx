@@ -189,8 +189,8 @@ export default function RouteFilePage() {
         <RouteRail view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} collapsed={railCollapsed} onCollapsedChange={setRailCollapsed} activeStopId={mode === 'map' ? mapSelection : undefined} onSelectStop={mode === 'map' ? setSelectedStop : undefined} hiddenStopIds={mode === 'list' ? hiddenStopIds : undefined} onRevealStop={() => setStopFilter('all')} listKey={`${mode}:${stopFilter}`} />
         {/* The scroll box is a plain block so nothing inside it can flex-shrink; the column of cards sits one level down. */}
         <div className="min-w-0 flex-1 overflow-y-auto py-5">
-          <div className="flex flex-col gap-3">
-          <section className="flex flex-col gap-2">
+          <div className="flex flex-col gap-5">
+          <section className="flex flex-col gap-4">
             <DriverCard view={view} card={card} />
           {(card.alerts.length > 0 || stale) && (
             <div className="flex flex-col gap-3">
@@ -210,7 +210,7 @@ export default function RouteFilePage() {
                 {shownStops.length === 0 ? (
                   <EmptyState title={`No stops match ${stopFilterLabel}.`} body="The filter is in the link, so this can happen on a shared route once the day moves on." action={<Button size="sm" onClick={() => setStopFilter('all')}>Show all stops</Button>} />
                 ) : (
-                  <ol className="flex flex-col gap-2">
+                  <ol className="flex flex-col gap-3">
                     {shownStops.map((s) => (
                       <li key={s.id} id={`stop-${s.id}`} className="scroll-mt-4">
                         <StopReceipt stop={s} delivery={deliveryById.get(s.deliveryId)} view={view} selected={selected.includes(s.id)} onSelect={(extendRange) => selectStop(s.id, extendRange)} pastLimit={pastLimitIds.has(s.id)} />
