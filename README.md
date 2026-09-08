@@ -2,7 +2,7 @@
 
 A fleet dispatcher runs ~50 heavy-duty trucks and 1,000+ deliveries a day. Her job is not monitoring; it is intervening in time. This is the view she lives in, built around one exception: the 11-hour Hours of Service driving limit.
 
-**Live:** _the Vercel link goes here after `npx vercel --prod`_ · **Source:** this repo
+**Live:** https://dispatch.kidastro.com · also at https://dispatcher-dashboard.vercel.app · **Source:** this repo
 
 ## Run it
 

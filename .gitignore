@@ -23,3 +23,5 @@ dist/
 docs/chronicle/progress/
 docs/chronicle/chronicle.json
 .playwright-mcp/
+.vercel
+.env*
