@@ -1,6 +1,9 @@
 import { CaretRight, MapTrifold, SquaresFour, TruckTrailer } from '@phosphor-icons/react'
 import { Link, useLocation } from 'react-router'
 import { DISPATCHER } from '../data/dispatcher'
+import LookoutAvatar from '../lookout/LookoutAvatar'
+import { useLookout } from '../lookout/LookoutContext'
+import { LOOKOUT } from '../lookout/voice'
 import { useDerived } from '../store/hooks'
 import DispatcherAvatar from '../ui/DispatcherAvatar'
 import { navigationItemState } from '../ui/navigation'
@@ -13,7 +16,9 @@ import SimulatedShift from './SimulatedShift'
 export default function Header() {
   const location = useLocation()
   const { pathname } = location
-  const { byId } = useDerived()
+  const { byId, ranked } = useDerived()
+  const { collapsed, setCollapsed } = useLookout()
+  const urgent = ranked.filter((c) => c.alerts.length > 0 && (c.severity === 'critical' || c.severity === 'act_now')).length
   const routeMatch = pathname.match(/^\/routes\/(drv-\d+)$/)
   const focused = routeMatch ? byId.get(routeMatch[1]) : undefined
   // On a route file the segment of the view it was opened from stays selected, and Map returns to that pick.
@@ -62,6 +67,14 @@ export default function Header() {
         >
           <DispatcherAvatar dispatcher={DISPATCHER} size={36} />
         </Link>
+        {/* With the rail closed, Lookout lives here as a pill, the act-now count still on it, until it is asked back. */}
+        {collapsed && (
+          <button type="button" onClick={() => setCollapsed(false)} aria-expanded="false" title={`Open ${LOOKOUT.name}`} className="inline-flex h-9 items-center gap-2 rounded-full bg-lookout-soft pl-3 pr-1.5 text-[12px] font-semibold text-ink transition hover:bg-lookout-soft/70">
+            <span className="font-lookout">Ask {LOOKOUT.name}</span>
+            {urgent > 0 && <span className="tnum inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-act-now px-1 text-[10px] font-semibold leading-none text-on-accent" title={`${urgent} need action now`}>{urgent}</span>}
+            <LookoutAvatar size={24} />
+          </button>
+        )}
       </div>
     </header>
   )

@@ -1,4 +1,4 @@
-import { CaretDoubleLeft, CaretDoubleRight } from '@phosphor-icons/react'
+import { CaretDoubleRight } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { useActions } from '../actions/ActionContext'
 import { useDerived } from '../store/hooks'
@@ -51,17 +51,8 @@ export default function LookoutSidebar() {
     if (reply.open) open(reply.open.action, reply.open.driverId)
   }
 
-  if (collapsed) {
-    return (
-      <aside className="lookout-panel flex w-14 shrink-0 flex-col items-center border-l border-line" aria-label={`${LOOKOUT.name}, collapsed`}>
-        <button type="button" onClick={() => setCollapsed(false)} className="flex h-14 w-full items-center justify-center text-ink hover:bg-well" aria-label={`Open ${LOOKOUT.name}`}>
-          <CaretDoubleLeft size={16} />
-        </button>
-        <LookoutAvatar size={28} className="mt-2" />
-        {urgentCards.length > 0 && <span className="tnum mt-2 rounded-full bg-act-now px-1.5 text-[11px] font-semibold text-on-accent" title={`${urgentCards.length} need action now`}>{urgentCards.length}</span>}
-      </aside>
-    )
-  }
+  // Collapsed, Lookout leaves the layout entirely; the product bar's Ask Lookout pill brings it back.
+  if (collapsed) return null
 
   return (
     <aside className="lookout-panel flex w-[26rem] shrink-0 flex-col border-l border-line" aria-label={`${LOOKOUT.name}, the shift co-pilot`}>
