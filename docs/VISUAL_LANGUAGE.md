@@ -207,7 +207,7 @@ All receipt sections center vertically across the row. Dispatcher notes are neut
 
 ### Lookout
 
-Lookout is visually related to the main product but clearly has a separate role. The full sidebar casts one restrained, cool-slate shadow toward the workspace so the assistant plane separates from dense operational content without appearing detached. Its original mark maps six vivid color regions into a clean clipped circle with no outline, behind a small white pixel face:
+Lookout is visually related to the main product but clearly has a separate role. Beneath the product bar, the full sidebar sits on an explicit foreground plane and casts one restrained, cool-slate shadow leftward across the workspace boundary. The shadow begins with the chat content instead of appearing across the product navigation, so the assistant remains separated from dense operational content for the full scrollable height without appearing detached. Its original mark maps six vivid color regions into a clean clipped circle with no outline, behind a small white pixel face:
 
 - orange active tab and name;
 - cyan-to-lime spectrum-disc avatar with a centered, friendly white pixel face;
