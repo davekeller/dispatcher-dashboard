@@ -43,7 +43,7 @@ function stopState(node: Node, nextId: string | undefined, pastLimitIds: Set<str
 /** A route-first progress rail. The summary answers "where are we?" and "does it fit?"
  * before the stop sequence supplies detail. Stops render in reverse route order so the
  * remaining and newly reassigned work leads, while the source route order stays intact. */
-export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed, onCollapsedChange, activeStopId, onSelectStop }: { view: DriverView; deliveryById: Map<string, Delivery>; pastLimitIds: Set<string>; activeStopId?: string | null; onSelectStop?: (id: string) => void; collapsed: boolean; onCollapsedChange: (c: boolean) => void }) {
+export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed, onCollapsedChange, activeStopId, onSelectStop, hiddenStopIds, onRevealStop, listKey }: { view: DriverView; deliveryById: Map<string, Delivery>; pastLimitIds: Set<string>; activeStopId?: string | null; onSelectStop?: (id: string) => void; collapsed: boolean; onCollapsedChange: (c: boolean) => void; /** Stops the page's filter has hidden; a jump to one clears the filter first. */ hiddenStopIds?: Set<string>; onRevealStop?: (id: string) => void; /** Changes when the receipt list changes shape, so the observer re-attaches. */ listKey?: string }) {
   const { route, now } = view
   const nextId = view.next?.id
   const progress = routeCompletionPct(view.done, view.total)
@@ -110,7 +110,7 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
     )
     elements.forEach((element) => observer.observe(element))
     return () => observer.disconnect()
-  }, [route.stops])
+  }, [route.stops, listKey])
 
   const jump = (id: string) => {
     setActive(id)
@@ -118,7 +118,14 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
       onSelectStop(id)
       return
     }
-    document.getElementById(`stop-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    const scroll = () => document.getElementById(`stop-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    if (hiddenStopIds?.has(id) && onRevealStop) {
+      onRevealStop(id)
+      // The receipt exists after the filter clears and React commits; two frames is enough.
+      requestAnimationFrame(() => requestAnimationFrame(scroll))
+      return
+    }
+    scroll()
   }
 
   return (
