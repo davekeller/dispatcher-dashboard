@@ -65,8 +65,9 @@ export default function MapPage() {
           <div className="ml-2 flex items-center gap-3 text-[10px] text-label">
             <span className="flex items-center gap-1.5"><span className="fleet-marker is-act_now inline-block h-3 w-3"><span className="fleet-marker-dot" /></span> act now</span>
             <span className="flex items-center gap-1.5"><span className="fleet-marker is-watch inline-block h-3 w-3"><span className="fleet-marker-dot" /></span> watch</span>
+            <span className="flex items-center gap-1.5"><span className="fleet-marker is-quiet band-break inline-block h-3 w-3"><span className="fleet-marker-dot" /></span> on break</span>
+            <span className="flex items-center gap-1.5"><span className="fleet-marker is-quiet band-clear inline-block h-3 w-3"><span className="fleet-marker-dot" /></span> clear</span>
             <span className="flex items-center gap-1.5"><span className="fleet-marker is-offline is-dark inline-block h-3 w-3"><span className="fleet-marker-dot" /></span> dark</span>
-            <span className="flex items-center gap-1.5"><span className="fleet-marker is-quiet inline-block h-3 w-3"><span className="fleet-marker-dot" /></span> quiet</span>
           </div>
           <label className="relative ml-auto min-w-44 flex-1 lg:max-w-56">
             <span className="sr-only">{search.label}</span>
@@ -94,7 +95,8 @@ export default function MapPage() {
                 return (
                   <li key={m.driverId}>
                     <button type="button" onClick={() => select(m.driverId)} aria-current={on ? 'true' : undefined} className={`flex w-full items-center gap-2.5 border-b border-line px-3 py-2 text-left transition hover:bg-well ${on ? 'bg-well' : ''}`}>
-                      <span className={`fleet-marker is-${m.kind}${m.dark ? ' is-dark' : ''} inline-block h-3 w-3 shrink-0`}><span className="fleet-marker-dot" /></span>
+                      {/* The board's status dot, not the map marker: no white ring off the tiles. */}
+                      <span className={`h-2 w-2 shrink-0 rounded-full ${m.dark ? `border border-dashed ${BAND_TONE[m.band].border}` : BAND_TONE[m.band].fill}`} />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-[12px] font-semibold text-ink">{m.name}</span>
                         <span className="block truncate text-[10px] text-muted"><span className="font-mono">{m.routeId.toUpperCase()}</span> · {BAND_LABEL[m.band]}{m.dark ? ` · last seen ${fmtAge(m.pingAgeMin)}` : ''}</span>
