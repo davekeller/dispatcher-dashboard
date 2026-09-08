@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Stop } from '../data/types'
-import { routeHosSignal, routeScheduleSignal, type RouteProgressView } from './routeProgress'
+import { routeCompletionPct, routeHosSignal, routeScheduleSignal, type RouteProgressView } from './routeProgress'
 
 const pending = [{} as Stop]
 
@@ -24,5 +24,14 @@ describe('route progress signals', () => {
 
   it('treats an empty route as complete', () => {
     expect(routeHosSignal(view({ remaining: [] }))).toEqual({ label: 'HOS fit', value: 'Complete', tone: 'clear' })
+  })
+})
+
+describe('route completion', () => {
+  it('rounds to a whole percentage and treats an empty route as complete', () => {
+    expect(routeCompletionPct(14, 16)).toBe(88)
+    expect(routeCompletionPct(0, 20)).toBe(0)
+    expect(routeCompletionPct(20, 20)).toBe(100)
+    expect(routeCompletionPct(0, 0)).toBe(100)
   })
 })
