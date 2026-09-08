@@ -1,6 +1,6 @@
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
-import { MapContainer, Marker, Tooltip } from 'react-leaflet'
+import { MapContainer, Marker, Tooltip, ZoomControl } from 'react-leaflet'
 import type { Delivery } from '../../data/types'
 import type { FleetMarker } from '../../geo/fleet'
 import type { DriverView } from '../../store/view'
@@ -39,8 +39,10 @@ export default function FleetMap({ markers, selectedId, selectedView, deliveryBy
     ? { key: `driver:${selectedId}`, points: [...routePoints, ...(selected ? [toLatLng(selected.position)] : [])], maxZoom: ROUTE_MAX_ZOOM }
     : { key: `fleet:${fitKey}`, points: markers.map((m) => toLatLng(m.position)), maxZoom: FLEET_MAX_ZOOM }
   return (
-    <MapContainer center={[41.87, -87.7]} zoom={11} zoomControl scrollWheelZoom className="h-full w-full" attributionControl>
+    <MapContainer center={[41.87, -87.7]} zoom={11} zoomControl={false} scrollWheelZoom className="h-full w-full" attributionControl>
       <Tiles />
+      {/* Zoom sits bottom right, above the attribution, so the top corners stay free for the driver list and the selected card. */}
+      <ZoomControl position="bottomright" />
       <FitOnce fitKey={framing.key} points={framing.points} maxZoom={framing.maxZoom} />
       {selectedView && <RouteOverlay view={selectedView} deliveryById={deliveryById} pastLimitIds={pastLimitIds} />}
       {markers.map((m) => (
