@@ -30,6 +30,7 @@ export default function MetricsView({ cards, d, filters, onPreset }: { cards: Dr
   const maxBin = Math.max(1, ...hours.map((b) => b.total))
   const maxBreak = Math.max(1, ...breaks.map((b) => b.count))
   const beyondDay = marks.filter((m) => !m.over && m.x >= 1).length
+  const emphasized = marks.filter((m) => m.over || m.band === 'act_now').map((m) => m.driverId)
 
   return (
     <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
@@ -68,19 +69,21 @@ export default function MetricsView({ cards, d, filters, onPreset }: { cards: Dr
       </Panel>
 
       <Panel title="Who hits the limit when" detail={`From now to ${fmtClock(DAY_END)}, for drivers with work left`}>
-        <div className="relative mt-1 h-16">
-          <span className="absolute inset-x-0 top-7 h-px bg-line" />
-          {marks.map((m, i) => {
+        <div className="relative mt-1 h-20">
+          <span className="absolute inset-x-0 top-9 h-px bg-line" />
+          {marks.map((m) => {
             const emphasis = m.over || m.band === 'act_now'
+            // Named dots alternate above and below the axis so neighbours' names never overlap.
+            const labelRow = emphasis ? emphasized.indexOf(m.driverId) % 2 : 0
             return (
-              <Link key={m.driverId} to={`/routes/${m.driverId}`} title={`${m.name} · ${m.routeId.toUpperCase()} · ${m.over ? 'over the limit now' : `limit at ${fmtClock(m.at)}`}`} className="group absolute -translate-x-1/2" style={{ left: `${m.x * 100}%`, top: emphasis ? '1.25rem' : '1.5rem', zIndex: emphasis ? 2 : 1 }}>
+              <Link key={m.driverId} to={`/routes/${m.driverId}`} title={`${m.name} · ${m.routeId.toUpperCase()} · ${m.over ? 'over the limit now' : `limit at ${fmtClock(m.at)}`}`} className="group absolute -translate-x-1/2" style={{ left: `${m.x * 100}%`, top: emphasis ? '1.75rem' : '2rem', zIndex: emphasis ? 2 : 1 }}>
                 <span className={`block rounded-full ring-2 ring-panel ${emphasis ? 'h-3.5 w-3.5' : 'h-2.5 w-2.5'} ${BAND_TONE[m.band].fill}`} />
-                {emphasis && <span className={`absolute left-1/2 top-4 -translate-x-1/2 whitespace-nowrap text-[9px] font-semibold ${i % 2 ? 'top-4' : 'top-4'} ${BAND_TONE[m.band].text}`}>{m.name}</span>}
+                {emphasis && <span className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] font-semibold ${labelRow ? '-top-4' : 'top-4'} ${BAND_TONE[m.band].text}`}>{m.name}</span>}
               </Link>
             )
           })}
-          <span className="tnum absolute left-0 top-10 text-[9px] text-label">now</span>
-          <span className="tnum absolute right-0 top-10 text-[9px] text-label">{fmtClock(DAY_END)}</span>
+          <span className="tnum absolute bottom-0 left-0 text-[9px] text-label">now</span>
+          <span className="tnum absolute bottom-0 right-0 text-[9px] text-label">{fmtClock(DAY_END)}</span>
         </div>
         <p className="mt-1 text-[10px] text-label">{marks.filter((m) => m.over).length} over now · {marks.filter((m) => !m.over && m.x < 1).length} reach it before {fmtClock(DAY_END)} · {beyondDay} after the day ends. Click a dot for the route.</p>
       </Panel>
