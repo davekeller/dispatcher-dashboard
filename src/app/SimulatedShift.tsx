@@ -73,7 +73,7 @@ export default function SimulatedShift() {
         title="Simulated shift: click to scrub the day and try the demo actions (⌘.)"
         className={`flex h-9 items-center gap-2 rounded-control border px-3 text-[13px] transition ${open ? 'border-ink bg-well' : 'border-line bg-panel hover:bg-well'}`}
       >
-        <Clock size={16} weight="duotone" className="text-lookout" />
+        <Clock size={16} weight="duotone" className="text-ink" />
         <span className="tnum font-semibold text-ink">{fmtClock(now)}</span>
         <span className="text-muted">{liveClock ? 'Real time' : 'Simulated shift'}</span>
         <CaretDown size={12} className="text-muted" />
@@ -82,7 +82,7 @@ export default function SimulatedShift() {
       {open && (
         <div role="dialog" aria-label="Simulated shift" className="absolute right-0 top-full z-40 mt-2 w-[26rem] rounded-card border border-line bg-panel p-4 shadow-card">
           <p className="flex items-center gap-2 font-display text-[15px] font-semibold text-ink">
-            <SunHorizon size={20} weight="duotone" className="shrink-0 text-lookout" aria-hidden="true" />
+            <SunHorizon size={20} weight="duotone" className="shrink-0 text-ink" aria-hidden="true" />
             This is a simulated shift.
           </p>
           <p className="mt-1 text-[12px] leading-snug text-muted">
