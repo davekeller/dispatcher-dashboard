@@ -102,8 +102,6 @@ export default function RouteFilePage() {
       <RouteRail view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} collapsed={railCollapsed} onCollapsedChange={setRailCollapsed} activeStopId={mode === 'map' ? mapSelection : undefined} onSelectStop={mode === 'map' ? setSelectedStop : undefined} />
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         <DriverCard view={view} card={card} />
-        {card.alerts.length > 0 && <AlertStrip view={view} card={card} />}
-        {stale && <StaleBanner view={view} />}
         <section>
           <header className={`sticky top-0 z-30 mb-3 flex min-h-14 w-full items-stretch border-y border-nav-selected-line/70 bg-nav-selected/55 px-3 backdrop-blur ${railCollapsed ? '' : 'flex-wrap'}`}>
             <div className={`flex min-w-0 shrink-0 items-center gap-2.5 py-2 pr-3 ${railCollapsed ? '' : 'order-1 flex-1'}`}>
@@ -149,6 +147,12 @@ export default function RouteFilePage() {
               </div>
             </div>
           </header>
+          {(card.alerts.length > 0 || stale) && (
+            <div className="mb-3 flex flex-col gap-3">
+              {card.alerts.length > 0 && <AlertStrip view={view} card={card} />}
+              {stale && <StaleBanner view={view} />}
+            </div>
+          )}
           {mode === 'map' ? (
             <Suspense fallback={<div className="flex h-[22rem] items-center justify-center rounded-card border border-line bg-panel text-[12px] text-muted">Loading the map…</div>}>
               <RouteMap view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} selectedStopId={mapSelection} onSelectStop={setSelectedStop} />
