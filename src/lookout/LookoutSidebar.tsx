@@ -54,7 +54,7 @@ export default function LookoutSidebar() {
   if (collapsed) {
     return (
       <aside className="lookout-panel flex w-14 shrink-0 flex-col items-center border-l border-line" aria-label={`${LOOKOUT.name}, collapsed`}>
-        <button type="button" onClick={() => setCollapsed(false)} className="flex h-14 w-full items-center justify-center text-lookout-strong hover:bg-well" aria-label={`Open ${LOOKOUT.name}`}>
+        <button type="button" onClick={() => setCollapsed(false)} className="flex h-14 w-full items-center justify-center text-ink hover:bg-well" aria-label={`Open ${LOOKOUT.name}`}>
           <CaretDoubleLeft size={16} />
         </button>
         <LookoutAvatar size={28} className="mt-2" />
@@ -75,7 +75,7 @@ export default function LookoutSidebar() {
           ))}
         </div>
         <div className="ml-auto min-w-0 text-right font-lookout">
-          <p className="text-[14px] font-semibold leading-tight text-lookout-strong">{LOOKOUT.name}</p>
+          <p className="text-[14px] font-semibold leading-tight text-ink">{LOOKOUT.name}</p>
           <p className="text-[10px] leading-tight text-muted">{LOOKOUT.role}</p>
         </div>
         <LookoutAvatar size={30} className="shrink-0" />
