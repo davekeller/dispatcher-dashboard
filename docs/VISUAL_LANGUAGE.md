@@ -188,7 +188,7 @@ Route details use a slightly deeper fixed slate gradient derived from `board`, `
 
 The expanded detail rail uses the same reverse-route ordering and completed-path gradient as the mini timeline. Remaining and reassigned stops lead at the top; completed rows continue below and tighten from 40px to 32px, but retain their time, stop number, name, full click target, and one-to-one receipt mapping; failed stops remain full-size and red.
 
-The left rail and the receipt list are literal counterparts: one timeline node per receipt, both presented route-end-first. The rail sits flush against the left edge of the route view and defaults collapsed, preserving the full stop spine while giving the detail grid the working width. Timeline entries read marker → time → stop number and name. Expanded, the rail uses the same light, flat grid grammar as the rest of the product: Route status opens to a 2×2 divider grid for Progress, Remaining, Schedule, and HOS fit; Route timeline opens beneath it. Each section collapses independently, and neither introduces an inset card or dark header block. Behind the file, one fixed vertical field moves from an open near-white slate at the top to the deeper offline-slate family at the bottom. Receipts scroll over that stationary gradient, adding depth and a quiet cue that more route work continues below without tinting the white operational surfaces.
+The left rail and the receipt list are literal counterparts: one timeline node per receipt, both presented route-end-first. The rail sits flush against the left edge of the route view and defaults collapsed, preserving the full stop spine while giving the detail grid the working width. Timeline entries read marker → time → stop number and name. Expanding the rail adds labeled timeline detail only; route-status readings remain in the sticky Stops band. Neither state introduces an inset card or dark header block. Behind the file, one fixed vertical field moves from an open near-white slate at the top to the deeper offline-slate family at the bottom. Receipts scroll over that stationary gradient, adding depth and a quiet cue that more route work continues below without tinting the white operational surfaces.
 
 Each stop receipt applies the same case-file grammar as four clear columns:
 
@@ -207,7 +207,7 @@ All receipt sections center vertically across the row. Dispatcher notes are neut
 
 ### Lookout
 
-Lookout is visually related to the main product but clearly has a separate role. Its original mark maps six vivid color regions into a clean clipped circle with no outline, behind a small white pixel face:
+Lookout is visually related to the main product but clearly has a separate role. The full sidebar casts one restrained, cool-slate shadow toward the workspace so the assistant plane separates from dense operational content without appearing detached. Its original mark maps six vivid color regions into a clean clipped circle with no outline, behind a small white pixel face:
 
 - orange active tab and name;
 - cyan-to-lime spectrum-disc avatar with a centered, friendly white pixel face;

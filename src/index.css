@@ -121,6 +121,9 @@ body { @apply bg-canvas text-ink font-sans; }
   background:
     radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--color-ai-cool) 5%, transparent), transparent 24rem),
     linear-gradient(180deg, #ffffff 0%, #ffffff 62%, #fff9f5 100%);
+  box-shadow:
+    -1px 0 3px rgb(42 48 61 / 0.05),
+    -10px 0 26px rgb(66 76 96 / 0.07);
 }
 
 .lookout-card-ring {
