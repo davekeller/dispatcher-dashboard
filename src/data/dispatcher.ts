@@ -6,6 +6,7 @@ export interface Dispatcher {
   id: string
   name: string
   initials: string
+  portraitSrc: string
   role: string
   carrier: string
   /** Her desk shift as hours of the day; the simulated day runs on past it into the evening. */
@@ -18,6 +19,7 @@ export const DISPATCHER: Dispatcher = {
   id: 'dsp-01',
   name: 'Lena Vasquez',
   initials: 'LV',
+  portraitSrc: '/avatars/driver-f-1.webp',
   role: 'Dispatcher',
   carrier: 'Regional carrier',
   shift: { startHour: 6, endHour: 16 },
