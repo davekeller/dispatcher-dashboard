@@ -12,7 +12,7 @@ export interface FiltersCopy {
   hint: string
 }
 
-export const BOARD_FILTER_COPY: FiltersCopy = { all: 'All routes', aria: 'Routes shown', title: 'Filter routes', hint: 'Combine status, data quality, and region.' }
+export const BOARD_FILTER_COPY: FiltersCopy = { all: 'All routes', aria: 'Routes shown', title: 'Filter routes', hint: 'Combine alerts, status, data quality, and region.' }
 
 /** Board columns the menu can open and close: their state by column key, and which filter groups are columns. */
 export interface ColumnControls {
