@@ -28,8 +28,8 @@ export default function Header() {
   const onSettings = pathname === '/settings'
   const onBoard = !onMap && !onSettings
   const mapTo = origin?.view === 'map' ? origin.to : '/map'
-  // The nav shadow belongs under the lowest nav layer: on a route file the Stops bar casts it, so the product bar does not.
-  const lowestNav = !focused
+  // The nav shadow belongs under the lowest nav layer only: on a route file the Stops bar casts it and on the map the controls bar does, so the product bar does not.
+  const lowestNav = !focused && !onMap
   const segment = (on: boolean) => `flex h-full flex-1 items-center justify-center gap-1.5 px-3 text-[12px] font-semibold transition focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ink/40 ${navigationItemState(on)}`
 
   return (

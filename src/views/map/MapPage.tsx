@@ -53,7 +53,7 @@ export default function MapPage() {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <nav aria-label="Map controls" className="relative z-20 shrink-0 border-b border-line bg-panel/95 px-5 py-3 shadow-sm backdrop-blur">
+      <nav aria-label="Map controls" className="nav-shadow-below relative z-20 shrink-0 border-b border-line bg-panel/95 px-5 py-3 backdrop-blur">
         <div className="flex flex-wrap items-center gap-2">
           <FiltersDropdown value={filters} onChange={setFilters} />
           {isFiltering(filters) && (
