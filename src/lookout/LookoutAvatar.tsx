@@ -8,7 +8,6 @@ export default function LookoutAvatar({ size = 28, className = '' }: { size?: nu
   const pinkId = `${id}-pink`
   const orangeId = `${id}-orange`
   const limeId = `${id}-lime`
-  const clipId = `${id}-clip`
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" className={`block ${className}`} aria-hidden="true" focusable="false">
       <defs>
@@ -38,18 +37,14 @@ export default function LookoutAvatar({ size = 28, className = '' }: { size?: nu
           <stop offset=".34" stopColor="#50e9a1" stopOpacity=".9" />
           <stop offset="1" stopColor="#50e9a1" stopOpacity="0" />
         </radialGradient>
-        <clipPath id={clipId}>
-          <circle cx="16" cy="16" r="15" />
-        </clipPath>
       </defs>
-      <g clipPath={`url(#${clipId})`}>
-        <rect x="1" y="1" width="30" height="30" fill={`url(#${baseId})`} />
-        <rect x="1" y="1" width="30" height="30" fill={`url(#${cyanId})`} />
-        <rect x="1" y="1" width="30" height="30" fill={`url(#${pinkId})`} />
-        <rect x="1" y="1" width="30" height="30" fill={`url(#${orangeId})`} />
-        <rect x="1" y="1" width="30" height="30" fill={`url(#${limeId})`} />
-      </g>
-      <g className="fill-on-accent" shapeRendering="crispEdges">
+      {/* Real circles, not clipped squares: a clip path's edge can render aliased at small sizes, a circle's never does. */}
+      <circle cx="16" cy="16" r="15" fill={`url(#${baseId})`} />
+      <circle cx="16" cy="16" r="15" fill={`url(#${cyanId})`} />
+      <circle cx="16" cy="16" r="15" fill={`url(#${pinkId})`} />
+      <circle cx="16" cy="16" r="15" fill={`url(#${orangeId})`} />
+      <circle cx="16" cy="16" r="15" fill={`url(#${limeId})`} />
+      <g className="fill-on-accent">
         <rect x="9" y="10" width="4" height="4" />
         <rect x="19" y="10" width="4" height="4" />
         <rect x="9" y="18" width="3" height="3" />
