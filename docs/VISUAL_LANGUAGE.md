@@ -247,9 +247,16 @@ Routine inputs use a neutral border. The Lookout composer and AI ordering contro
 
 ### Motion
 
-Motion is functional and brief:
+Motion is functional and brief. It uses two curves and a short scale of durations, all tokens in `index.css`:
 
-- 180–200ms lane expand/collapse and content entry;
+- `--ease-gentle`, `cubic-bezier(0.6, 0.2, 0.1, 1)`, for layout the dispatcher asked for: Lookout sliding in and out, the route rail widening, lanes opening. It eases in softly and lands softly; nothing snaps or bounces.
+- `--ease-out-soft`, `cubic-bezier(0.22, 1, 0.36, 1)`, for entrances: the route workspace fading up, the selected card expanding into it.
+- 150ms for hover and press feedback, 200ms for small state changes, 300ms for panels and rails, 380ms for the one shared-element route expansion.
+
+Where it appears:
+
+- Lookout closes by sliding off to the right over 300ms on the gentle curve while the workspace regains its width; it stays mounted, so a reopened chat keeps its thread. Reduced motion cuts the slide;
+- 200ms lane expand/collapse and content entry, 300ms for the route rail;
 - a route-card press compresses to 98.5%, then the selected card expands into the route's driver summary over 380ms while the remaining workspace fades up behind it;
 - live countdown updates without layout shift;
 - timeline selection follows the receipt in view;

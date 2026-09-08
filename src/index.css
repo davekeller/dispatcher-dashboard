@@ -66,6 +66,10 @@
   --radius-control: 8px;
 
   --shadow-card: 0 1px 2px rgba(33, 30, 28, 0.05), 0 5px 16px rgba(33, 30, 28, 0.04);
+
+  /* Motion: two curves. Gentle for layout the dispatcher asked for (panels, rails, lanes); soft-out for entrances. */
+  --ease-gentle: cubic-bezier(0.6, 0.2, 0.1, 1);
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 html, body, #root { height: 100%; }
@@ -125,8 +129,15 @@ body { @apply bg-canvas text-ink font-sans; }
     linear-gradient(180deg, #ffffff 0%, #ffffff 62%, #fff9f5 100%);
 }
 
+/* Lookout's slot: its width animates so the workspace regains the room as the panel slides off to the right. The panel stays
+   mounted at full width inside, so a closed-and-reopened chat keeps its thread; the root clips what hangs past the viewport. */
+.lookout-slot { transition: width 300ms var(--ease-gentle); }
+.lookout-slot.is-closed .lookout-panel::before { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .lookout-slot { transition: none; } }
+
 .lookout-panel::before {
   content: '';
+  transition: opacity 300ms var(--ease-gentle);
   position: absolute;
   top: 3.5rem;
   bottom: 0;
