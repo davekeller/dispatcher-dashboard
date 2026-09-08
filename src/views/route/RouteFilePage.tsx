@@ -174,10 +174,11 @@ export default function RouteFilePage() {
           </div>
         </div>
       </nav>
-      <div className="flex min-h-0 flex-1 items-stretch gap-5 py-5 pr-5">
+      {/* The inset lives inside the scroll box, so the cards slide up under the Stops bar instead of clipping 20px below it. */}
+      <div className="flex min-h-0 flex-1 items-stretch gap-5 pr-5">
         <RouteRail view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} collapsed={railCollapsed} onCollapsedChange={setRailCollapsed} activeStopId={mode === 'map' ? mapSelection : undefined} onSelectStop={mode === 'map' ? setSelectedStop : undefined} hiddenStopIds={mode === 'list' ? hiddenStopIds : undefined} onRevealStop={() => setStopFilter('all')} listKey={`${mode}:${stopFilter}`} />
         {/* The scroll box is a plain block so nothing inside it can flex-shrink; the column of cards sits one level down. */}
-        <div className="min-w-0 flex-1 overflow-y-auto">
+        <div className="min-w-0 flex-1 overflow-y-auto py-5">
           <div className="flex flex-col gap-3">
           <section className="flex flex-col gap-2">
             <DriverCard view={view} card={card} />
