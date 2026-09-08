@@ -25,7 +25,7 @@ export default function ChatThread({ messages, d, onExample }: { messages: Messa
               {m.reply?.examples && (
                 <div className="mt-1.5 flex flex-wrap gap-1">
                   {m.reply.examples.map((e) => (
-                    <button key={e} type="button" onClick={() => onExample(e)} className="rounded-full border border-line bg-panel px-2 py-0.5 font-lookout text-[11px] text-ink hover:border-lookout hover:text-ink">{e}</button>
+                    <button key={e} type="button" onClick={() => onExample(e)} className="rounded-full border border-line bg-panel px-2 py-0.5 font-lookout text-[11px] text-ink hover:border-line hover:text-ink">{e}</button>
                   ))}
                 </div>
               )}
