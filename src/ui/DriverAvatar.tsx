@@ -9,7 +9,6 @@ const PORTRAITS = {
     '/avatars/driver-m-4.webp',
   ],
   f: [
-    '/avatars/driver-f-1.webp',
     '/avatars/driver-f-2.webp',
     '/avatars/driver-f-3.webp',
     '/avatars/driver-f-4.webp',
