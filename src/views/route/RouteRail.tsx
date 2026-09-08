@@ -1,11 +1,10 @@
-import { ArrowLeft, CaretDown, Check, SidebarSimple } from '@phosphor-icons/react'
+import { CaretDown, Check, SidebarSimple } from '@phosphor-icons/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router'
 import type { Delivery, Stop } from '../../data/types'
 import { projectedEta } from '../../hos/compute'
 import { fmtClock } from '../../lib/format'
 import type { DriverView } from '../../store/view'
-import { originOf } from '../../app/origin'
+import { routeCompletionPct } from '../../lib/routeProgress'
 import StopStatusMarker, { stopHistoryStyle } from './StopStatusMarker'
 
 interface Node {
@@ -46,9 +45,8 @@ function stopState(node: Node, nextId: string | undefined, pastLimitIds: Set<str
  * remaining and newly reassigned work leads, while the source route order stays intact. */
 export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed, onCollapsedChange, activeStopId, onSelectStop }: { view: DriverView; deliveryById: Map<string, Delivery>; pastLimitIds: Set<string>; activeStopId?: string | null; onSelectStop?: (id: string) => void; collapsed: boolean; onCollapsedChange: (c: boolean) => void }) {
   const { route, now } = view
-  const origin = originOf(useLocation())
   const nextId = view.next?.id
-  const progress = view.total === 0 ? 100 : Math.round((view.done / view.total) * 100)
+  const progress = routeCompletionPct(view.done, view.total)
   const [active, setActive] = useState<string | null>(nextId ?? route.stops.at(-1)?.id ?? null)
   // In map mode the page owns the selection; in list mode the receipt being read does.
   const shownActive = activeStopId !== undefined ? activeStopId : active
@@ -124,11 +122,8 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
   }
 
   return (
-    <nav aria-label="Route" className={`sticky left-0 top-0 z-20 flex h-[calc(100vh-3.5rem-2.5rem)] shrink-0 flex-col overflow-hidden rounded-r-card border-y border-r border-line bg-panel shadow-card transition-[width] duration-200 ${collapsed ? 'w-16' : 'w-64'}`}>
+    <nav aria-label="Route timeline" className={`relative z-20 flex shrink-0 flex-col self-stretch overflow-hidden rounded-r-card border-y border-r border-line bg-panel shadow-card transition-[width] duration-200 ${collapsed ? 'w-16' : 'w-64'}`}>
       <div className={`flex shrink-0 items-center border-b border-line px-2 py-2 ${collapsed ? 'flex-col gap-1' : 'gap-2'}`}>
-        <Link to={origin.to} title={`Back to the ${origin.view}`} aria-label={`Back to the ${origin.view}`} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-control text-muted transition hover:bg-board hover:text-ink">
-          <ArrowLeft size={16} weight="bold" />
-        </Link>
         {!collapsed && (
           <div className="min-w-0 flex-1">
             <p className="text-[8px] font-semibold uppercase tracking-[0.08em] text-label">Route</p>
