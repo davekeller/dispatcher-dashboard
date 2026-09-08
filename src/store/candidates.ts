@@ -10,7 +10,7 @@ import type { DriverView } from './view'
 export type CandidateOrder = 'lookout' | 'proximity' | 'time_left'
 
 export const CANDIDATE_ORDERS: { id: CandidateOrder; label: string; hint: string }[] = [
-  { id: 'lookout', label: 'Lookout orders', hint: 'Same region first, then the most spare drive time' },
+  { id: 'lookout', label: 'Ordered by Lookout', hint: 'Same region first, then the most spare drive time' },
   { id: 'proximity', label: 'Closest first', hint: 'Distance between the trucks right now' },
   { id: 'time_left', label: 'Most drive time left', hint: 'Minutes until the 11-hour limit' },
 ]
