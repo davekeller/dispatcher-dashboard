@@ -8,6 +8,7 @@ const tokens = {
   'act-now-soft': '#fff0f3', 'watch-soft': '#fff6df', 'clear-soft': '#eaf8f0', 'offline-soft': '#eff2f6', 'break-soft': '#edf3ff', 'lookout-soft': '#fff0e9',
   'act-now-board': '#f8d6df', 'watch-board': '#f5dfa7', 'break-board': '#d8e5fb', 'offline-board': '#dce3ed', 'clear-board': '#d3eedf',
   'hero-brightest': '#545353',
+  'act-now-hero': '#ff7a90', 'act-now-hero-text': '#ffb3c1',
 }
 const lum = (hex) => {
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
@@ -21,9 +22,12 @@ const pairs = [
   ['clear', 'panel'], ['clear', 'clear-soft'], ['offline', 'panel'], ['offline', 'offline-soft'], ['break', 'panel'], ['break', 'break-soft'],
   ['on-accent', 'act-now'], ['on-accent', 'watch'], ['on-accent', 'break'], ['on-accent', 'offline'], ['on-accent', 'clear'],
   ['act-now-soft', 'act-now'], ['watch-soft', 'watch'], ['break-soft', 'break'], ['offline-soft', 'offline'], ['clear-soft', 'clear'],
-  ['act-now-board', 'hero-brightest'], ['watch-board', 'hero-brightest'], ['break-board', 'hero-brightest'], ['offline-board', 'hero-brightest'], ['clear-board', 'hero-brightest'],
+  ['act-now-board', 'hero-brightest'], ['watch-board', 'hero-brightest'], ['break-board', 'hero-brightest'], ['offline-board', 'hero-brightest'], ['clear-board', 'hero-brightest'], ['act-now-hero-text', 'hero-brightest'],
 ]
+// Large text (the shift instrument's 32px count) and its dot need 3:1, not 4.5:1.
+const largePairs = [['act-now-hero', 'hero-brightest']]
 let fails = 0
 console.log('| text | ground | ratio | AA |\n|---|---|---|---|')
 for (const [t, g] of pairs) { const r = ratio(tokens[t], tokens[g]); if (r < 4.5) fails++; console.log(`| ${t} | ${g} | ${r} | ${r >= 4.5 ? 'pass' : 'FAIL'} |`) }
+for (const [t, g] of largePairs) { const r = ratio(tokens[t], tokens[g]); if (r < 3) fails++; console.log(`| ${t} | ${g} | ${r} | ${r >= 3 ? 'pass (large)' : 'FAIL'} |`) }
 process.exit(fails ? 1 : 0)
