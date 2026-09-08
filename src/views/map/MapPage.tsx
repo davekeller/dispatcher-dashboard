@@ -5,6 +5,7 @@ import { BAND_LABEL } from '../../bands'
 import { applyFilters, EMPTY_FILTERS, FILTERS, isFiltering, type FilterState } from '../../filters'
 import { originFor } from '../../app/origin'
 import { fleetMarkers } from '../../geo/fleet'
+import { fmtAge } from '../../lib/format'
 import { useLookout } from '../../lookout/LookoutContext'
 import { stopsPastLimit } from '../../store/actions'
 import { useDerived } from '../../store/hooks'
@@ -77,12 +78,41 @@ export default function MapPage() {
           </Button>
         </div>
       </nav>
-      <div className="relative min-h-0 flex-1 bg-canvas">
+      <div className="flex min-h-0 flex-1">
+        {/* The same ranked, filtered list the markers come from, as a list: one row per truck, in board order. */}
+        <aside aria-label="Drivers on the map" className="flex w-60 shrink-0 flex-col border-r border-line bg-panel">
+          <div className="flex items-center justify-between border-b border-line px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-label">
+            <span>Drivers</span>
+            <span className="tnum">{markers.length}</span>
+          </div>
+          {markers.length === 0 ? (
+            <p className="px-3 py-4 text-[12px] text-muted">No trucks match the filters.</p>
+          ) : (
+            <ul className="min-h-0 flex-1 overflow-y-auto">
+              {markers.map((m) => {
+                const on = m.driverId === selectedId
+                return (
+                  <li key={m.driverId}>
+                    <button type="button" onClick={() => select(m.driverId)} aria-current={on ? 'true' : undefined} className={`flex w-full items-center gap-2.5 border-b border-line px-3 py-2 text-left transition hover:bg-well ${on ? 'bg-well' : ''}`}>
+                      <span className={`fleet-marker is-${m.kind}${m.dark ? ' is-dark' : ''} inline-block h-3 w-3 shrink-0`}><span className="fleet-marker-dot" /></span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[12px] font-semibold text-ink">{m.name}</span>
+                        <span className="block truncate text-[10px] text-muted"><span className="font-mono">{m.routeId.toUpperCase()}</span> · {BAND_LABEL[m.band]}{m.dark ? ` · last seen ${fmtAge(m.pingAgeMin)}` : ''}</span>
+                      </span>
+                      <Countdown minutes={m.minutesUntilLimit} stale={m.staleness !== 'fresh'} size="xs" className="shrink-0" />
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </aside>
+        <div className="relative min-h-0 flex-1 bg-canvas">
         <Suspense fallback={<div className="flex h-full items-center justify-center text-[12px] text-muted">Loading the map…</div>}>
           <FleetMap markers={markers} selectedId={selectedId} selectedView={selectedView} deliveryById={deliveryById} pastLimitIds={pastLimitIds} fitKey={fitKey} onSelect={select} />
         </Suspense>
         {selectedView && selectedCard && (
-          <aside aria-label={`${selectedView.driver.name}, selected`} className="absolute left-4 top-4 z-[1000] w-64 rounded-card border border-line bg-panel p-3 shadow-card">
+          <aside aria-label={`${selectedView.driver.name}, selected`} className="absolute right-4 top-4 z-[1000] w-64 rounded-card border border-line bg-panel p-3 shadow-card">
             <div className="flex items-start gap-2">
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[13px] font-semibold text-ink">{selectedView.driver.name}</p>
@@ -103,6 +133,7 @@ export default function MapPage() {
             </Link>
           </aside>
         )}
+        </div>
       </div>
     </div>
   )
