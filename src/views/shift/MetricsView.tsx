@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react'
+import { MagnifyingGlass } from '@phosphor-icons/react'
+import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
 import type { DriverCard } from '../../alerts/types'
 import { BAND_LABEL, BAND_ORDER, type Band } from '../../bands'
@@ -39,8 +40,32 @@ const METRIC_STATUS_SELECTED: Record<Band, string> = {
 /** The Metrics lens: the shift as charts. It reads the same filtered cards the board would show,
  *  so a chart and a column never disagree. Band colors appear only where they mean status; every
  *  other quantity is neutral. No chart library: bars are divs, positions are percentages. */
+/** Every chart on the lens, in reading order, keyed to its section. The chooser and the search read this; the sections render from it. */
+const CHARTS = [
+  { id: 'forecast', title: 'Who hits the limit when', section: 'hos-exposure' },
+  { id: 'hours', title: 'Hours driven today', section: 'hos-exposure' },
+  { id: 'closest', title: 'Closest to the limit', section: 'hos-exposure' },
+  { id: 'status', title: 'Fleet by status', section: 'shift-operations' },
+  { id: 'regions', title: 'Deliveries by region', section: 'shift-operations' },
+  { id: 'breaks', title: 'Since the last break', section: 'driver-readiness' },
+  { id: 'freshness', title: 'Data freshness', section: 'driver-readiness' },
+] as const
+type ChartId = (typeof CHARTS)[number]['id']
+const SECTION_TITLE: Record<string, string> = { 'hos-exposure': 'Hours of service', 'shift-operations': 'Shift operations', 'driver-readiness': 'Driver readiness' }
+
+function chartMatches(chart: (typeof CHARTS)[number], query: string): boolean {
+  const q = query.trim().toLowerCase()
+  return q === '' || `${chart.title} ${SECTION_TITLE[chart.section]}`.toLowerCase().includes(q)
+}
+
 export default function MetricsView({ cards, d, filters, onPreset }: { cards: DriverCard[]; d: Derived; filters: FilterState; onPreset: (filters: FilterState) => void }) {
   const rows = metricRows(cards, d.byId)
+  // Pick one chart to see it alone, or type to narrow the charts by name; both drive which sections render.
+  const [pick, setPick] = useState<ChartId | null>(null)
+  const [query, setQuery] = useState('')
+  const show = (id: ChartId) => (pick === null || pick === id) && chartMatches(CHARTS.find((c) => c.id === id)!, query)
+  const sectionShows = (section: string) => CHARTS.some((c) => c.section === section && show(c.id))
+  const anyShown = CHARTS.some((c) => show(c.id))
   const bands = bandBreakdown(rows)
   const hours = drivingHistogram(rows)
   const marks = limitTimeline(rows, d.now, DAY_END)
@@ -65,12 +90,30 @@ export default function MetricsView({ cards, d, filters, onPreset }: { cards: Dr
         <p className="tnum shrink-0 text-[10px] font-medium text-label">{rows.length} trucks in view · {fmtClock(d.now)}</p>
       </header>
 
+      <div className="!mt-4 flex flex-wrap items-center gap-2 border-y border-line py-2.5">
+        <div className="flex flex-wrap items-center gap-1" role="group" aria-label="Charts shown">
+          <ChartChip on={pick === null} onClick={() => setPick(null)}>All charts</ChartChip>
+          {CHARTS.filter((c) => chartMatches(c, query)).map((c) => (
+            <ChartChip key={c.id} on={pick === c.id} onClick={() => setPick(pick === c.id ? null : c.id)}>{c.title}</ChartChip>
+          ))}
+        </div>
+        <label className="relative ml-auto min-w-44 lg:max-w-56">
+          <span className="sr-only">Search charts</span>
+          <MagnifyingGlass size={14} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" />
+          <input value={query} onChange={(e) => { setQuery(e.target.value); setPick(null) }} placeholder="Search charts" className="h-8 w-full rounded-control border border-line bg-panel pl-8 pr-2 text-[12px] text-ink placeholder:text-label focus:border-ink/40 focus:outline-none" />
+        </label>
+      </div>
+      {!anyShown && <p className="text-[12px] text-muted">No chart matches "{query}".</p>}
+
+      {sectionShows('hos-exposure') && (
       <MetricSection
         id="hos-exposure"
+        wide={pick !== null}
         title="Hours of service"
         detail="Limit exposure and legal driving balance across the filtered fleet."
         summary={<><span className="h-2 w-2 rounded-full bg-act-now-fill" />{overNow} over · {approachingThisShift} more before {fmtClock(DAY_END)}</>}
       >
+        {show('forecast') && (
         <Panel
           title="Who hits the limit when"
           detail="Projected clock time each driver exhausts 11 driving hours · service time is included"
@@ -82,16 +125,18 @@ export default function MetricsView({ cards, d, filters, onPreset }: { cards: Dr
             {later > 0 ? `${later} ${later === 1 ? 'driver does' : 'drivers do'} not reach the limit before ${fmtClock(DAY_END)}.` : `Every visible driver reaches the limit by ${fmtClock(DAY_END)}.`}
             {' '}The countdown is drive time left; the plotted time also accounts for service at stops.
           </p>
-        </Panel>
+        </Panel>)}
 
+        {show('hours') && (
         <Panel
           title="Hours driven today"
           detail="Fleet distribution across the 11-hour legal driving window"
           aside={<PanelStat tone={hours.at(-1)?.total ? 'critical' : 'neutral'}>{hours.at(-1)?.total ?? 0} over</PanelStat>}
         >
           <HoursChart bins={hours} />
-        </Panel>
+        </Panel>)}
 
+        {show('closest') && (
         <Panel title="Closest to the limit" detail="Current driving allowance used · stop service time excluded">
           <ol className="flex flex-col gap-1">
             {closest.map(({ card, view }) => {
@@ -118,15 +163,18 @@ export default function MetricsView({ cards, d, filters, onPreset }: { cards: Dr
               )
             })}
           </ol>
-        </Panel>
-      </MetricSection>
+        </Panel>)}
+      </MetricSection>)}
 
+      {sectionShows('shift-operations') && (
       <MetricSection
         id="shift-operations"
+        wide={pick !== null}
         title="Shift operations"
         detail="Route status and delivery completion across the current view."
         summary={<>{rows.length} trucks · {visibleDeliveredPct}% delivered</>}
       >
+        {show('status') && (
         <Panel
           title="Fleet by status"
           detail={`The same ${rows.length} trucks shown on the board · as of ${fmtClock(d.now)}`}
@@ -147,8 +195,9 @@ export default function MetricsView({ cards, d, filters, onPreset }: { cards: Dr
               )
             })}
           </div>
-        </Panel>
+        </Panel>)}
 
+        {show('regions') && (
         <Panel title="Deliveries by region" detail="Delivered share, remaining work, and failures" className="xl:col-span-2">
           <ol className="grid grid-cols-1 gap-x-8 gap-y-3 xl:grid-cols-2">
             {regions.map((region) => {
@@ -169,23 +218,27 @@ export default function MetricsView({ cards, d, filters, onPreset }: { cards: Dr
             })}
           </ol>
           <Legend items={[{ label: 'Delivered', fill: 'bg-clear-fill' }, { label: 'Remaining', fill: 'bg-nav-selected-ink/55' }, { label: 'Failed', fill: 'bg-act-now-fill' }]} />
-        </Panel>
-      </MetricSection>
+        </Panel>)}
+      </MetricSection>)}
 
+      {sectionShows('driver-readiness') && (
       <MetricSection
         id="driver-readiness"
+        wide={pick !== null}
         title="Driver readiness"
         detail="Break compliance and confidence in the latest telematics."
         summary={<><span className={`h-2 w-2 rounded-full ${breakDue > 0 ? 'bg-watch-fill' : 'bg-clear-fill'}`} />{breakDue} break due · {reportingIssues} reporting {reportingIssues === 1 ? 'exception' : 'exceptions'}</>}
       >
+        {show('breaks') && (
         <Panel
           title="Since the last break"
           detail="Continuous driving since a qualifying 30-minute interruption"
           aside={<PanelStat tone={breakDue > 0 ? 'watch' : 'neutral'}>{breakDue} due</PanelStat>}
         >
           <BreakChart bins={breaks} />
-        </Panel>
+        </Panel>)}
 
+        {show('freshness') && (
         <Panel
           title="Data freshness"
           detail="How recently the fleet reported in"
@@ -204,13 +257,13 @@ export default function MetricsView({ cards, d, filters, onPreset }: { cards: Dr
           </dl>
           <div className="mt-3"><StackedBar total={rows.length} segments={[{ key: 'fresh', label: 'Fresh', count: fresh.fresh, fill: STALENESS_TONE.fresh.fill }, { key: 'stale', label: 'Stale', count: fresh.stale, fill: STALENESS_TONE.stale.fill }, { key: 'offline', label: 'Offline', count: fresh.offline, fill: STALENESS_TONE.offline.fill }]} height="h-2.5" /></div>
           <p className="mt-2 text-[10px] text-label">Stale and offline projections carry a tilde throughout Dispatch.</p>
-        </Panel>
-      </MetricSection>
+        </Panel>)}
+      </MetricSection>)}
     </div>
   )
 }
 
-function MetricSection({ id, title, detail, summary, children }: { id: string; title: string; detail: string; summary: ReactNode; children: ReactNode }) {
+function MetricSection({ id, title, detail, summary, wide = false, children }: { id: string; title: string; detail: string; summary: ReactNode; wide?: boolean; children: ReactNode }) {
   return (
     <section aria-labelledby={id}>
       <header className="mb-3 flex min-w-0 items-center justify-between gap-6 border-b border-nav-selected-line pb-2.5">
@@ -220,7 +273,7 @@ function MetricSection({ id, title, detail, summary, children }: { id: string; t
           <p className="mt-1.5 text-[10px] leading-snug text-label">{detail}</p>
         </div>
       </header>
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">{children}</div>
+      <div className={`grid grid-cols-1 gap-4 ${wide ? '' : 'xl:grid-cols-2'}`}>{children}</div>
     </section>
   )
 }
@@ -383,5 +436,13 @@ function Legend({ items, className = '' }: { items: { label: string; fill: strin
         <span key={item.label} className="flex items-center gap-1.5"><span className={`h-2 w-2 rounded-sm ${item.fill}`} /> {item.label}</span>
       ))}
     </div>
+  )
+}
+
+function ChartChip({ on, onClick, children }: { on: boolean; onClick: () => void; children: ReactNode }) {
+  return (
+    <button type="button" aria-pressed={on} onClick={onClick} className={`inline-flex h-7 items-center rounded-full border px-2.5 text-[11px] font-semibold transition ${on ? 'border-ink bg-ink text-on-accent' : 'border-line bg-panel text-muted hover:border-ink/25 hover:text-ink'}`}>
+      {children}
+    </button>
   )
 }
