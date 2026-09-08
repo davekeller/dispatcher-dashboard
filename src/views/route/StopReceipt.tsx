@@ -91,7 +91,7 @@ export default function StopReceipt({ stop, delivery, view, selected, onSelect, 
   return (
     <div className="relative grid grid-cols-[1rem_minmax(0,1fr)] gap-2">
       <div className="relative flex items-center justify-center">
-        <span aria-hidden="true" className={`pointer-events-none absolute left-1/2 w-px -translate-x-1/2 ${timelineTone} ${firstStop ? 'top-1/2' : '-top-1'} ${lastStop ? 'bottom-1/2' : '-bottom-1'}`} style={timelineStyle} />
+        <span aria-hidden="true" className={`pointer-events-none absolute left-1/2 w-px -translate-x-1/2 ${timelineTone} ${firstStop ? 'top-1/2' : '-top-1.5'} ${lastStop ? 'bottom-1/2' : '-bottom-1.5'}`} style={timelineStyle} />
         <StopStatusMarker stop={stop} pastLimit={pastLimit} late={pastWindow} className="h-3.5 w-3.5" style={timelineStyle} />
       </div>
       <div className="relative">
