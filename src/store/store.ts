@@ -40,6 +40,8 @@ export interface State {
   lastAction?: LastAction
   undoSnapshot?: Fleet
   groupBy: BoardLens
+  /** Which board columns are open, by column key (band ids, region names). Unset means open; Offline and Clear start closed. */
+  columnOpen: Record<string, boolean>
   devOpen: boolean
   now: () => number
   reassignStops: (fromDriverId: string, toDriverId: string, stopIds: string[]) => void
@@ -60,6 +62,7 @@ export interface State {
   resetClock: () => void
   resetFleet: () => void
   setGroupBy: (id: BoardLens) => void
+  setColumnOpen: (key: string, open: boolean) => void
   toggleDev: () => void
   /** Apply the clock to the simulated day. Cheap: returns early when no stop crossed `now`. */
   advanceWorld: () => void
@@ -89,6 +92,7 @@ export const useStore = create<State>()((set, get) => {
     corrections: {},
     events: opening(),
     groupBy: 'band', // act on it to the left: Act now is the first column
+    columnOpen: { offline: false, clear: false }, // quiet tails start as rails
     devOpen: false,
     now: () => simNow(get().scrubOffsetMs),
     reassignStops: (from, to, stopIds) =>
@@ -156,6 +160,7 @@ export const useStore = create<State>()((set, get) => {
     },
     resetFleet: () => set({ fleet: makeFleet(ANCHOR), snoozes: {}, corrections: {}, events: opening(), undoSnapshot: undefined, lastAction: undefined, scrubOffsetMs: 0, liveClock: false }),
     setGroupBy: (groupBy) => set({ groupBy }),
+    setColumnOpen: (key, open) => set((s) => ({ columnOpen: { ...s.columnOpen, [key]: open } })),
     toggleDev: () => set((s) => ({ devOpen: !s.devOpen })),
   }
 })
