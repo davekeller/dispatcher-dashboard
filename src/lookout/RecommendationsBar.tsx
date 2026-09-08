@@ -12,10 +12,16 @@ export default function RecommendationsBar({ open, onToggle, summary, children }
       <button type="button" onClick={onToggle} aria-expanded={open} className="sticky top-0 z-10 flex w-full items-center gap-2 border-b border-lookout/20 bg-panel/15 px-3 py-2 text-left font-lookout">
         <LookoutAvatar size={18} className="shrink-0" />
         <span className="shrink-0 whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.04em] text-lookout-strong">{LOOKOUT.name} recommends</span>
-        <span className="ml-auto truncate text-[11px] text-lookout-strong/80">{summary}</span>
-        {open ? <CaretUp size={14} className="shrink-0 text-lookout-strong" /> : <CaretDown size={14} className="shrink-0 text-lookout-strong" />}
+        {/* Collapsed, the gist rides in the bar; open, it gets its own line below so nothing is cut off. */}
+        {!open && <span className="ml-auto truncate text-[11px] text-lookout-strong/80">{summary}</span>}
+        {open ? <CaretUp size={14} className="ml-auto shrink-0 text-lookout-strong" /> : <CaretDown size={14} className="shrink-0 text-lookout-strong" />}
       </button>
-      {open && <div className="flex flex-col gap-2 border-b border-lookout/15 p-2.5">{children}</div>}
+      {open && (
+        <div className="border-b border-lookout/15">
+          <p className="px-3 pb-1 pt-2 font-lookout text-[11px] leading-snug text-lookout-strong/80">{summary}</p>
+          <div className="flex flex-col gap-2 p-2.5">{children}</div>
+        </div>
+      )}
     </section>
   )
 }

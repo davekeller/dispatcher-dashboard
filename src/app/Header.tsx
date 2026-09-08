@@ -34,7 +34,7 @@ export default function Header() {
           <TruckTrailer size={22} weight="fill" />
         </Link>
       </div>
-      <Link to="/" className="whitespace-nowrap font-display text-[17px] font-semibold tracking-[-0.02em] text-ink">Dispatch</Link>
+      <Link to="/" className="-ml-3 whitespace-nowrap font-display text-[17px] font-semibold tracking-[-0.02em] text-ink">Dispatch</Link>
       <nav aria-label="Workspace view" className="ml-4 flex h-8 shrink-0 items-stretch overflow-hidden rounded-control border border-nav-selected-ink bg-panel">
         <Link to="/" aria-current={onBoard ? 'page' : undefined} className={segment(onBoard)}>
           <SquaresFour size={14} weight={onBoard ? 'fill' : 'regular'} /> Board
