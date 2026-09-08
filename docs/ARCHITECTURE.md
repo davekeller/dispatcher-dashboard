@@ -378,7 +378,7 @@ The fleet on one map, a Map tab beside Board in the product bar. It reads the sa
 
 ### Settings
 
-Lena's page, reached from her avatar at the end of the product bar. Who she is comes from `data/dispatcher.ts`, the one record every surface that names her reads. The desk she is running today (trucks, regions, stops delivered, the clock) is read from derived state, never restated. The one preference the product has, the real-clock toggle, calls the same store action as the shift panel. The alert rules on the desk render straight from the rules array with their severities, so a rule added live shows up here too. Deliberately basic: the persona needed a home in the product, not an admin surface.
+Lena's page, reached from her avatar at the end of the product bar. Who she is comes from `data/dispatcher.ts`, the one record every surface that names her reads. The desk she is running today (trucks, regions, stops delivered, the clock) is read from derived state, never restated. The one preference the product has, the real-clock toggle, calls the same store action as the shift panel. The alert rules on the desk render straight from the rules array with their severities, so a rule added live shows up here too. A Design files card links the decks behind the build from `data/designFiles.ts`, one object per file; a file without a link shows as in progress. Deliberately basic: the persona needed a home in the product, not an admin surface.
 
 ## 10. Edge paths
 
