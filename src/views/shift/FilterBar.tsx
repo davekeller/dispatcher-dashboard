@@ -2,6 +2,7 @@ import { ChartBar, Columns, MagnifyingGlass, MapPin, X } from '@phosphor-icons/r
 import { EMPTY_FILTERS, FILTERS, isFiltering, type FilterState } from '../../filters'
 import { BOARD_LENSES, type BoardLens } from '../../groupBy'
 import Button from '../../ui/Button'
+import { useStore } from '../../store/store'
 import { navigationItemState } from '../../ui/navigation'
 import FiltersDropdown from './FiltersDropdown'
 import OrderDropdown, { BOARD_ORDERS } from './OrderDropdown'
@@ -10,11 +11,13 @@ import type { BoardSort } from './boardSort'
 /** One sticky-feeling control band: order, scope, and search on the left; the board lens (Status, Region, Metrics) on the right.
  * Filters still render from FILTERS, so a live-added filter stays a one-object change. */
 export default function FilterBar({ filters, onChange, sort, onSortChange, groupBy, onGroupByChange }: { filters: FilterState; onChange: (f: FilterState) => void; sort: BoardSort; onSortChange: (sort: BoardSort) => void; groupBy: BoardLens; onGroupByChange: (groupBy: BoardLens) => void }) {
+  const columnOpen = useStore((s) => s.columnOpen)
+  const setColumnOpen = useStore((s) => s.setColumnOpen)
   return (
     <nav aria-label="Board controls" className="relative z-20 shrink-0 border-b border-line bg-panel/95 px-5 py-3 shadow-sm backdrop-blur">
       <div className="flex flex-wrap items-center gap-2">
         <OrderDropdown value={sort} onChange={onSortChange} options={BOARD_ORDERS} />
-        <FiltersDropdown value={filters} onChange={onChange} />
+        <FiltersDropdown value={filters} onChange={onChange} columns={{ openState: columnOpen, onOpenChange: setColumnOpen, groupIds: ['band', 'region'] }} />
         {isFiltering(filters) && (
           <Button size="sm" variant="ghost" onClick={() => onChange(EMPTY_FILTERS)}>
             <X size={12} /> Clear

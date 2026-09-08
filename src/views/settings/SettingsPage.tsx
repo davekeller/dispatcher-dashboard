@@ -60,6 +60,7 @@ export default function SettingsPage() {
               )
             })}
           </ol>
+          <p className="mt-4 px-2 text-[11px] leading-snug text-muted">By {PROJECT.author.name}<br /><a href={`mailto:${PROJECT.author.email}`} className="text-ink underline-offset-2 hover:underline">{PROJECT.author.email}</a></p>
         </nav>
 
         <div className="flex min-w-0 flex-1 flex-col gap-4">
