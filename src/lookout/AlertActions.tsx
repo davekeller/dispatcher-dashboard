@@ -40,7 +40,7 @@ export default function AlertActions({ driverId, actions, alertIds, positionDepe
         const disabled = stale || resetDone
         const title = stale ? positionDependentDisabled : resetDone ? `Reset already scheduled for ${fmtClock(resetScheduledAt)}` : undefined
         return (
-          <Button key={a} size="sm" variant={a === 'reassign' ? 'primary' : 'secondary'} className={compact ? 'h-6 px-2 text-[10px]' : ''} disabled={disabled} title={title} onClick={() => open(a, driverId)}>
+          <Button key={a} size="sm" variant={a === 'reassign' ? 'danger' : 'secondary'} className={compact ? 'h-6 px-2 text-[10px]' : ''} disabled={disabled} title={title} onClick={() => open(a, driverId)}>
             {labels[a]}
           </Button>
         )
