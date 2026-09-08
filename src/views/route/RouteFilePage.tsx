@@ -36,13 +36,6 @@ const SIGNAL_TEXT: Record<RouteSignalTone, string> = {
   offline: 'text-offline',
 }
 
-const SIGNAL_RULE: Record<RouteSignalTone, string> = {
-  clear: 'border-t-clear-fill/75',
-  watch: 'border-t-watch-fill/75',
-  act_now: 'border-t-act-now-fill/75',
-  offline: 'border-t-offline-fill/75',
-}
-
 const compactSignalValue = (value: string) => value
   .replace(/(\d+)h (\d+)m/g, '$1h$2m')
   .replace(/(\d+) min\b/g, '$1m')
@@ -107,7 +100,7 @@ export default function RouteFilePage() {
   const pastLimitIds = new Set(stopsPastLimit(view))
   // On the map the rail's selection is the page's; it starts on the next stop, like the rail does when reading.
   const mapSelection = selectedStop ?? view.next?.id ?? null
-  const stopMetricInset = railCollapsed ? 'px-2.5' : 'px-1.5'
+  const stopMetricInset = railCollapsed ? 'px-3.5' : 'px-1.5'
   const stopMetricSize = railCollapsed ? 'text-[20px]' : 'text-[16px]'
   const seg = (on: boolean) => `inline-flex h-7 items-center gap-1.5 rounded-[6px] font-semibold transition ${railCollapsed ? 'px-2 text-[11px]' : 'px-1.5 text-[10px]'} ${on ? 'bg-nav-selected text-nav-selected-ink' : 'text-muted hover:bg-nav-selected/45 hover:text-ink'}`
 
@@ -117,8 +110,8 @@ export default function RouteFilePage() {
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         <DriverCard view={view} card={card} />
         <section>
-          <header className="stops-navbar sticky top-0 z-30 -mx-5 mb-3 flex min-h-[4.5rem] flex-nowrap items-stretch border-y border-offline-fill/55 backdrop-blur">
-            <div className={`flex shrink-0 items-center gap-1.5 py-2.5 ${railCollapsed ? 'w-52 pl-5 pr-3' : 'w-44 pl-4 pr-2'}`}>
+          <header className="stops-navbar sticky top-0 z-30 -mx-5 mb-3 flex min-h-[4.75rem] flex-nowrap items-stretch border-y border-line">
+            <div className={`flex shrink-0 items-center gap-1.5 py-3 ${railCollapsed ? 'w-[13.5rem] pl-5 pr-4' : 'w-44 pl-4 pr-2'}`}>
               <span className={`flex shrink-0 items-center justify-center rounded-control bg-ink text-on-accent ${railCollapsed ? 'h-7 w-7' : 'h-6 w-6'}`} aria-hidden="true">
                 <ListBullets size={railCollapsed ? 14 : 12} weight="bold" />
               </span>
@@ -127,8 +120,8 @@ export default function RouteFilePage() {
                 <h2 className={`tnum mt-1 whitespace-nowrap font-display font-semibold leading-none tracking-tight text-ink ${railCollapsed ? 'text-[22px]' : 'text-[18px]'}`}>{view.done}/{view.total} delivered</h2>
               </div>
             </div>
-            <dl aria-label="Route status" className="grid min-w-0 flex-1 grid-cols-3 divide-x divide-nav-selected-line border-l border-nav-selected-line bg-panel/20">
-              <div className={`flex min-w-0 flex-col justify-center border-t-[3px] border-t-nav-selected-ink/45 py-3 ${stopMetricInset}`}>
+            <dl aria-label="Route status" className="grid min-w-0 flex-1 grid-cols-3 divide-x divide-line border-l border-line">
+              <div className={`flex min-w-0 flex-col justify-center py-3 ${stopMetricInset}`}>
                 <dt className="flex min-w-0 items-center gap-1.5 text-[8px] font-semibold uppercase tracking-[0.06em] text-label">
                   <span>Remaining</span>
                   <span className="truncate font-medium normal-case tracking-normal text-muted" title={`Updated ${fmtAge(view.pingAgeMin)}`}>· {fmtAge(view.pingAgeMin)}</span>
@@ -136,7 +129,7 @@ export default function RouteFilePage() {
                 <dd className={`tnum mt-1 font-display font-semibold leading-none tracking-tight text-ink ${stopMetricSize}`}>{view.remaining.length} <span className="font-sans text-[9px] font-medium tracking-normal text-muted">stops</span></dd>
               </div>
               {routeSignals.map((signal) => (
-                <div key={signal.label} className={`flex min-w-0 flex-col justify-center border-t-[3px] py-3 ${stopMetricInset} ${SIGNAL_RULE[signal.tone]}`}>
+                <div key={signal.label} className={`flex min-w-0 flex-col justify-center py-3 ${stopMetricInset}`}>
                   <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">{signal.label}</dt>
                   <dd className={`mt-1 flex min-w-0 items-center gap-1 font-display font-semibold leading-none tracking-tight ${stopMetricSize} ${SIGNAL_TEXT[signal.tone]}`}>
                     <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${SIGNAL_DOT[signal.tone]}`} />
@@ -145,13 +138,13 @@ export default function RouteFilePage() {
                 </div>
               ))}
             </dl>
-            <div className={`ml-auto flex shrink-0 items-center gap-2 border-l border-nav-selected-line py-2.5 ${railCollapsed ? 'pl-2 pr-4' : 'pl-1.5 pr-2.5'}`}>
+            <div className={`ml-auto flex shrink-0 items-center gap-2 border-l border-line py-3 ${railCollapsed ? 'pl-2.5 pr-5' : 'pl-1.5 pr-2.5'}`}>
               {selected.length > 0 && (
                 <Button size="sm" variant="primary" disabled={stale} title={staleReason} onClick={() => open('reassign', view.driver.id, { stopIds: selected })}>
                   Reassign selected ({selected.length})
                 </Button>
               )}
-              <div className="ml-1 flex shrink-0 items-center gap-0.5 rounded-control border border-nav-selected-line bg-panel/85 p-0.5" role="group" aria-label="Show stops as">
+              <div className="ml-1 flex shrink-0 items-center gap-0.5 rounded-control border border-nav-selected-line bg-canvas/80 p-0.5" role="group" aria-label="Show stops as">
                 <button type="button" aria-pressed={mode === 'list'} onClick={() => setMode('list')} className={seg(mode === 'list')} title="Stops as a list">
                   <ListBullets size={railCollapsed ? 14 : 12} weight={mode === 'list' ? 'fill' : 'regular'} /> List
                 </button>

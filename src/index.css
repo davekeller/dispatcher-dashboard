@@ -127,12 +127,7 @@ body { @apply bg-canvas text-ink font-sans; }
 }
 
 .stops-navbar {
-  background:
-    linear-gradient(
-      112deg,
-      color-mix(in srgb, var(--color-nav-selected) 84%, var(--color-offline-fill)) 0%,
-      color-mix(in srgb, var(--color-offline-board) 82%, var(--color-nav-selected-ink)) 100%
-    );
+  background: var(--color-panel);
 }
 
 .lookout-card-ring {
