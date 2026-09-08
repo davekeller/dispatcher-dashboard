@@ -60,12 +60,9 @@ export default function MetricsView({ cards, d, filters, onPreset }: { cards: Dr
 
   return (
     <div className="space-y-8 pb-2">
-      <header className="flex min-w-0 items-end justify-between gap-6">
-        <div className="min-w-0">
-          <h1 className="font-display text-[26px] font-semibold leading-none tracking-[-0.035em] text-ink">Shift metrics</h1>
-          <p className="mt-2 text-[11px] leading-snug text-label">Fleet risk, delivery progress, and driver readiness in one operational view.</p>
-        </div>
-        <p className="tnum shrink-0 pb-0.5 text-[10px] font-medium text-label">{rows.length} trucks in view · {fmtClock(d.now)}</p>
+      <header className="flex min-w-0 items-center justify-between gap-4">
+        <h1 className="font-display text-[22px] font-semibold leading-none tracking-[-0.03em] text-ink">Shift metrics</h1>
+        <p className="tnum shrink-0 text-[10px] font-medium text-label">{rows.length} trucks in view · {fmtClock(d.now)}</p>
       </header>
 
       <MetricSection
@@ -216,12 +213,12 @@ export default function MetricsView({ cards, d, filters, onPreset }: { cards: Dr
 function MetricSection({ id, title, detail, summary, children }: { id: string; title: string; detail: string; summary: ReactNode; children: ReactNode }) {
   return (
     <section aria-labelledby={id}>
-      <header className="mb-3 flex min-w-0 items-end justify-between gap-6 border-b border-nav-selected-line pb-2.5">
-        <div className="min-w-0">
-          <h2 id={id} className="font-display text-[19px] font-semibold leading-none tracking-[-0.025em] text-ink">{title}</h2>
+      <header className="mb-3 flex min-w-0 items-center justify-between gap-6 border-b border-nav-selected-line pb-2.5">
+        <h2 id={id} className="shrink-0 font-display text-[19px] font-semibold leading-none tracking-[-0.025em] text-ink">{title}</h2>
+        <div className="min-w-0 max-w-[34rem] text-right">
+          <div className="tnum flex items-center justify-end gap-1.5 text-[13px] font-semibold leading-none text-nav-selected-ink">{summary}</div>
           <p className="mt-1.5 text-[10px] leading-snug text-label">{detail}</p>
         </div>
-        <div className="tnum flex shrink-0 items-center gap-1.5 pb-0.5 text-[10px] font-semibold text-nav-selected-ink">{summary}</div>
       </header>
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">{children}</div>
     </section>
