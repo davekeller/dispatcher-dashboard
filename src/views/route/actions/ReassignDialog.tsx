@@ -79,7 +79,7 @@ export default function ReassignDialog({ driverId, initialStopIds, initialToId, 
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>Cancel</Button>
-          <Button variant="primary" disabled={!to || stopIds.length === 0} onClick={() => { if (to) { reassign(driverId, to.driver.id, stopIds); onClose() } }}>
+          <Button variant="danger" disabled={!to || stopIds.length === 0} onClick={() => { if (to) { reassign(driverId, to.driver.id, stopIds); onClose() } }}>
             Confirm reassign{to ? ` to ${to.driver.name}` : ''}
           </Button>
         </>

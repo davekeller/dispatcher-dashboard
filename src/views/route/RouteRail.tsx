@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Delivery, Stop } from '../../data/types'
 import { projectedEta } from '../../hos/compute'
 import { fmtClock } from '../../lib/format'
+import { MIN } from '../../time/clock'
 import type { DriverView } from '../../store/view'
 import { routeCompletionPct } from '../../lib/routeProgress'
 import StopStatusMarker, { stopHistoryStyle } from './StopStatusMarker'
@@ -46,6 +47,10 @@ function stopState(node: Node, nextId: string | undefined, pastLimitIds: Set<str
 export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed, onCollapsedChange, activeStopId, onSelectStop, hiddenStopIds, onRevealStop, listKey }: { view: DriverView; deliveryById: Map<string, Delivery>; pastLimitIds: Set<string>; activeStopId?: string | null; onSelectStop?: (id: string) => void; collapsed: boolean; onCollapsedChange: (c: boolean) => void; /** Stops the page's filter has hidden; a jump to one clears the filter first. */ hiddenStopIds?: Set<string>; onRevealStop?: (id: string) => void; /** Changes when the receipt list changes shape, so the observer re-attaches. */ listKey?: string }) {
   const { route, now } = view
   const nextId = view.next?.id
+  // The route's origin: when the truck rolled from the dock, so the timeline's foot carries a time like every node.
+  const firstStop = route.stops[0]
+  const routeStartAt = firstStop ? firstStop.plannedEta - firstStop.driveMinutesFromPrev * MIN : view.driver.shiftStartedAt
+  const originDone = firstStop !== undefined && (firstStop.status === 'done' || firstStop.status === 'failed')
   const progress = routeCompletionPct(view.done, view.total)
   const [active, setActive] = useState<string | null>(nextId ?? route.stops.at(-1)?.id ?? null)
   // In map mode the page owns the selection; in list mode the receipt being read does.
@@ -230,6 +235,20 @@ export default function RouteRail({ view, deliveryById, pastLimitIds, collapsed,
             )
           })}
         </ol>
+        <div title={`Route start · ${fmtClock(routeStartAt)}`} style={collapsed ? undefined : TIMELINE_COLUMNS} className={collapsed ? 'flex flex-col items-center pb-1' : 'grid min-h-8 items-stretch'}>
+          <span className={`relative flex ${collapsed ? 'h-5' : 'h-full min-h-7'} items-center justify-center`}>
+            <span className={`absolute left-1/2 top-0 h-1/2 w-px -translate-x-1/2 ${originDone ? 'route-history-node' : 'bg-line'}`} style={originDone ? stopHistoryStyle(0, lastCompleteIndex) : undefined} />
+            <span className="relative h-1.5 w-1.5 rounded-full bg-label" />
+          </span>
+          {collapsed ? (
+            <span className="tnum text-[8px] leading-none text-label">{fmtClock(routeStartAt)}</span>
+          ) : (
+            <span className="min-w-0 py-1 pl-2 pr-2">
+              <span className="tnum block text-[8px] text-label">{fmtClock(routeStartAt)}</span>
+              <span className="mt-0.5 block text-[10px] text-muted">Route start</span>
+            </span>
+          )}
+        </div>
       </div>}
 
       {!collapsed && !timelineOpen && <div className="min-h-0 flex-1 border-t border-line bg-board/45" />}
