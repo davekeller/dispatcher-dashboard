@@ -137,9 +137,12 @@ export default function RouteFilePage() {
           <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${BAND_TONE[card.band].fill}`} role="img" aria-label={BAND_LABEL[card.band]} title={BAND_LABEL[card.band]} />
           <div className="min-w-0">
             <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">Route</p>
-            <h2 className="mt-1 whitespace-nowrap font-display text-[16px] font-semibold leading-none tracking-tight text-ink">{view.route.id.toUpperCase()}</h2>
+            <h2 className="mt-1 flex items-center whitespace-nowrap font-display text-[16px] font-semibold leading-none tracking-tight text-ink">
+              {view.route.id.toUpperCase()}
+              <span aria-hidden="true" className="mx-2.5 h-4 w-px bg-line" />
+              <span className="tnum text-[18px]" aria-label={`${progress}% complete`}>{progress}%</span>
+            </h2>
           </div>
-          <span className="tnum ml-3 font-display text-[18px] font-semibold leading-none tracking-tight text-ink" aria-label={`${progress}% complete`}>{progress}%</span>
         </div>
         <div className="flex shrink-0 items-center border-r border-line px-4">
           <div className="min-w-0">
