@@ -110,7 +110,7 @@ export default function RouteFilePage() {
               </span>
               <div className="min-w-0">
                 <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">Stops · {progress}% complete</p>
-                <h2 className="tnum mt-1 whitespace-nowrap text-[13px] font-semibold leading-none text-ink">{view.done}/{view.total} delivered</h2>
+                <h2 className="tnum mt-1 whitespace-nowrap text-[15px] font-semibold leading-none text-ink">{view.done}/{view.total} delivered</h2>
               </div>
             </div>
             <dl aria-label="Route status" className={`grid min-w-0 flex-1 grid-cols-3 divide-x divide-nav-selected-line/70 ${railCollapsed ? 'border-l border-nav-selected-line/70' : 'order-3 basis-full border-t border-nav-selected-line/70'}`}>
@@ -119,12 +119,12 @@ export default function RouteFilePage() {
                   <span>Remaining</span>
                   <span className="truncate font-medium normal-case tracking-normal text-muted" title={`Updated ${fmtAge(view.pingAgeMin)}`}>· {fmtAge(view.pingAgeMin)}</span>
                 </dt>
-                <dd className="tnum mt-1 text-[12px] font-semibold leading-none text-ink">{view.remaining.length} <span className="text-[9px] font-medium text-muted">stops</span></dd>
+                <dd className="tnum mt-1 text-[14px] font-semibold leading-none text-ink">{view.remaining.length} <span className="text-[9px] font-medium text-muted">stops</span></dd>
               </div>
               {routeSignals.map((signal) => (
                 <div key={signal.label} className="flex min-w-0 flex-col justify-center px-3 py-2">
                   <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">{signal.label}</dt>
-                  <dd className={`mt-1 flex min-w-0 items-center gap-1.5 text-[11px] font-semibold leading-none ${SIGNAL_TEXT[signal.tone]}`}>
+                  <dd className={`mt-1 flex min-w-0 items-center gap-1.5 text-[14px] font-semibold leading-none ${SIGNAL_TEXT[signal.tone]}`}>
                     <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${SIGNAL_DOT[signal.tone]}`} />
                     <span className="truncate" title={signal.value}>{signal.value}</span>
                   </dd>
