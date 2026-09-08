@@ -30,7 +30,8 @@ export default function RouteTimelineMini({ view }: { view: DriverView }) {
   const pastLimitThrough = firstPastIndex < 0 ? 5 : position(firstPastIndex)
 
   return (
-    <div className="relative isolate w-6 shrink-0 self-stretch border-r border-line/70 bg-canvas/50" aria-label={`Route timeline: ${view.done} of ${view.total} stops complete${pastLimitIds.size > 0 ? `, ${pastLimitIds.size} stops past HOS` : ''}.`}>
+    <div className="relative isolate w-6 shrink-0 self-stretch border-r border-line/70 bg-canvas/50 py-2.5" aria-label={`Route timeline: ${view.done} of ${view.total} stops complete${pastLimitIds.size > 0 ? `, ${pastLimitIds.size} stops past HOS` : ''}.`}>
+      <div className="relative h-full">
       <span className="absolute bottom-[5%] left-1/2 top-[5%] w-px -translate-x-1/2 bg-line" aria-hidden="true" />
       {lastCompleteIndex >= 0 && <span className="route-history-progress absolute bottom-[5%] left-1/2 w-px -translate-x-1/2" style={{ top: `${completeFrom}%` }} aria-hidden="true" />}
       {firstPastIndex >= 0 && <span className="absolute left-1/2 top-[5%] w-px -translate-x-1/2 bg-act-now-fill/70" style={{ bottom: `${100 - pastLimitThrough}%` }} aria-hidden="true" />}
@@ -46,6 +47,7 @@ export default function RouteTimelineMini({ view }: { view: DriverView }) {
           aria-hidden="true"
         />
       ))}
+      </div>
     </div>
   )
 }

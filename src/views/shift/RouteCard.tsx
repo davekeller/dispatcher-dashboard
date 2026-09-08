@@ -59,10 +59,10 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
       className={`group block shrink-0 overflow-hidden rounded-card border-[1.5px] transition active:scale-[.985] hover:-translate-y-px hover:border-ink/25 hover:shadow-md ${transitioning ? 'route-card-departing' : ''} ${surface} ${limitBorder} ${dim}`}
     >
       <RouteHeader view={view} card={card} showPingAge status={headerStatus} />
-      <div className="flex min-h-[6.25rem]">
+      <div className="flex min-h-[5.5rem]">
         <RouteTimelineMini view={view} />
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className="grid min-h-14 min-w-0 grid-cols-4">
+          <div className="grid min-h-11 min-w-0 grid-cols-4">
             <div className="col-span-2 flex min-w-0 items-center gap-1.5 border-r border-line/80 px-2 py-1.5">
               <DriverAvatar driver={view.driver} size={20} className={quiet ? 'opacity-80' : ''} />
               <div className="min-w-0 flex-1">
@@ -71,13 +71,14 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
               </div>
             </div>
             <dl className="contents">
-              <div className="flex min-w-0 flex-col items-start justify-center border-r border-line/80 px-1 text-left">
-                <dd className="tnum whitespace-nowrap text-[13px] font-semibold leading-none tracking-[-0.02em] text-ink">{view.done}/{view.total}</dd>
-                <dt className="mt-0.5 text-[7px] font-semibold uppercase tracking-[0.03em] text-label">Stops</dt>
+              {/* Label over value, the same grammar and insets as the HOS fit / Route risk row below. */}
+              <div className="flex min-w-0 flex-col justify-center border-r border-line/80 px-2 py-1.5 text-left">
+                <dt className="text-[8px] font-semibold uppercase tracking-[0.04em] text-label">Stops</dt>
+                <dd className="tnum mt-0.5 whitespace-nowrap text-[12px] font-semibold leading-none tracking-[-0.02em] text-ink">{view.done}/{view.total}</dd>
               </div>
-              <div className="flex min-w-0 flex-col items-start justify-center px-1 text-left">
-                <dd className="tnum whitespace-nowrap text-[13px] font-semibold leading-none tracking-[-0.02em] text-ink">{nextValue}</dd>
-                <dt className="mt-0.5 max-w-full truncate whitespace-nowrap text-[7px] font-semibold uppercase tracking-[0.03em] text-label" title={nextLabel}>{nextLabel}</dt>
+              <div className="flex min-w-0 flex-col justify-center px-2 py-1.5 text-left">
+                <dt className="max-w-full truncate whitespace-nowrap text-[8px] font-semibold uppercase tracking-[0.04em] text-label" title={nextLabel}>{nextLabel}</dt>
+                <dd className="tnum mt-0.5 whitespace-nowrap text-[12px] font-semibold leading-none tracking-[-0.02em] text-ink">{nextValue}</dd>
               </div>
             </dl>
           </div>
