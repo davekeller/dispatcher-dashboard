@@ -24,7 +24,7 @@ export const BAND_TONE: Record<Band, Tone> = {
 /** Over the limit is the one state that must never be missed: dark red, white text, striped ground. */
 export const CRITICAL_TONE: Tone = { text: 'text-on-accent', fill: 'bg-act-now', soft: 'bg-act-now', border: 'border-act-now', pattern: 'critical-alert-stripe' }
 export const INFO_TONE: Tone = { text: 'text-muted', fill: 'bg-offline-fill', soft: 'bg-well', border: 'border-line' }
-export const LOOKOUT_TONE: Tone = { text: 'text-lookout-strong', fill: 'bg-lookout', soft: 'bg-lookout-soft', border: 'border-lookout' }
+export const LOOKOUT_TONE: Tone = { text: 'text-ink', fill: 'bg-lookout', soft: 'bg-lookout-soft', border: 'border-lookout' }
 
 export const STALENESS_TONE: Record<Staleness, Tone> = { fresh: BAND_TONE.clear, stale: BAND_TONE.watch, offline: BAND_TONE.offline }
 
