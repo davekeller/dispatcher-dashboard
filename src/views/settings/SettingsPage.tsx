@@ -16,6 +16,8 @@ import Chip from '../../ui/Chip'
 import DispatcherAvatar from '../../ui/DispatcherAvatar'
 import { navigationItemState } from '../../ui/navigation'
 import { BAND_TONE, severityTone } from '../../ui/tones'
+import SlideFrame from './SlideFrame'
+import { slidesFor } from './slides'
 import { isSettingsSection, PROBLEMS, PROJECT, SECTIONS, SOLUTIONS, WHY, type SettingsSection } from './story'
 
 const SEVERITY_LABEL: Record<Severity, string> = { critical: 'Over the limit', act_now: 'Act now', watch: 'Watch', info: 'Info' }
@@ -96,6 +98,7 @@ export default function SettingsPage() {
             </header>
 
             <div className="settings-section-enter flex flex-col gap-4" key={section}>
+              <Slides section={section} />
               {section === 'project' && <ProjectSection />}
               {section === 'lena' && <LenaSection />}
               {section === 'problems' && <ProblemsSection />}
@@ -106,6 +109,17 @@ export default function SettingsPage() {
         </main>
       </div>
     </div>
+  )
+}
+
+/** The chapter's pages from the design file, in deck order, ahead of the working detail. */
+function Slides({ section }: { section: SettingsSection }) {
+  const slides = slidesFor(section)
+  if (slides.length === 0) return null
+  return (
+    <section aria-label="From the design file" className="flex flex-col gap-5">
+      {slides.map((slide) => <SlideFrame key={slide.id} slide={slide} />)}
+    </section>
   )
 }
 
