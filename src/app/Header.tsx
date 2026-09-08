@@ -22,10 +22,12 @@ export default function Header() {
   const onSettings = pathname === '/settings'
   const onBoard = !onMap && !onSettings
   const mapTo = origin?.view === 'map' ? origin.to : '/map'
+  // The nav shadow belongs under the lowest nav layer: on a route file the Stops bar casts it, so the product bar does not.
+  const lowestNav = !focused
   const segment = (on: boolean) => `flex h-full items-center gap-1.5 px-3 text-[12px] font-semibold transition focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ink/40 ${navigationItemState(on)}`
 
   return (
-    <header className="nav-shadow-below relative z-30 flex h-14 shrink-0 items-center gap-0.5 border-b border-line bg-panel pr-3.5">
+    <header className={`relative z-30 flex h-14 shrink-0 items-center gap-0.5 border-b border-line bg-panel pr-3.5 ${lowestNav ? 'nav-shadow-below' : ''}`}>
       {/* The tile sits centered in a cell the width of the collapsed route rail, so it lines up over the route file's back arrow. */}
       <div className="flex w-16 shrink-0 items-center justify-center">
         <Link to="/" aria-label="Open the Dispatch board" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control bg-ink text-on-accent transition hover:bg-ink/90">
