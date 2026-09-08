@@ -71,25 +71,25 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
               </div>
             </div>
             <dl className="contents">
-              {/* Label over value, the same grammar and insets as the HOS fit / Route risk row below. */}
+              {/* Value over label in every cell: the number first, its name beneath, one grammar across both rows. */}
               <div className="flex min-w-0 flex-col justify-center border-r border-line/80 px-2 py-1.5 text-left">
-                <dt className="text-[8px] font-semibold uppercase tracking-[0.04em] text-label">Stops</dt>
-                <dd className="tnum mt-0.5 whitespace-nowrap text-[12px] font-semibold leading-none tracking-[-0.02em] text-ink">{view.done}/{view.total}</dd>
+                <dd className="tnum whitespace-nowrap text-[12px] font-semibold leading-none tracking-[-0.02em] text-ink">{view.done}/{view.total}</dd>
+                <dt className="mt-0.5 text-[8px] font-semibold uppercase tracking-[0.04em] text-label">Stops</dt>
               </div>
               <div className="flex min-w-0 flex-col justify-center px-2 py-1.5 text-left">
-                <dt className="max-w-full truncate whitespace-nowrap text-[8px] font-semibold uppercase tracking-[0.04em] text-label" title={nextLabel}>{nextLabel}</dt>
-                <dd className="tnum mt-0.5 whitespace-nowrap text-[12px] font-semibold leading-none tracking-[-0.02em] text-ink">{nextValue}</dd>
+                <dd className="tnum whitespace-nowrap text-[12px] font-semibold leading-none tracking-[-0.02em] text-ink">{nextValue}</dd>
+                <dt className="mt-0.5 max-w-full truncate whitespace-nowrap text-[8px] font-semibold uppercase tracking-[0.04em] text-label" title={nextLabel}>{nextLabel}</dt>
               </div>
             </dl>
           </div>
           <dl className="mt-auto grid min-h-11 grid-cols-2 border-t border-line/80">
             <div className="flex min-w-0 flex-col justify-center border-r border-line/80 px-2.5 py-1.5">
-              <dt className="flex items-center gap-1 text-[8px] font-semibold uppercase tracking-[0.04em] text-label"><span className={`h-1.5 w-1.5 rounded-full ${hosFill}`} /> HOS fit</dt>
-              <dd className={`tnum mt-0.5 truncate text-[10px] font-semibold ${hosText}`} title={hos.value}>{hos.value}</dd>
+              <dd className={`tnum truncate text-[10px] font-semibold ${hosText}`} title={hos.value}>{hos.value}</dd>
+              <dt className="mt-0.5 flex items-center gap-1 text-[8px] font-semibold uppercase tracking-[0.04em] text-label"><span className={`h-1.5 w-1.5 rounded-full ${hosFill}`} /> HOS fit</dt>
             </div>
             <div className="flex min-w-0 flex-col justify-center px-2.5 py-1.5">
-              <dt className="text-[8px] font-semibold uppercase tracking-[0.04em] text-label">Route risk</dt>
-              <dd className={`tnum mt-0.5 truncate text-[10px] font-semibold ${riskTone}`} title={riskValue}>{riskValue}</dd>
+              <dd className={`tnum truncate text-[10px] font-semibold ${riskTone}`} title={riskValue}>{riskValue}</dd>
+              <dt className="mt-0.5 text-[8px] font-semibold uppercase tracking-[0.04em] text-label">Route risk</dt>
             </div>
           </dl>
           {(footerAlerts.length > 0 || pick || hasCorrection) && (
