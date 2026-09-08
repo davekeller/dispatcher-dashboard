@@ -16,7 +16,7 @@ function truckIcon(m: FleetMarker, selected: boolean): L.DivIcon {
   const pill = m.label ? `<span class="fleet-marker-pill">${escapeHtml(m.label)}</span>` : ''
   return L.divIcon({
     className: 'fleet-marker-icon',
-    html: `<span class="fleet-marker is-${m.kind}${m.dark ? ' is-dark' : ''}${selected ? ' is-selected' : ''}"><span class="fleet-marker-dot"></span>${pill}</span>`,
+    html: `<span class="fleet-marker is-${m.kind} band-${m.band}${m.dark ? ' is-dark' : ''}${selected ? ' is-selected' : ''}"><span class="fleet-marker-dot"></span>${pill}</span>`,
     iconSize: [14, 14],
     iconAnchor: [7, 7],
     tooltipAnchor: [0, -8],

@@ -6,8 +6,8 @@ import { fmtAge, fmtCountdown } from '../lib/format'
 import type { DriverView } from '../store/view'
 import { truckFixAt, type TruckFix } from './truckPosition'
 
-// The attention rule on a map. Quiet trucks (clear, on break) are small neutral dots; the
-// ones that need Lena carry their band color and a name-and-countdown pill; a dark truck is
+// The attention rule on a map. Quiet trucks (clear, on break) are small dots in their band
+// color, the board's green and blue; the ones that need Lena carry a name-and-countdown pill; a dark truck is
 // hollow at its last known fix with how long ago that was. Pure, so the map view holds no logic.
 
 export type FleetMarkerKind = 'quiet' | 'watch' | 'act_now' | 'offline'
