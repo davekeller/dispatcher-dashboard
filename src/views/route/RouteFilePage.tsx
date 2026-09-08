@@ -160,7 +160,9 @@ export default function RouteFilePage() {
       </nav>
       <div className="flex min-h-0 flex-1 items-stretch gap-5 py-5 pr-5">
         <RouteRail view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} collapsed={railCollapsed} onCollapsedChange={setRailCollapsed} activeStopId={mode === 'map' ? mapSelection : undefined} onSelectStop={mode === 'map' ? setSelectedStop : undefined} />
-        <div className="flex min-w-0 flex-1 flex-col gap-3 overflow-y-auto">
+        {/* The scroll box is a plain block so nothing inside it can flex-shrink; the column of cards sits one level down. */}
+        <div className="min-w-0 flex-1 overflow-y-auto">
+          <div className="flex flex-col gap-3">
           <DriverCard view={view} card={card} />
           {(card.alerts.length > 0 || stale) && (
             <div className="flex flex-col gap-3">
@@ -183,6 +185,7 @@ export default function RouteFilePage() {
               </ol>
             )}
           </section>
+          </div>
         </div>
       </div>
     </div>
