@@ -2,6 +2,7 @@ import { ArrowLeft, ListBullets, MapTrifold } from '@phosphor-icons/react'
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useParams, useSearchParams } from 'react-router'
 import { useActions } from '../../actions/ActionContext'
+import { BAND_LABEL } from '../../bands'
 import { originOf } from '../../app/origin'
 import { stopsPastLimit } from '../../store/actions'
 import { useLookout } from '../../lookout/LookoutContext'
@@ -11,6 +12,7 @@ import { useDerived } from '../../store/hooks'
 import { useStore } from '../../store/store'
 import Button from '../../ui/Button'
 import EmptyState from '../../ui/EmptyState'
+import { BAND_TONE } from '../../ui/tones'
 import AlertStrip from './AlertStrip'
 import DriverCard from './DriverCard'
 import StaleBanner from './StaleBanner'
@@ -130,15 +132,26 @@ export default function RouteFilePage() {
         <Link to={origin.to} title={`Back to the ${origin.view}`} aria-label={`Back to the ${origin.view}`} className="flex w-16 shrink-0 items-center justify-center border-r border-line text-muted transition hover:bg-board hover:text-ink">
           <ArrowLeft size={16} weight="bold" />
         </Link>
-        <div className="flex min-w-[16rem] shrink-0 items-center gap-2.5 border-r border-line pl-4 pr-5">
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-control bg-ink text-on-accent" aria-hidden="true">
+        <div className="flex shrink-0 items-center gap-2.5 border-r border-line pl-4 pr-5">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-control bg-nav-selected-ink text-on-accent" aria-hidden="true">
             <ListBullets size={12} weight="bold" />
           </span>
           <div className="min-w-0">
-            <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">{view.route.id.toUpperCase()} · Stops</p>
-            <h2 className="tnum mt-1 whitespace-nowrap font-display text-[16px] font-semibold leading-none tracking-tight text-ink">{view.done}/{view.total} delivered</h2>
+            <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">Route</p>
+            <h2 className="mt-1 flex items-center gap-2 whitespace-nowrap font-display text-[16px] font-semibold leading-none tracking-tight text-ink">
+              {view.route.id.toUpperCase()}
+              <span className={`h-2 w-2 shrink-0 rounded-full ${BAND_TONE[card.band].fill}`} role="img" aria-label={BAND_LABEL[card.band]} title={BAND_LABEL[card.band]} />
+            </h2>
           </div>
-          <span className="tnum ml-auto pl-5 font-display text-[18px] font-semibold leading-none tracking-tight text-ink" aria-label={`${progress}% complete`}>{progress}%</span>
+        </div>
+        <div className="flex min-w-[13rem] shrink-0 items-center border-r border-line px-4">
+          <div className="min-w-0">
+            <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">Stops</p>
+            <h2 className="tnum mt-1 flex items-baseline gap-6 whitespace-nowrap font-display text-[16px] font-semibold leading-none tracking-tight text-ink">
+              {view.done}/{view.total} delivered
+              <span className="text-[18px]" aria-label={`${progress}% complete`}>{progress}%</span>
+            </h2>
+          </div>
         </div>
         <dl aria-label="Route status" className="flex min-w-0 items-stretch divide-x divide-line">
           <div className="flex w-[9.5rem] min-w-0 flex-col justify-center px-4">
