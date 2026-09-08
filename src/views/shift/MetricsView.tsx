@@ -44,131 +44,170 @@ export default function MetricsView({ cards, d, filters, onPreset }: { cards: Dr
   const fresh = freshnessCounts(rows)
   const breaks = sinceBreakBins(rows)
   const breakDue = breaks.find((bin) => bin.due)?.count ?? 0
+  const reportingIssues = fresh.stale + fresh.offline
+  const visibleDelivered = regions.reduce((total, region) => total + region.delivered, 0)
+  const visibleStops = regions.reduce((total, region) => total + region.total, 0)
+  const visibleDeliveredPct = visibleStops === 0 ? 100 : Math.round((visibleDelivered / visibleStops) * 100)
 
   return (
-    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-      <Panel
-        title="Fleet by status"
-        detail={`The same ${rows.length} trucks shown on the board · as of ${fmtClock(d.now)}`}
-        aside={<PanelStat>{rows.length} trucks</PanelStat>}
-        className="xl:col-span-2"
+    <div className="space-y-8 pb-2">
+      <MetricSection
+        id="hos-exposure"
+        title="Hours of service"
+        detail="Limit exposure and legal driving balance across the filtered fleet."
+        summary={<><span className="h-2 w-2 rounded-full bg-act-now-fill" />{overNow} over · {approachingThisShift} more before {fmtClock(DAY_END)}</>}
       >
-        <StackedBar total={rows.length} segments={bands.map((band) => ({ key: band.band, label: band.label, count: band.count, fill: BAND_TONE[band.band].fill }))} height="h-5" />
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {bands.map((band) => {
-            const preset: FilterState = { ...EMPTY_FILTERS, band: [band.band] }
-            const on = sameFilters(filters, preset)
-            return (
-              <button key={band.band} type="button" aria-pressed={on} onClick={() => onPreset(on ? EMPTY_FILTERS : preset)} className={`inline-flex h-8 items-center gap-1.5 rounded-control border px-2.5 text-[11px] font-semibold transition ${on ? 'border-nav-selected-ink bg-nav-selected-ink text-on-accent' : 'border-line bg-panel text-ink hover:border-nav-selected-line hover:bg-board/50'}`}>
-                <span className={`h-2 w-2 rounded-full ${on ? 'bg-on-accent/85' : BAND_TONE[band.band].fill}`} />
-                {band.label}
-                <span className={`tnum font-medium ${on ? 'text-on-accent/75' : 'text-label'}`}>{band.count}</span>
-              </button>
-            )
-          })}
-        </div>
-      </Panel>
+        <Panel
+          title="Who hits the limit when"
+          detail="Projected clock time each driver exhausts 11 driving hours · service time is included"
+          aside={<PanelStat tone={overNow > 0 ? 'critical' : approachingThisShift > 0 ? 'watch' : 'neutral'}>{overNow > 0 ? `${overNow} over · ` : ''}{approachingThisShift} before {fmtClock(DAY_END)}</PanelStat>}
+          className="xl:col-span-2"
+        >
+          <LimitForecast marks={withinShift} now={d.now} dayEnd={DAY_END} />
+          <p className="mt-3 border-t border-line pt-2.5 text-[10px] leading-relaxed text-label">
+            {later > 0 ? `${later} ${later === 1 ? 'driver does' : 'drivers do'} not reach the limit before ${fmtClock(DAY_END)}.` : `Every visible driver reaches the limit by ${fmtClock(DAY_END)}.`}
+            {' '}The countdown is drive time left; the plotted time also accounts for service at stops.
+          </p>
+        </Panel>
 
-      <Panel
-        title="Who hits the limit when"
-        detail="Projected clock time each driver exhausts 11 driving hours · service time is included"
-        aside={<PanelStat tone={overNow > 0 ? 'critical' : approachingThisShift > 0 ? 'watch' : 'neutral'}>{overNow > 0 ? `${overNow} over · ` : ''}{approachingThisShift} before {fmtClock(DAY_END)}</PanelStat>}
-        className="xl:col-span-2"
+        <Panel
+          title="Hours driven today"
+          detail="Fleet distribution across the 11-hour legal driving window"
+          aside={<PanelStat tone={hours.at(-1)?.total ? 'critical' : 'neutral'}>{hours.at(-1)?.total ?? 0} over</PanelStat>}
+        >
+          <HoursChart bins={hours} />
+        </Panel>
+
+        <Panel title="Closest to the limit" detail="Current driving allowance used · stop service time excluded">
+          <ol className="flex flex-col gap-1">
+            {closest.map(({ card, view }) => {
+              const used = Math.min(1, Math.max(0, view.drivingMin / LIMIT_MIN))
+              const over = view.minutesUntilLimit <= 0
+              return (
+                <li key={card.driverId}>
+                  <Link to={`/routes/${card.driverId}`} className="grid min-h-9 grid-cols-[1.5rem_minmax(0,8.5rem)_minmax(4rem,1fr)_4rem] items-center gap-2 rounded-control px-1.5 py-1 transition hover:bg-board/70 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-nav-selected-ink">
+                    <DriverAvatar driver={view.driver} size={22} />
+                    <span className="min-w-0">
+                      <span className="block truncate text-[12px] font-semibold text-ink">{view.driver.name}</span>
+                      <span className="block truncate font-mono text-[9px] text-label">{view.route.id.toUpperCase()} · {fmtHm(view.drivingMin)} driven</span>
+                    </span>
+                    <span className="relative h-2.5 overflow-hidden rounded-full bg-board" title={`${fmtHm(view.drivingMin)} of 11:00 driven`}>
+                      <span className={`absolute inset-y-0 left-0 rounded-full ${over ? 'bg-act-now' : BAND_TONE[card.band].fill}`} style={{ width: `${used * 100}%` }} />
+                      <span className="absolute inset-y-0 right-0 w-px bg-ink/35" aria-hidden="true" />
+                    </span>
+                    <span className="text-right">
+                      <span className={`tnum block text-[12px] font-semibold leading-none ${over ? 'text-act-now' : card.band === 'watch' ? 'text-watch' : 'text-ink'}`}>{fmtCountdown(view.minutesUntilLimit, view.staleness !== 'fresh')}</span>
+                      <span className="mt-0.5 block text-[8px] uppercase tracking-wide text-label">{over ? 'over' : 'left'}</span>
+                    </span>
+                  </Link>
+                </li>
+              )
+            })}
+          </ol>
+        </Panel>
+      </MetricSection>
+
+      <MetricSection
+        id="shift-operations"
+        title="Shift operations"
+        detail="Route status and delivery completion across the current view."
+        summary={<>{rows.length} trucks · {visibleDeliveredPct}% delivered</>}
       >
-        <LimitForecast marks={withinShift} now={d.now} dayEnd={DAY_END} />
-        <p className="mt-3 border-t border-line pt-2.5 text-[10px] leading-relaxed text-label">
-          {later > 0 ? `${later} ${later === 1 ? 'driver does' : 'drivers do'} not reach the limit before ${fmtClock(DAY_END)}.` : `Every visible driver reaches the limit by ${fmtClock(DAY_END)}.`}
-          {' '}The countdown is drive time left; the plotted time also accounts for service at stops.
-        </p>
-      </Panel>
+        <Panel
+          title="Fleet by status"
+          detail={`The same ${rows.length} trucks shown on the board · as of ${fmtClock(d.now)}`}
+          aside={<PanelStat>{rows.length} trucks</PanelStat>}
+          className="xl:col-span-2"
+        >
+          <StackedBar total={rows.length} segments={bands.map((band) => ({ key: band.band, label: band.label, count: band.count, fill: BAND_TONE[band.band].fill }))} height="h-5" />
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {bands.map((band) => {
+              const preset: FilterState = { ...EMPTY_FILTERS, band: [band.band] }
+              const on = sameFilters(filters, preset)
+              return (
+                <button key={band.band} type="button" aria-pressed={on} onClick={() => onPreset(on ? EMPTY_FILTERS : preset)} className={`inline-flex h-8 items-center gap-1.5 rounded-control border px-2.5 text-[11px] font-semibold transition ${on ? 'border-nav-selected-ink bg-nav-selected-ink text-on-accent' : 'border-line bg-panel text-ink hover:border-nav-selected-line hover:bg-board/50'}`}>
+                  <span className={`h-2 w-2 rounded-full ${on ? 'bg-on-accent/85' : BAND_TONE[band.band].fill}`} />
+                  {band.label}
+                  <span className={`tnum font-medium ${on ? 'text-on-accent/75' : 'text-label'}`}>{band.count}</span>
+                </button>
+              )
+            })}
+          </div>
+        </Panel>
 
-      <Panel
-        title="Hours driven today"
-        detail="Fleet distribution across the 11-hour legal driving window"
-        aside={<PanelStat tone={hours.at(-1)?.total ? 'critical' : 'neutral'}>{hours.at(-1)?.total ?? 0} over</PanelStat>}
-      >
-        <HoursChart bins={hours} />
-      </Panel>
-
-      <Panel title="Closest to the limit" detail="Current driving allowance used · stop service time excluded">
-        <ol className="flex flex-col gap-1">
-          {closest.map(({ card, view }) => {
-            const used = Math.min(1, Math.max(0, view.drivingMin / LIMIT_MIN))
-            const over = view.minutesUntilLimit <= 0
-            return (
-              <li key={card.driverId}>
-                <Link to={`/routes/${card.driverId}`} className="grid min-h-9 grid-cols-[1.5rem_minmax(0,8.5rem)_minmax(4rem,1fr)_4rem] items-center gap-2 rounded-control px-1.5 py-1 transition hover:bg-board/70 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-nav-selected-ink">
-                  <DriverAvatar driver={view.driver} size={22} />
+        <Panel title="Deliveries by region" detail="Delivered share, remaining work, and failures" className="xl:col-span-2">
+          <ol className="grid grid-cols-1 gap-x-8 gap-y-3 xl:grid-cols-2">
+            {regions.map((region) => {
+              const pct = region.total === 0 ? 100 : Math.round((region.delivered / region.total) * 100)
+              return (
+                <li key={region.region} className="grid grid-cols-[4.75rem_minmax(0,1fr)_4.5rem] items-center gap-3">
                   <span className="min-w-0">
-                    <span className="block truncate text-[12px] font-semibold text-ink">{view.driver.name}</span>
-                    <span className="block truncate font-mono text-[9px] text-label">{view.route.id.toUpperCase()} · {fmtHm(view.drivingMin)} driven</span>
+                    <span className="block text-[12px] font-semibold text-ink">{region.region}</span>
+                    <span className="tnum block text-[9px] text-label">{region.drivers} trucks</span>
                   </span>
-                  <span className="relative h-2.5 overflow-hidden rounded-full bg-board" title={`${fmtHm(view.drivingMin)} of 11:00 driven`}>
-                    <span className={`absolute inset-y-0 left-0 rounded-full ${over ? 'bg-act-now' : BAND_TONE[card.band].fill}`} style={{ width: `${used * 100}%` }} />
-                    <span className="absolute inset-y-0 right-0 w-px bg-ink/35" aria-hidden="true" />
-                  </span>
+                  <StackedBar total={Math.max(1, region.total)} segments={[{ key: 'done', label: 'Delivered', count: region.delivered, fill: 'bg-clear-fill' }, { key: 'left', label: 'Remaining', count: region.remaining, fill: 'bg-nav-selected-ink/55' }, { key: 'failed', label: 'Failed', count: region.failed, fill: 'bg-act-now-fill' }]} height="h-2.5" />
                   <span className="text-right">
-                    <span className={`tnum block text-[12px] font-semibold leading-none ${over ? 'text-act-now' : card.band === 'watch' ? 'text-watch' : 'text-ink'}`}>{fmtCountdown(view.minutesUntilLimit, view.staleness !== 'fresh')}</span>
-                    <span className="mt-0.5 block text-[8px] uppercase tracking-wide text-label">{over ? 'over' : 'left'}</span>
+                    <span className="tnum block text-[13px] font-semibold leading-none text-ink">{pct}%</span>
+                    <span className="tnum mt-0.5 block text-[9px] text-label">{region.delivered}/{region.total}</span>
                   </span>
-                </Link>
-              </li>
-            )
-          })}
-        </ol>
-      </Panel>
+                </li>
+              )
+            })}
+          </ol>
+          <Legend items={[{ label: 'Delivered', fill: 'bg-clear-fill' }, { label: 'Remaining', fill: 'bg-nav-selected-ink/55' }, { label: 'Failed', fill: 'bg-act-now-fill' }]} />
+        </Panel>
+      </MetricSection>
 
-      <Panel title="Deliveries by region" detail="Delivered share, remaining work, and failures">
-        <ol className="flex flex-col gap-3">
-          {regions.map((region) => {
-            const pct = region.total === 0 ? 100 : Math.round((region.delivered / region.total) * 100)
-            return (
-              <li key={region.region} className="grid grid-cols-[4.75rem_minmax(0,1fr)_4.5rem] items-center gap-3">
-                <span className="min-w-0">
-                  <span className="block text-[12px] font-semibold text-ink">{region.region}</span>
-                  <span className="tnum block text-[9px] text-label">{region.drivers} trucks</span>
-                </span>
-                <StackedBar total={Math.max(1, region.total)} segments={[{ key: 'done', label: 'Delivered', count: region.delivered, fill: 'bg-clear-fill' }, { key: 'left', label: 'Remaining', count: region.remaining, fill: 'bg-nav-selected-ink/55' }, { key: 'failed', label: 'Failed', count: region.failed, fill: 'bg-act-now-fill' }]} height="h-2.5" />
-                <span className="text-right">
-                  <span className="tnum block text-[13px] font-semibold leading-none text-ink">{pct}%</span>
-                  <span className="tnum mt-0.5 block text-[9px] text-label">{region.delivered}/{region.total}</span>
-                </span>
-              </li>
-            )
-          })}
-        </ol>
-        <Legend items={[{ label: 'Delivered', fill: 'bg-clear-fill' }, { label: 'Remaining', fill: 'bg-nav-selected-ink/55' }, { label: 'Failed', fill: 'bg-act-now-fill' }]} />
-      </Panel>
-
-      <Panel
-        title="Since the last break"
-        detail="Continuous driving since a qualifying 30-minute interruption"
-        aside={<PanelStat tone={breakDue > 0 ? 'watch' : 'neutral'}>{breakDue} due</PanelStat>}
+      <MetricSection
+        id="driver-readiness"
+        title="Driver readiness"
+        detail="Break compliance and confidence in the latest telematics."
+        summary={<><span className={`h-2 w-2 rounded-full ${breakDue > 0 ? 'bg-watch-fill' : 'bg-clear-fill'}`} />{breakDue} break due · {reportingIssues} reporting {reportingIssues === 1 ? 'exception' : 'exceptions'}</>}
       >
-        <BreakChart bins={breaks} />
-      </Panel>
+        <Panel
+          title="Since the last break"
+          detail="Continuous driving since a qualifying 30-minute interruption"
+          aside={<PanelStat tone={breakDue > 0 ? 'watch' : 'neutral'}>{breakDue} due</PanelStat>}
+        >
+          <BreakChart bins={breaks} />
+        </Panel>
 
-      <Panel
-        title="Data freshness"
-        detail="How recently the fleet reported in"
-        aside={<PanelStat>{fresh.fresh} current</PanelStat>}
-        className="xl:col-span-2"
-      >
-        <dl className="grid grid-cols-3 overflow-hidden rounded-control border border-line bg-board/45 divide-x divide-line">
-          {(['fresh', 'stale', 'offline'] as const).map((key) => (
-            <div key={key} className="px-3 py-2.5">
-              <dt className="flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-wide text-label">
-                <span className={`h-2 w-2 rounded-full ${STALENESS_TONE[key].fill}`} />
-                {key === 'fresh' ? 'Fresh · under 3m' : key === 'stale' ? 'Stale · 3–15m' : 'Offline · over 15m'}
-              </dt>
-              <dd className={`tnum mt-1 font-display text-[22px] font-semibold leading-none ${STALENESS_TONE[key].text}`}>{fresh[key]}</dd>
-            </div>
-          ))}
-        </dl>
-        <div className="mt-3"><StackedBar total={rows.length} segments={[{ key: 'fresh', label: 'Fresh', count: fresh.fresh, fill: STALENESS_TONE.fresh.fill }, { key: 'stale', label: 'Stale', count: fresh.stale, fill: STALENESS_TONE.stale.fill }, { key: 'offline', label: 'Offline', count: fresh.offline, fill: STALENESS_TONE.offline.fill }]} height="h-2.5" /></div>
-        <p className="mt-2 text-[10px] text-label">Stale and offline projections carry a tilde throughout Dispatch.</p>
-      </Panel>
+        <Panel
+          title="Data freshness"
+          detail="How recently the fleet reported in"
+          aside={<PanelStat>{fresh.fresh} current</PanelStat>}
+        >
+          <dl className="grid grid-cols-3 overflow-hidden rounded-control border border-line bg-board/45 divide-x divide-line">
+            {(['fresh', 'stale', 'offline'] as const).map((key) => (
+              <div key={key} className="px-3 py-2.5">
+                <dt className="flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-wide text-label">
+                  <span className={`h-2 w-2 rounded-full ${STALENESS_TONE[key].fill}`} />
+                  {key === 'fresh' ? 'Fresh · under 3m' : key === 'stale' ? 'Stale · 3–15m' : 'Offline · over 15m'}
+                </dt>
+                <dd className={`tnum mt-1 font-display text-[22px] font-semibold leading-none ${STALENESS_TONE[key].text}`}>{fresh[key]}</dd>
+              </div>
+            ))}
+          </dl>
+          <div className="mt-3"><StackedBar total={rows.length} segments={[{ key: 'fresh', label: 'Fresh', count: fresh.fresh, fill: STALENESS_TONE.fresh.fill }, { key: 'stale', label: 'Stale', count: fresh.stale, fill: STALENESS_TONE.stale.fill }, { key: 'offline', label: 'Offline', count: fresh.offline, fill: STALENESS_TONE.offline.fill }]} height="h-2.5" /></div>
+          <p className="mt-2 text-[10px] text-label">Stale and offline projections carry a tilde throughout Dispatch.</p>
+        </Panel>
+      </MetricSection>
     </div>
+  )
+}
+
+function MetricSection({ id, title, detail, summary, children }: { id: string; title: string; detail: string; summary: ReactNode; children: ReactNode }) {
+  return (
+    <section aria-labelledby={id}>
+      <header className="mb-3 flex min-w-0 items-end justify-between gap-6 border-b border-nav-selected-line pb-2.5">
+        <div className="min-w-0">
+          <h2 id={id} className="font-display text-[19px] font-semibold leading-none tracking-[-0.025em] text-ink">{title}</h2>
+          <p className="mt-1.5 text-[10px] leading-snug text-label">{detail}</p>
+        </div>
+        <div className="tnum flex shrink-0 items-center gap-1.5 pb-0.5 text-[10px] font-semibold text-nav-selected-ink">{summary}</div>
+      </header>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">{children}</div>
+    </section>
   )
 }
 
