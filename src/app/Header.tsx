@@ -40,8 +40,8 @@ export default function Header() {
           <DispatchMark className="h-[29px] w-[29px]" />
         </Link>
       </div>
-      <Link to="/" className="-ml-2 whitespace-nowrap font-brand text-[17px] font-bold leading-none tracking-[-0.035em] text-nav-selected-ink">Dispatch</Link>
-      <nav aria-label="Workspace view" className="absolute left-1/2 top-1/2 z-10 flex h-8 w-44 -translate-x-1/2 -translate-y-1/2 items-stretch overflow-hidden rounded-control border border-nav-selected-ink bg-panel">
+      <Link to="/" className="-ml-3.5 whitespace-nowrap font-brand text-[17px] font-bold leading-none tracking-[-0.035em] text-nav-selected-ink">Dispatch</Link>
+      <nav aria-label="Workspace view" className="ml-5 flex h-8 w-48 shrink-0 items-stretch overflow-hidden rounded-control border border-nav-selected-ink bg-panel">
         <Link to="/" aria-current={onBoard ? 'page' : undefined} className={segment(onBoard)}>
           <SquaresFour size={14} weight={onBoard ? 'fill' : 'regular'} /> Board
         </Link>
@@ -50,7 +50,7 @@ export default function Header() {
         </Link>
       </nav>
       {focused && (
-        <div className="ml-4 flex min-w-0 items-center gap-1.5 text-[12px] text-muted" aria-label={`Route Details: ${focused.route.id.toUpperCase()}`}>
+        <div className="ml-1 flex min-w-0 items-center gap-1.5 text-[12px] text-muted" aria-label={`Route Details: ${focused.route.id.toUpperCase()}`}>
           <CaretRight size={13} className="shrink-0" />
           <span className="whitespace-nowrap font-medium">Route Details</span>
           <span aria-hidden="true" className="text-label">·</span>
