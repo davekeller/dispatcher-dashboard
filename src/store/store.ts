@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { makeFleet } from '../data/seed'
 import { materialize } from '../data/simulate'
 import type { Fleet, StopOutcome } from '../data/types'
-import type { GroupingId } from '../groupBy'
+import type { BoardLens } from '../groupBy'
 import { minutesUntilLimit } from '../hos/compute'
 import { SNOOZE_MIN } from '../hos/constants'
 import { ANCHOR, LIVE_OFFSET_MS, MIN, clampScrub, simNow } from '../time/clock'
@@ -39,7 +39,7 @@ export interface State {
   events: ShiftEvent[]
   lastAction?: LastAction
   undoSnapshot?: Fleet
-  groupBy: GroupingId
+  groupBy: BoardLens
   devOpen: boolean
   now: () => number
   reassignStops: (fromDriverId: string, toDriverId: string, stopIds: string[]) => void
@@ -59,7 +59,7 @@ export interface State {
   setLiveClock: (on: boolean) => void
   resetClock: () => void
   resetFleet: () => void
-  setGroupBy: (id: GroupingId) => void
+  setGroupBy: (id: BoardLens) => void
   toggleDev: () => void
   /** Apply the clock to the simulated day. Cheap: returns early when no stop crossed `now`. */
   advanceWorld: () => void

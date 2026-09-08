@@ -57,17 +57,18 @@ export default function FiltersDropdown({ value, onChange, filters = FILTERS, co
         <CaretDown size={12} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div className={`absolute left-0 top-full z-40 mt-2 rounded-card border border-line bg-panel p-2 shadow-lg ${multiFilters.length >= 3 ? 'w-[32rem]' : 'w-[24rem]'}`}>
-          <div className="flex items-center justify-between px-2 pb-2 pt-1">
-            <div>
-              <p className="text-[11px] font-semibold text-ink">{copy.title}</p>
-              <p className="text-[10px] text-muted">{copy.hint}</p>
+        <div className={`absolute left-0 top-full z-40 mt-2 overflow-hidden rounded-card border border-line bg-panel shadow-lg ${multiFilters.length >= 3 ? 'w-[32rem]' : 'w-[24rem]'}`}>
+          {/* A title row, a divider, then the fields: the menu reads as a small form, not a pile of checkboxes. */}
+          <div className="flex items-center justify-between gap-3 border-b border-line bg-canvas px-4 py-3">
+            <div className="min-w-0">
+              <p className="font-display text-[14px] font-semibold leading-tight text-ink">{copy.title}</p>
+              <p className="mt-0.5 text-[11px] text-muted">{copy.hint}</p>
             </div>
-            {selectedCount > 0 && <button type="button" onClick={clear} className="text-[11px] font-semibold text-muted hover:text-ink">Clear all</button>}
+            {selectedCount > 0 && <button type="button" onClick={clear} className="shrink-0 text-[11px] font-semibold text-muted hover:text-ink">Clear all</button>}
           </div>
-          <div className="grid divide-x divide-line" style={{ gridTemplateColumns: `repeat(${multiFilters.length}, minmax(0, 1fr))` }}>
+          <div className="grid divide-x divide-line p-2" style={{ gridTemplateColumns: `repeat(${multiFilters.length}, minmax(0, 1fr))` }}>
             {multiFilters.map((filter) => (
-              <fieldset key={filter.id} className="min-w-0 px-2 first:pl-2 last:pr-2">
+              <fieldset key={filter.id} className="min-w-0 px-2 pt-1 first:pl-2 last:pr-2">
                 <legend className="mb-1 w-full px-1 text-[9px] font-semibold uppercase tracking-[0.05em] text-label">{filter.label}</legend>
                 <div className="flex flex-col gap-0.5">
                   {(filter.options ?? []).map((option) => {
