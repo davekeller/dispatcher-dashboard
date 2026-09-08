@@ -39,9 +39,11 @@ export default function Header() {
         </Link>
       </nav>
       {focused && (
-        <div className="ml-1 flex min-w-0 items-center gap-2 text-[12px] text-muted">
+        <div className="ml-1 flex min-w-0 items-center gap-1.5 text-[12px] text-muted" aria-label={`Route Details: ${focused.route.id.toUpperCase()}`}>
           <CaretRight size={13} className="shrink-0" />
-          <span className="truncate font-semibold text-ink">{focused.route.id.toUpperCase()} · {focused.driver.name}</span>
+          <span className="whitespace-nowrap font-medium">Route Details</span>
+          <span aria-hidden="true" className="text-label">·</span>
+          <span className="truncate font-semibold text-ink">{focused.route.id.toUpperCase()}</span>
         </div>
       )}
       <div className="ml-auto flex items-center gap-3">
