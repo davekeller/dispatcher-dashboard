@@ -1,5 +1,4 @@
 import { CaretLeft } from '@phosphor-icons/react'
-import { useEffect, useState } from 'react'
 import type { DriverCard } from '../../alerts/types'
 import { BAND_ORDER, type Band } from '../../bands'
 import type { Grouping } from '../../groupBy'
@@ -7,22 +6,17 @@ import type { DriverView } from '../../store/view'
 import EmptyState from '../../ui/EmptyState'
 import { BAND_TONE } from '../../ui/tones'
 import RouteCard from './RouteCard'
+import { useStore } from '../../store/store'
 import { useColumnTracks } from './useColumnTracks'
 
-/** Columns come from the grouping; rows are Lookout's rank. The top row of the board is
- *  therefore "the most urgent problem in each column." Quiet tail columns start as rails;
- *  every column can collapse, and expanded columns share the remaining width smoothly. */
-/** Status columns that start as count rails: Act now, Watch, and On break open by default;
- *  Offline and Clear are quiet tails. One constant, read at mount and when the grouping changes. */
-const BAND_RAILS: Record<string, boolean> = { offline: false, clear: false }
+/** Columns come from the grouping; rows are Lookout's rank. The top row of the board is the top of the ranked list. */
 
 export default function Board({ cards, byId, grouping, pickId, filtering = false }: { cards: DriverCard[]; byId: Map<string, DriverView>; grouping: Grouping; pickId: string | null; filtering?: boolean }) {
   const columns = grouping.columns.map((col) => ({ ...col, cards: cards.filter((c) => grouping.keyOf(byId.get(c.driverId)!, c) === col.key) }))
-  const [expanded, setExpanded] = useState<Record<string, boolean>>(BAND_RAILS)
-  useEffect(() => {
-    setExpanded(grouping.id === 'band' ? BAND_RAILS : {})
-  }, [grouping.id])
-  const isExpanded = (key: string) => expanded[key] !== false
+  // Open/closed per column lives in the store so the Filters menu can set it too; a user's picks survive a lens change.
+  const columnOpen = useStore((s) => s.columnOpen)
+  const setColumnOpen = useStore((s) => s.setColumnOpen)
+  const isExpanded = (key: string) => columnOpen[key] !== false
   const tracks = useColumnTracks(columns.map((column) => {
     if (!isExpanded(column.key)) return null
     if (grouping.id !== 'band') return 1
@@ -47,7 +41,7 @@ export default function Board({ cards, byId, grouping, pickId, filtering = false
                     <span className={`h-2 w-2 rounded-full ${grouping.id === 'band' && isBand(col.key) ? BAND_TONE[col.key].fill : 'bg-offline-fill'}`} aria-hidden="true" />
                     <h2 className={`min-w-0 truncate text-[12px] font-semibold ${labelTone(col.key)}`}>{col.label}</h2>
                     <span className="tnum ml-auto rounded-full bg-panel/80 px-2 py-0.5 text-[10px] font-semibold text-ink/80">{col.cards.length}</span>
-                    <button type="button" onClick={() => setExpanded((state) => ({ ...state, [col.key]: false }))} aria-expanded="true" aria-label={`Collapse ${col.label}`} title={`Collapse ${col.label}`} className="shrink-0 rounded-[6px] p-0.5 text-muted transition hover:bg-panel/70 hover:text-ink">
+                    <button type="button" onClick={() => setColumnOpen(col.key, false)} aria-expanded="true" aria-label={`Collapse ${col.label}`} title={`Collapse ${col.label}`} className="shrink-0 rounded-[6px] p-0.5 text-muted transition hover:bg-panel/70 hover:text-ink">
                       <CaretLeft size={14} />
                     </button>
                   </header>
@@ -62,7 +56,7 @@ export default function Board({ cards, byId, grouping, pickId, filtering = false
               ) : (
                 <button
                   type="button"
-                  onClick={() => setExpanded((state) => ({ ...state, [col.key]: true }))}
+                  onClick={() => setColumnOpen(col.key, true)}
                   aria-expanded="false"
                   title={`${col.label} — ${col.cards.length} route${col.cards.length === 1 ? '' : 's'}. Expand.`}
                   className={`lane-content-enter flex h-56 w-full shrink-0 flex-col items-center gap-2 rounded-control py-2.5 transition hover:brightness-[.97] ${wash(col.key)}`}

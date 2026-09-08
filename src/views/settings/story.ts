@@ -24,6 +24,7 @@ export const PROJECT = {
     ['What is real', 'A deterministic seeded fleet, one clock, pure derivation. Time to the limit is computed against the clock, never typed in.'],
     ['Stack', 'Vite · React 19 · TypeScript · Tailwind v4 · Zustand · react-router · Leaflet, lazy'],
   ] as [string, string][],
+  author: { name: 'Dave Keller', email: 'dave@kidastro.com' },
   links: [
     { label: 'Live', href: 'https://dispatch.kidastro.com' },
     { label: 'Source', href: 'https://github.com/davekeller/dispatcher-dashboard' },

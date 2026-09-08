@@ -1,4 +1,5 @@
-import type { DriverCard } from './alerts/types'
+import { RULES } from './alerts/rules'
+import type { DriverCard, Severity } from './alerts/types'
 import { BAND_LABEL, BAND_ORDER } from './bands'
 import { REGIONS } from './data/regions'
 import type { DriverView } from './store/view'
@@ -18,7 +19,12 @@ export interface FilterDef {
 const multi = (value: FilterValue): string[] => (Array.isArray(value) ? value : [])
 const text = (value: FilterValue): string => (typeof value === 'string' ? value.trim().toLowerCase() : '')
 
+const SEVERITY_WORD: Record<Severity, string> = { critical: 'over', act_now: 'act now', watch: 'watch', info: 'info' }
+// One option per rule; rules that share a label say their severity so the two Approaching limits and two Offlines stay apart.
+const ALERT_OPTIONS = RULES.map((r) => ({ value: r.id, label: RULES.filter((x) => x.label === r.label).length > 1 ? `${r.label} · ${SEVERITY_WORD[r.severity]}` : r.label }))
+
 export const FILTERS: FilterDef[] = [
+  { id: 'alert', label: 'Alert', kind: 'multi', options: ALERT_OPTIONS, apply: (_v, c, value) => multi(value).length === 0 || c.alerts.some((a) => multi(value).includes(a.ruleId)) },
   { id: 'band', label: 'Status', kind: 'multi', options: BAND_ORDER.map((b) => ({ value: b, label: BAND_LABEL[b] })), apply: (_v, c, value) => multi(value).length === 0 || multi(value).includes(c.band) },
   { id: 'freshness', label: 'Data', kind: 'multi', options: [{ value: 'fresh', label: 'Fresh' }, { value: 'stale', label: 'Stale' }, { value: 'offline', label: 'Offline' }], apply: (v, _c, value) => multi(value).length === 0 || multi(value).includes(v.staleness) },
   { id: 'region', label: 'Region', kind: 'multi', options: REGIONS.map((r) => ({ value: r, label: r })), apply: (v, _c, value) => multi(value).length === 0 || multi(value).includes(v.driver.region) },
