@@ -44,7 +44,7 @@ export default function SettingsPage() {
         <Section title="This desk" body="What Lena is running today, read from the same state as the board.">
           <Facts rows={[['Trucks', `${views.length} on the board`], ['Regions', REGIONS.join(', ')], ['Stops', `${delivered} of ${stops} delivered`], ['Clock', `${fmtClock(now)} · ${liveClock ? 'real time' : 'simulated shift'}`]]} />
           <label className="mt-3 flex cursor-pointer items-start gap-2.5 rounded-control border border-line bg-canvas px-3 py-2">
-            <input type="checkbox" checked={liveClock} onChange={(e) => setLiveClock(e.target.checked)} className="mt-0.5 accent-lookout" aria-describedby="settings-real-time-note" />
+            <input type="checkbox" checked={liveClock} onChange={(e) => setLiveClock(e.target.checked)} className="mt-0.5 accent-ink" aria-describedby="settings-real-time-note" />
             <span className="min-w-0">
               <span className="block text-[12px] font-semibold text-ink">Play against the real clock</span>
               <span id="settings-real-time-note" className="block text-[11px] leading-snug text-muted">The same day on today's clock instead of pinned at 2:47 PM. The shift panel in the product bar has the scrubber.</span>

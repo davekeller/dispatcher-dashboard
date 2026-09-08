@@ -84,7 +84,7 @@ The board uses one intentionally vivid wash per status lane—Act now `#f8d6df`,
 | Token | Value | Role |
 |---|---:|---|
 | `lookout` | `#cf4620` | Accessible orange accent and AI action fill |
-| `lookout-strong` | `#a93817` | Orange text on light surfaces |
+| `lookout-strong` | `#a93817` | Reserved; Lookout's type is ink, so red stays with alerts |
 | `lookout-soft` | `#fff0e9` | Warm AI wash |
 | `ai-warm` | `#f45b2b` | Decorative gradient start |
 | `ai-gold` | `#e9ad48` | Warm bridge |
