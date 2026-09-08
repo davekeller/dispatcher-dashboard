@@ -16,7 +16,9 @@ import DriverCard from './DriverCard'
 import StaleBanner from './StaleBanner'
 import RouteRail from './RouteRail'
 import StopReceipt from './StopReceipt'
+import { applyStopFilter, isStopFilterId, STOP_FILTERS, stopFilterCounts, stopsNearLimit, type StopFilterId } from './stopFilters'
 import { nextStopSelection } from './stopSelection'
+import StopsTitleRow from './StopsTitleRow'
 
 // Leaflet and its stylesheet load only when someone opens the map; the board never pays for them.
 const RouteMap = lazy(() => import('./map/RouteMap'))
@@ -65,6 +67,14 @@ export default function RouteFilePage() {
     else q.delete('view')
     return q
   }, { replace: true })
+  const stopsParam = params.get('stops')
+  const stopFilter: StopFilterId = isStopFilterId(stopsParam) ? stopsParam : 'all'
+  const setStopFilter = (next: StopFilterId) => setParams((prev) => {
+    const q = new URLSearchParams(prev)
+    if (next === 'all') q.delete('stops')
+    else q.set('stops', next)
+    return q
+  }, { replace: true })
   const [selectedStop, setSelectedStop] = useState<string | null>(null)
   const view = d.byId.get(driverId)
   const card = d.cardById.get(driverId)
@@ -102,6 +112,13 @@ export default function RouteFilePage() {
     if (!extendRange || anchor === null) selectionAnchor.current = id
   }
   const pastLimitIds = new Set(stopsPastLimit(view))
+  // Receipts read route-end first; the filter keeps that order and only drops cards.
+  const orderedStops = [...view.route.stops].reverse()
+  const filterCtx = { driftMin: view.driftMin, deliveryById, pastLimitIds, nearLimitIds: new Set(stopsNearLimit(view)) }
+  const stopCounts = stopFilterCounts(orderedStops, filterCtx)
+  const shownStops = applyStopFilter(orderedStops, stopFilter, filterCtx)
+  const hiddenStopIds = stopFilter === 'all' ? undefined : new Set(orderedStops.filter((s) => !shownStops.includes(s)).map((s) => s.id))
+  const stopFilterLabel = STOP_FILTERS.find((f) => f.id === stopFilter)?.label ?? 'All'
   // On the map the rail's selection is the page's; it starts on the next stop, like the rail does when reading.
   const mapSelection = selectedStop ?? view.next?.id ?? null
   const seg = (on: boolean) => `inline-flex h-6 items-center gap-1 rounded-[6px] px-2 text-[11px] font-semibold transition ${on ? 'bg-nav-selected text-nav-selected-ink' : 'text-muted hover:bg-nav-selected/45 hover:text-ink'}`
@@ -109,11 +126,11 @@ export default function RouteFilePage() {
   return (
     <div className="route-workspace flex h-full min-h-0 flex-col">
       {/* The secondary nav: part of the chrome, not the scroll. Back is its first column; the rail has no arrow of its own. */}
-      <nav aria-label="Route" className="stops-navbar flex h-12 shrink-0 items-stretch border-b border-line">
-        <Link to={origin.to} title={`Back to the ${origin.view}`} aria-label={`Back to the ${origin.view}`} className="flex w-12 shrink-0 items-center justify-center border-r border-line text-muted transition hover:bg-board hover:text-ink">
+      <nav aria-label="Route" className="stops-navbar flex h-[3.25rem] shrink-0 items-stretch border-b border-line">
+        <Link to={origin.to} title={`Back to the ${origin.view}`} aria-label={`Back to the ${origin.view}`} className="flex w-[3.25rem] shrink-0 items-center justify-center border-r border-line text-muted transition hover:bg-board hover:text-ink">
           <ArrowLeft size={16} weight="bold" />
         </Link>
-        <div className="flex min-w-[12rem] shrink-0 items-center gap-2 border-r border-line pl-4 pr-5">
+        <div className="flex min-w-[13rem] shrink-0 items-center gap-2.5 border-r border-line pl-4 pr-6">
           <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-control bg-ink text-on-accent" aria-hidden="true">
             <ListBullets size={12} weight="bold" />
           </span>
@@ -125,7 +142,7 @@ export default function RouteFilePage() {
           </div>
         </div>
         <dl aria-label="Route status" className="flex min-w-0 items-stretch divide-x divide-line">
-          <div className="flex w-[8.5rem] min-w-0 flex-col justify-center px-3">
+          <div className="flex w-[9.5rem] min-w-0 flex-col justify-center px-4">
             <dt className="flex min-w-0 items-center gap-1 text-[8px] font-semibold uppercase tracking-[0.06em] text-label">
               <span>Remaining</span>
               <span className="truncate font-medium normal-case tracking-normal text-muted" title={`Updated ${fmtAge(view.pingAgeMin)}`}>· {fmtAge(view.pingAgeMin)}</span>
@@ -133,7 +150,7 @@ export default function RouteFilePage() {
             <dd className="tnum mt-1 font-display text-[13px] font-semibold leading-none tracking-tight text-ink">{view.remaining.length} <span className="font-sans text-[9px] font-medium tracking-normal text-muted">stops</span></dd>
           </div>
           {routeSignals.map((signal) => (
-            <div key={signal.label} className="flex w-[7.5rem] min-w-0 flex-col justify-center px-3">
+            <div key={signal.label} className="flex w-[8.5rem] min-w-0 flex-col justify-center px-4">
               <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">{signal.label}</dt>
               <dd className={`mt-1 flex min-w-0 items-center gap-1 font-display text-[13px] font-semibold leading-none tracking-tight ${SIGNAL_TEXT[signal.tone]}`}>
                 <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${SIGNAL_DOT[signal.tone]}`} />
@@ -142,7 +159,7 @@ export default function RouteFilePage() {
             </div>
           ))}
         </dl>
-        <div className="ml-auto flex shrink-0 items-center gap-2 border-l border-line pl-3 pr-5">
+        <div className="ml-auto flex shrink-0 items-center gap-2 border-l border-line pl-4 pr-5">
           {selected.length > 0 && (
             <Button size="sm" variant="primary" disabled={stale} title={staleReason} onClick={() => open('reassign', view.driver.id, { stopIds: selected })}>
               Reassign selected ({selected.length})
@@ -159,7 +176,7 @@ export default function RouteFilePage() {
         </div>
       </nav>
       <div className="flex min-h-0 flex-1 items-stretch gap-5 py-5 pr-5">
-        <RouteRail view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} collapsed={railCollapsed} onCollapsedChange={setRailCollapsed} activeStopId={mode === 'map' ? mapSelection : undefined} onSelectStop={mode === 'map' ? setSelectedStop : undefined} />
+        <RouteRail view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} collapsed={railCollapsed} onCollapsedChange={setRailCollapsed} activeStopId={mode === 'map' ? mapSelection : undefined} onSelectStop={mode === 'map' ? setSelectedStop : undefined} hiddenStopIds={mode === 'list' ? hiddenStopIds : undefined} onRevealStop={() => setStopFilter('all')} listKey={`${mode}:${stopFilter}`} />
         {/* The scroll box is a plain block so nothing inside it can flex-shrink; the column of cards sits one level down. */}
         <div className="min-w-0 flex-1 overflow-y-auto">
           <div className="flex flex-col gap-3">
@@ -176,13 +193,20 @@ export default function RouteFilePage() {
                 <RouteMap view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} selectedStopId={mapSelection} onSelectStop={setSelectedStop} />
               </Suspense>
             ) : (
-              <ol className="flex flex-col gap-2">
-                {[...view.route.stops].reverse().map((s) => (
-                  <li key={s.id} id={`stop-${s.id}`} className="scroll-mt-4">
-                    <StopReceipt stop={s} delivery={deliveryById.get(s.deliveryId)} view={view} selected={selected.includes(s.id)} onSelect={(extendRange) => selectStop(s.id, extendRange)} pastLimit={pastLimitIds.has(s.id)} />
-                  </li>
-                ))}
-              </ol>
+              <div className="flex flex-col gap-2">
+                <StopsTitleRow total={orderedStops.length} counts={stopCounts} value={stopFilter} onChange={setStopFilter} />
+                {shownStops.length === 0 ? (
+                  <EmptyState title={`No stops match ${stopFilterLabel}.`} body="The filter is in the link, so this can happen on a shared route once the day moves on." action={<Button size="sm" onClick={() => setStopFilter('all')}>Show all stops</Button>} />
+                ) : (
+                  <ol className="flex flex-col gap-2">
+                    {shownStops.map((s) => (
+                      <li key={s.id} id={`stop-${s.id}`} className="scroll-mt-4">
+                        <StopReceipt stop={s} delivery={deliveryById.get(s.deliveryId)} view={view} selected={selected.includes(s.id)} onSelect={(extendRange) => selectStop(s.id, extendRange)} pastLimit={pastLimitIds.has(s.id)} />
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </div>
             )}
           </section>
           </div>

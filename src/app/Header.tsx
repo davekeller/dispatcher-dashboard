@@ -25,7 +25,7 @@ export default function Header() {
   const segment = (on: boolean) => `flex h-full items-center gap-1.5 px-3 text-[12px] font-semibold transition focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ink/40 ${navigationItemState(on)}`
 
   return (
-    <header className="flex h-14 shrink-0 items-center gap-0.5 border-b border-line bg-panel px-5">
+    <header className="flex h-14 shrink-0 items-center gap-0.5 border-b border-line bg-panel pl-1.5 pr-5">
       <Link to="/" aria-label="Open the Dispatch board" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control bg-ink text-on-accent transition hover:bg-ink/90">
         <TruckTrailer size={17} weight="fill" />
       </Link>
