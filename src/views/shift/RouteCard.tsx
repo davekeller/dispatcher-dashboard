@@ -1,4 +1,6 @@
-import { Link } from 'react-router'
+import { useState, type MouseEvent } from 'react'
+import { flushSync } from 'react-dom'
+import { Link, useNavigate } from 'react-router'
 import type { DriverCard } from '../../alerts/types'
 import { routeHosSignal } from '../../lib/routeProgress'
 import { stopsPastLimit } from '../../store/actions'
@@ -16,6 +18,16 @@ const TITLE_STATUS_RULES = new Set(['wont_finish', 'offline_near_limit', 'offlin
 /** The route is the card's primary entity; its driver and truck are assignment metadata.
  * Color is attention, clear work stays quiet, and nothing drags because bands are derived. */
 export default function RouteCard({ view, card, pick = false }: { view: DriverView; card: DriverCard; pick?: boolean }) {
+  const routeHref = `/routes/${view.driver.id}`
+  const navigate = useNavigate()
+  const [transitioning, setTransitioning] = useState(false)
+  const openRoute = (event: MouseEvent<HTMLAnchorElement>) => {
+    const modified = event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
+    if (event.defaultPrevented || modified || event.currentTarget.target === '_blank' || !document.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    event.preventDefault()
+    flushSync(() => setTransitioning(true))
+    document.startViewTransition(() => flushSync(() => navigate(routeHref)))
+  }
   const quiet = card.band === 'clear' && !pick
   const surface = quiet ? 'border-line/70 bg-panel/80 opacity-80 hover:opacity-100' : 'border-line bg-panel shadow-card'
   const overLimit = card.alerts.some((alert) => alert.ruleId === 'over_limit')
@@ -40,7 +52,12 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
   const riskValue = pastLimitCount > 0 ? `${pastLimitCount} past HOS` : view.lateStops.length > 0 ? `${view.lateStops.length} late` : 'Clear'
   const riskTone = pastLimitCount > 0 ? 'text-act-now' : view.lateStops.length > 0 ? 'text-watch' : 'text-clear'
   return (
-    <Link to={`/routes/${view.driver.id}`} className={`group block shrink-0 overflow-hidden rounded-card border-[1.5px] transition hover:-translate-y-px hover:border-ink/25 hover:shadow-md ${surface} ${limitBorder} ${dim}`}>
+    <Link
+      to={routeHref}
+      onClick={openRoute}
+      style={{ viewTransitionName: transitioning ? 'route-card-expand' : 'none' }}
+      className={`group block shrink-0 overflow-hidden rounded-card border-[1.5px] transition active:scale-[.985] hover:-translate-y-px hover:border-ink/25 hover:shadow-md ${transitioning ? 'route-card-departing' : ''} ${surface} ${limitBorder} ${dim}`}
+    >
       <RouteHeader view={view} card={card} showPingAge status={headerStatus} />
       <div className="flex min-h-[6.25rem]">
         <RouteTimelineMini view={view} />

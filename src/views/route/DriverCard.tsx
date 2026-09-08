@@ -27,7 +27,7 @@ export default function DriverCard({ view, card }: { view: DriverView; card: Ran
     { label: 'Driving left vs. limit', value: `${fmtHm(view.remainingDriveMin)} vs ${fmtCountdown(view.minutesUntilLimit, stale)}`, sub: view.remaining.length === 0 ? 'route complete' : fits ? 'fits before the limit' : 'does not fit', tone: view.remaining.length === 0 ? undefined : fits ? 'text-clear' : 'text-act-now' },
   ]
   return (
-    <Card className={`overflow-hidden ${overLimit ? 'border-t-[3px] border-t-act-now' : ''}`}>
+    <Card className={`route-detail-card overflow-hidden ${overLimit ? 'border-t-[3px] border-t-act-now' : ''}`}>
       <div className="flex items-center gap-5 px-5 py-4">
         <DriverAvatar driver={view.driver} size={56} />
         <div className="min-w-0">

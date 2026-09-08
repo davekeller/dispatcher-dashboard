@@ -183,6 +183,7 @@ body { @apply bg-canvas text-ink font-sans; }
 /* The route file scrolls over one fixed depth field: open and light near the header, then
    gradually deeper slate toward the continued route history below. */
 .route-workspace {
+  animation: route-workspace-fallback-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
   background-color: var(--color-board);
   background-image: linear-gradient(
     to bottom,
@@ -194,6 +195,66 @@ body { @apply bg-canvas text-ink font-sans; }
   background-position: left top;
   background-repeat: no-repeat;
   background-size: 100% 100vh;
+}
+
+.route-card-departing {
+  contain: layout paint;
+  pointer-events: none;
+  transform: translateY(0) scale(0.985);
+}
+
+@keyframes route-workspace-fallback-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes route-card-old-out {
+  from { opacity: 1; filter: saturate(1); }
+  to { opacity: 0.22; filter: saturate(0.8); }
+}
+
+@keyframes route-card-new-in {
+  from { opacity: 0.2; }
+  to { opacity: 1; }
+}
+
+@keyframes route-workspace-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@supports (view-transition-name: route-card-expand) {
+  .route-workspace {
+    animation: none;
+    view-transition-name: route-workspace;
+  }
+
+  .route-detail-card { view-transition-name: route-card-expand; }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  ::view-transition-group(route-card-expand) {
+    animation-duration: 380ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  ::view-transition-old(route-card-expand) {
+    animation: route-card-old-out 180ms ease-out both;
+  }
+
+  ::view-transition-new(route-card-expand) {
+    animation: route-card-new-in 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    mix-blend-mode: normal;
+  }
+
+  ::view-transition-new(route-workspace) {
+    animation: route-workspace-in 320ms 55ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    mix-blend-mode: normal;
+  }
 }
 
 @keyframes lane-content-enter {
@@ -213,6 +274,16 @@ body { @apply bg-canvas text-ink font-sans; }
 
 @media (prefers-reduced-motion: reduce) {
   .lane-content-enter { animation: none; }
+  .route-workspace { animation: none; }
+  .route-card-departing { transform: none; }
+
+  ::view-transition-group(route-card-expand),
+  ::view-transition-old(route-card-expand),
+  ::view-transition-new(route-card-expand),
+  ::view-transition-new(route-workspace) {
+    animation-duration: 1ms;
+    animation-delay: 0ms;
+  }
 }
 
 /* Route map: Leaflet chrome on the tokens, and markers that read like the route rail. */
