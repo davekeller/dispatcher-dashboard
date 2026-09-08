@@ -43,6 +43,12 @@ const SIGNAL_RULE: Record<RouteSignalTone, string> = {
   offline: 'border-t-offline-fill/75',
 }
 
+const compactSignalValue = (value: string) => value
+  .replace(/(\d+)h (\d+)m/g, '$1h$2m')
+  .replace(/(\d+) min\b/g, '$1m')
+  .replace(/ behind\b/g, ' late')
+  .replace(/ ahead\b/g, ' early')
+
 /** A file for one driver's day, in the case-file shape: the route rail down the left, then one
  *  driver-and-alert header card followed by the stop list or map. Lookout stays focused here. */
 export default function RouteFilePage() {
@@ -101,7 +107,7 @@ export default function RouteFilePage() {
   const pastLimitIds = new Set(stopsPastLimit(view))
   // On the map the rail's selection is the page's; it starts on the next stop, like the rail does when reading.
   const mapSelection = selectedStop ?? view.next?.id ?? null
-  const seg = (on: boolean) => `inline-flex h-7 items-center gap-1.5 rounded-[6px] px-2.5 text-[11px] font-semibold transition ${on ? 'bg-nav-selected text-nav-selected-ink' : 'text-muted hover:bg-nav-selected/45 hover:text-ink'}`
+  const seg = (on: boolean) => `inline-flex h-7 items-center gap-1.5 rounded-[6px] px-2 text-[11px] font-semibold transition ${on ? 'bg-nav-selected text-nav-selected-ink' : 'text-muted hover:bg-nav-selected/45 hover:text-ink'}`
 
   return (
     <div className="route-workspace flex min-h-full items-start gap-5 py-5 pr-5">
@@ -109,18 +115,18 @@ export default function RouteFilePage() {
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         <DriverCard view={view} card={card} />
         <section>
-          <header className="stops-navbar sticky top-0 z-30 -mx-5 mb-3 flex min-h-14 flex-wrap items-stretch border-y border-offline-fill/55 backdrop-blur">
-            <div className="order-1 flex min-w-0 flex-1 items-center gap-3 py-2.5 pl-8 pr-3">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-ink text-on-accent" aria-hidden="true">
-                <ListBullets size={16} weight="bold" />
+          <header className="stops-navbar sticky top-0 z-30 -mx-5 mb-3 flex min-h-[4.5rem] flex-nowrap items-stretch border-y border-offline-fill/55 backdrop-blur">
+            <div className="flex w-52 shrink-0 items-center gap-1.5 py-2.5 pl-5 pr-3">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-control bg-ink text-on-accent" aria-hidden="true">
+                <ListBullets size={14} weight="bold" />
               </span>
               <div className="min-w-0">
                 <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">Stops</p>
-                <h2 className="tnum mt-1 whitespace-nowrap font-display text-2xl font-semibold leading-none tracking-tight text-ink">{view.done}/{view.total} delivered</h2>
+                <h2 className="tnum mt-1 whitespace-nowrap font-display text-[22px] font-semibold leading-none tracking-tight text-ink">{view.done}/{view.total} delivered</h2>
               </div>
             </div>
-            <dl aria-label="Route status" className="order-3 grid min-w-0 basis-full grid-cols-3 divide-x divide-nav-selected-line bg-panel/20">
-              <div className="flex min-w-0 flex-col justify-center border-t-[3px] border-t-nav-selected-ink/45 px-4 py-3">
+            <dl aria-label="Route status" className="grid min-w-0 flex-1 grid-cols-3 divide-x divide-nav-selected-line border-l border-nav-selected-line bg-panel/20">
+              <div className="flex min-w-0 flex-col justify-center border-t-[3px] border-t-nav-selected-ink/45 px-2.5 py-3">
                 <dt className="flex min-w-0 items-center gap-1.5 text-[8px] font-semibold uppercase tracking-[0.06em] text-label">
                   <span>Remaining</span>
                   <span className="truncate font-medium normal-case tracking-normal text-muted" title={`Updated ${fmtAge(view.pingAgeMin)}`}>· {fmtAge(view.pingAgeMin)}</span>
@@ -128,16 +134,16 @@ export default function RouteFilePage() {
                 <dd className="tnum mt-1 font-display text-[22px] font-semibold leading-none tracking-tight text-ink">{view.remaining.length} <span className="font-sans text-[10px] font-medium tracking-normal text-muted">stops</span></dd>
               </div>
               {routeSignals.map((signal) => (
-                <div key={signal.label} className={`flex min-w-0 flex-col justify-center border-t-[3px] px-4 py-3 ${SIGNAL_RULE[signal.tone]}`}>
+                <div key={signal.label} className={`flex min-w-0 flex-col justify-center border-t-[3px] px-2.5 py-3 ${SIGNAL_RULE[signal.tone]}`}>
                   <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-label">{signal.label}</dt>
-                  <dd className={`mt-1 flex min-w-0 items-center gap-1.5 font-display text-[22px] font-semibold leading-none tracking-tight ${SIGNAL_TEXT[signal.tone]}`}>
+                  <dd className={`mt-1 flex min-w-0 items-center gap-1 font-display text-[22px] font-semibold leading-none tracking-tight ${SIGNAL_TEXT[signal.tone]}`}>
                     <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${SIGNAL_DOT[signal.tone]}`} />
-                    <span className="truncate" title={signal.value}>{signal.value}</span>
+                    <span className="truncate" title={signal.value}>{compactSignalValue(signal.value)}</span>
                   </dd>
                 </div>
               ))}
             </dl>
-            <div className="order-2 ml-auto flex items-center gap-2 py-2.5 pl-3 pr-8">
+            <div className="ml-auto flex shrink-0 items-center gap-2 border-l border-nav-selected-line py-2.5 pl-2 pr-4">
               {selected.length > 0 && (
                 <Button size="sm" variant="primary" disabled={stale} title={staleReason} onClick={() => open('reassign', view.driver.id, { stopIds: selected })}>
                   Reassign selected ({selected.length})
