@@ -139,14 +139,12 @@ export default function RouteFilePage() {
             <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">Route</p>
             <h2 className="mt-1 whitespace-nowrap font-display text-[16px] font-semibold leading-none tracking-tight text-ink">{view.route.id.toUpperCase()}</h2>
           </div>
+          <span className="tnum ml-3 font-display text-[18px] font-semibold leading-none tracking-tight text-ink" aria-label={`${progress}% complete`}>{progress}%</span>
         </div>
-        <div className="flex min-w-[13rem] shrink-0 items-center border-r border-line px-4">
+        <div className="flex shrink-0 items-center border-r border-line px-4">
           <div className="min-w-0">
             <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">Stops</p>
-            <h2 className="tnum mt-1 flex items-baseline gap-6 whitespace-nowrap font-display text-[16px] font-semibold leading-none tracking-tight text-ink">
-              {view.done}/{view.total} delivered
-              <span className="text-[18px]" aria-label={`${progress}% complete`}>{progress}%</span>
-            </h2>
+            <h2 className="tnum mt-1 whitespace-nowrap font-display text-[16px] font-semibold leading-none tracking-tight text-ink">{view.done}/{view.total} delivered</h2>
           </div>
         </div>
         <dl aria-label="Route status" className="flex min-w-0 items-stretch divide-x divide-line">
