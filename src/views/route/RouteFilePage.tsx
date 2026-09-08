@@ -114,7 +114,7 @@ export default function RouteFilePage() {
                 <ListBullets size={railCollapsed ? 14 : 12} weight="bold" />
               </span>
               <div className="min-w-0">
-                <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">Stops</p>
+                <p className="text-[8px] font-semibold uppercase leading-none tracking-[0.07em] text-label">{view.route.id.toUpperCase()} · Stops</p>
                 <h2 className={`tnum mt-1 whitespace-nowrap font-display font-semibold leading-none tracking-tight text-ink ${railCollapsed ? 'text-[22px]' : 'text-[18px]'}`}>{view.done}/{view.total} delivered</h2>
               </div>
             </div>
