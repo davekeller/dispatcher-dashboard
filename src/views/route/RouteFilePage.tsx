@@ -109,7 +109,7 @@ export default function RouteFilePage() {
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         <DriverCard view={view} card={card} />
         <section>
-          <header className="stops-navbar sticky top-0 z-30 -mx-5 mb-3 flex min-h-14 flex-wrap items-stretch border-y border-nav-selected-line backdrop-blur">
+          <header className="stops-navbar sticky top-0 z-30 -mx-5 mb-3 flex min-h-14 flex-wrap items-stretch border-y border-offline-fill/55 backdrop-blur">
             <div className="order-1 flex min-w-0 flex-1 items-center gap-3 py-2.5 pl-8 pr-3">
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-ink text-on-accent" aria-hidden="true">
                 <ListBullets size={16} weight="bold" />
