@@ -41,6 +41,9 @@
   --color-act-now-fill: #cb3453;
   --color-act-now-soft: #fff0f3;
   --color-act-now-board: #f8d6df;
+  /* The one saturated red on the dark shift instrument: the Act now dot and count (3:1 on the band's brightest patch, large text), with a lighter companion for its 9px label and detail (4.5:1). */
+  --color-act-now-hero: #ff7a90;
+  --color-act-now-hero-text: #ffb3c1;
 
   --color-watch: #755000;
   --color-watch-fill: #c88708;
@@ -154,7 +157,7 @@ body { @apply bg-canvas text-ink font-sans; }
   background: var(--color-panel);
 }
 
-/* One nav shadow: the same 16px slate wash Lookout casts leftward, cast downward under the product bar and the Stops bar. */
+/* One nav shadow: the same 16px slate wash Lookout casts leftward, cast downward under whichever nav row is lowest: the product bar, the Stops bar, or the map controls. */
 .nav-shadow-below::after {
   content: '';
   position: absolute;

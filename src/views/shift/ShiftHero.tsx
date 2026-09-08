@@ -11,6 +11,8 @@ interface Metric {
   preset: FilterState
   dot: string
   tone: string
+  /** The big count's own color when it should be louder than the label (the Act now red). */
+  valueTone?: string
   detail?: string
 }
 
@@ -23,7 +25,7 @@ function sameFilters(a: FilterState, b: FilterState): boolean {
 export default function ShiftHero({ metrics, ranked, filters, onPreset }: { metrics: Metrics; ranked: DriverCard[]; filters: FilterState; onPreset: (filters: FilterState) => void }) {
   const count = (band: Band) => ranked.filter((card) => card.band === band).length
   const items: Metric[] = [
-    { id: 'act_now', label: BAND_LABEL.act_now, value: count('act_now'), preset: { ...EMPTY_FILTERS, band: ['act_now'] }, dot: 'bg-act-now-board', tone: 'text-act-now-board', detail: `${metrics.over} over limit` },
+    { id: 'act_now', label: BAND_LABEL.act_now, value: count('act_now'), preset: { ...EMPTY_FILTERS, band: ['act_now'] }, dot: 'bg-act-now-hero', tone: 'text-act-now-hero-text', valueTone: 'text-act-now-hero', detail: `${metrics.over} over limit` }, // the one saturated red on the band; the label is lighter to hold 4.5:1
     { id: 'watch', label: BAND_LABEL.watch, value: count('watch'), preset: { ...EMPTY_FILTERS, band: ['watch'] }, dot: 'bg-watch-board', tone: 'text-watch-board' },
     { id: 'break', label: BAND_LABEL.break, value: count('break'), preset: { ...EMPTY_FILTERS, band: ['break'] }, dot: 'bg-break-board', tone: 'text-break-board' },
     { id: 'offline', label: BAND_LABEL.offline, value: count('offline'), preset: { ...EMPTY_FILTERS, band: ['offline'] }, dot: 'bg-offline-board', tone: 'text-offline-board' },
@@ -58,7 +60,7 @@ export default function ShiftHero({ metrics, ranked, filters, onPreset }: { metr
                   <span className={`h-2 w-2 rounded-full ${item.dot}`} /> {item.label}
                 </dt>
                 <dd className="mt-1.5 flex items-baseline gap-2">
-                  <span className={`tnum font-display text-[2rem] font-semibold leading-none tracking-[-0.045em] ${item.tone}`}>{item.value}</span>
+                  <span className={`tnum font-display text-[2rem] font-semibold leading-none tracking-[-0.045em] ${item.valueTone ?? item.tone}`}>{item.value}</span>
                   {item.detail && <span className={`whitespace-nowrap text-[10px] font-semibold ${item.tone}`}>{item.detail}</span>}
                 </dd>
               </div>
