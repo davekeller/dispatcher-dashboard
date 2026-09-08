@@ -24,6 +24,10 @@ export const DAY_END = DAY_START + (DAY_END_HOUR - DAY_START_HOUR) * 60 * MIN
 export const SCRUB_MIN_MS = DAY_START - ANCHOR
 export const SCRUB_MAX_MS = DAY_END - ANCHOR
 
+/** The offset at which the simulated clock reads the real time of day, and keeps doing so: both
+ *  sides advance with real elapsed time, so the difference is constant. */
+export const LIVE_OFFSET_MS = LOADED_AT - ANCHOR
+
 /** Keep the scrub offset inside the simulated day. */
 export function clampScrub(ms: number): number {
   return Math.min(SCRUB_MAX_MS, Math.max(SCRUB_MIN_MS, ms))

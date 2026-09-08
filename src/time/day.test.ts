@@ -3,7 +3,7 @@ import { makeFleet } from '../data/seed'
 import { materialize } from '../data/simulate'
 import { effectiveLastPingAt } from '../hos/compute'
 import { derive } from '../store/derive'
-import { ANCHOR, DAY_END, DAY_START, MIN, SCRUB_MAX_MS, SCRUB_MIN_MS, clampScrub } from './clock'
+import { ANCHOR, DAY_END, DAY_START, LIVE_OFFSET_MS, MIN, SCRUB_MAX_MS, SCRUB_MIN_MS, clampScrub, simNow } from './clock'
 
 describe('the simulated day', () => {
   it('runs 6:00 AM to 6:00 PM around the 2:47 anchor', () => {
@@ -15,6 +15,11 @@ describe('the simulated day', () => {
     expect(clampScrub(-99 * 60 * MIN)).toBe(SCRUB_MIN_MS)
     expect(clampScrub(99 * 60 * MIN)).toBe(SCRUB_MAX_MS)
     expect(clampScrub(0)).toBe(0)
+  })
+
+  it('the real-time offset makes the simulated clock read the wall clock at any moment', () => {
+    const wall = Date.now() + 37 * MIN
+    expect(simNow(LIVE_OFFSET_MS, wall)).toBe(wall)
   })
 
   const base = makeFleet(ANCHOR)

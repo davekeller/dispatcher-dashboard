@@ -28,6 +28,8 @@ export default function SimulatedShift() {
   const scrubOffsetMs = useStore((s) => s.scrubOffsetMs)
   const scrub = useStore((s) => s.scrub)
   const setClock = useStore((s) => s.setClock)
+  const liveClock = useStore((s) => s.liveClock)
+  const setLiveClock = useStore((s) => s.setLiveClock)
   const resetClock = useStore((s) => s.resetClock)
   const resetFleet = useStore((s) => s.resetFleet)
   const bringOnline = useStore((s) => s.bringOnline)
@@ -59,6 +61,7 @@ export default function SimulatedShift() {
   const marcus = byId.get('drv-01')
   const offsetMin = Math.round(scrubOffsetMs / MIN)
   const dayMin = Math.min(DAY_MIN, Math.max(0, Math.round((now - DAY_START) / MIN)))
+  const outsideDay = now < DAY_START || now > DAY_END
 
   return (
     <div ref={ref} className="relative">
@@ -72,7 +75,7 @@ export default function SimulatedShift() {
       >
         <Clock size={16} weight="duotone" className="text-lookout" />
         <span className="tnum font-semibold text-ink">{fmtClock(now)}</span>
-        <span className="text-muted">Simulated shift</span>
+        <span className="text-muted">{liveClock ? 'Real time' : 'Simulated shift'}</span>
         <CaretDown size={12} className="text-muted" />
       </button>
 
@@ -89,7 +92,7 @@ export default function SimulatedShift() {
           <div className="mt-4">
             <div className="flex items-baseline justify-between">
               <span className="text-[11px] font-semibold uppercase tracking-wide text-label">Time of day</span>
-              <span className="tnum text-[12px] font-semibold text-ink">{fmtClock(now)}{offsetMin !== 0 ? <span className="font-normal text-muted"> · {fmtOffset(offsetMin)} from 2:47</span> : ''}</span>
+              <span className="tnum text-[12px] font-semibold text-ink">{fmtClock(now)}{liveClock ? <span className="font-normal text-muted"> · real time</span> : offsetMin !== 0 ? <span className="font-normal text-muted"> · {fmtOffset(offsetMin)} from 2:47</span> : ''}</span>
             </div>
             <div className="relative mt-2">
               <span aria-hidden="true" title="2:47 PM, where the shift is pinned" className="pointer-events-none absolute -top-1.5 h-2 w-0.5 -translate-x-1/2 rounded-full bg-lookout" style={{ left: `${ANCHOR_PCT}%` }} />
@@ -100,6 +103,7 @@ export default function SimulatedShift() {
                 step={SCRUB_STEP_MIN}
                 value={dayMin}
                 onChange={(e) => setClock(DAY_START + Number(e.target.value) * MIN)}
+                disabled={liveClock}
                 aria-label="Scrub the simulated clock across the day"
                 aria-valuetext={fmtClock(now)}
                 className="w-full accent-lookout"
@@ -115,6 +119,19 @@ export default function SimulatedShift() {
               <Button size="sm" variant="ghost" onClick={resetClock} disabled={scrubOffsetMs === 0}><ArrowCounterClockwise size={12} /> Back to 2:47 PM</Button>
             </div>
             <p className="mt-2 text-[11px] text-muted">The fleet moves with the clock in both directions: receipts unwind, duty hours are counted only up to the clock, and a truck that went dark at 2:22 is fresh again at 2:00. The planted scenarios (Marcus, Priya, Dre and the others) hold still at 2:47 so the demo always finds them.</p>
+            <label className="mt-3 flex cursor-pointer items-start gap-2.5 rounded-control border border-line bg-canvas px-3 py-2">
+              <input type="checkbox" checked={liveClock} onChange={(e) => setLiveClock(e.target.checked)} className="mt-0.5 accent-lookout" aria-describedby="real-time-note" />
+              <span className="min-w-0">
+                <span className="block text-[12px] font-semibold text-ink">Play against the real clock</span>
+                <span id="real-time-note" className="block text-[11px] leading-snug text-muted">
+                  {liveClock
+                    ? outsideDay
+                      ? `It is ${fmtClock(now)}: the shift ${now < DAY_START ? 'has not started yet' : 'is over for the day'}. Scrub, or go back to 2:47 PM, to see it live.`
+                      : `The same day on today's clock: it is ${fmtClock(now)}, and the board shows ${fmtClock(now)}. Scrubbing returns to the pinned shift.`
+                    : 'The same day on today\'s clock, unfolding in real time: at 10:15 AM the board shows 10:15. The pinned 2:47 view is one click back.'}
+                </span>
+              </span>
+            </label>
           </div>
 
           <div className="mt-4 border-t border-line pt-3">

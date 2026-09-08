@@ -13,7 +13,7 @@ npm test         # derivation tests: HOS math, rules, ranking, bands, seed, acti
 npm run build
 ```
 
-Node 20+. No backend, no keys. The shift is simulated: the clock is pinned to 2:47 PM so the demo is the same at any hour, and it ticks in real time. Click the clock in the header (or press `⌘.`) for the simulated-shift panel: scrub the day, fast-forward, bring a truck back online, undo. The scrubber runs the whole day, 6:00 AM to 6:00 PM, in both directions.
+Node 20+. No backend, no keys. The shift is simulated: the clock is pinned to 2:47 PM so the demo is the same at any hour, and it ticks in real time. Click the clock in the header (or press `⌘.`) for the simulated-shift panel: scrub the day, fast-forward, bring a truck back online, undo. The scrubber runs the whole day, 6:00 AM to 6:00 PM, in both directions. A switch in the same panel plays the day against the real clock instead.
 
 ## What to look at
 
