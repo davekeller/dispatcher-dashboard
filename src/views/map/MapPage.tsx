@@ -72,7 +72,7 @@ export default function MapPage() {
           <label className="relative ml-auto min-w-44 flex-1 lg:max-w-56">
             <span className="sr-only">{search.label}</span>
             <MagnifyingGlass size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-            <input value={(filters[search.id] as string | undefined) ?? ''} onChange={(e) => setFilters({ ...filters, [search.id]: e.target.value })} placeholder={search.label} className="h-9 w-full rounded-control border border-line bg-panel pl-9 pr-3 text-[12px] text-ink outline-none transition placeholder:text-muted focus:border-ink/35 focus:ring-2 focus:ring-ink/10" aria-label={search.label} />
+            <input value={(filters[search.id] as string | undefined) ?? ''} onChange={(e) => setFilters({ ...filters, [search.id]: e.target.value })} placeholder={search.label} className="h-9 w-full rounded-control border border-nav-selected-line bg-panel pl-9 pr-3 text-[12px] text-ink outline-none transition placeholder:text-muted focus:border-ink/35 focus:ring-2 focus:ring-ink/10" aria-label={search.label} />
           </label>
           <Button size="sm" variant="secondary" onClick={() => { select(null); setFitKey((k) => k + 1) }} title="Clear the selection and fit every visible truck">
             <ArrowsOutSimple size={13} /> Fit all
