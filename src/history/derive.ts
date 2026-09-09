@@ -18,7 +18,7 @@ const FAMILY_OF: Record<EventDetail['type'], Family> = {
   reconnect: 'shift', undo: 'shift',
 }
 
-export type ActivityItem =
+export type HistoryItem =
   | { kind: 'card'; id: string; at: number; family: Family; driverId?: string; text: string; event: ShiftEvent; undoneAt?: number }
   | { kind: 'marker'; id: string; at: number; family: 'shift'; driverId?: string; text: string; label: string; tone: MarkerKind | 'neutral'; estimated: boolean }
 
@@ -44,13 +44,13 @@ function haystack(e: ShiftEvent, d: Derived): string {
   return parts.join(' ').toLowerCase()
 }
 
-const seqOf = (i: ActivityItem) => (i.kind === 'card' ? i.event.seq : 0)
+const seqOf = (i: HistoryItem) => (i.kind === 'card' ? i.event.seq : 0)
 
-export function activityFeed(events: ShiftEvent[], d: Derived): ActivityItem[] {
+export function historyFeed(events: ShiftEvent[], d: Derived): HistoryItem[] {
   // An undo is not its own entry: it marks the card it reversed.
   const undoneAt = new Map<number, number>()
   for (const e of events) if (e.detail?.type === 'undo') undoneAt.set(e.detail.targetSeq, e.at)
-  const items: ActivityItem[] = []
+  const items: HistoryItem[] = []
   for (const e of events) {
     if (e.kind === 'undo') continue
     if (e.kind === 'system') items.push({ kind: 'marker', id: `e${e.seq}`, at: e.at, family: 'shift', text: e.label.toLowerCase(), label: e.label, tone: 'neutral', estimated: false })
@@ -64,11 +64,11 @@ export function activityFeed(events: ShiftEvent[], d: Derived): ActivityItem[] {
 
 export interface HourGroup {
   hourStart: number
-  items: ActivityItem[]
+  items: HistoryItem[]
 }
 
 /** Newest hour first; items keep the feed's order inside each hour. */
-export function groupByHour(items: ActivityItem[]): HourGroup[] {
+export function groupByHour(items: HistoryItem[]): HourGroup[] {
   const groups: HourGroup[] = []
   for (const item of items) {
     const hourStart = new Date(item.at).setMinutes(0, 0, 0)

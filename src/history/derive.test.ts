@@ -3,7 +3,7 @@ import { makeFleet } from '../data/seed'
 import { derive } from '../store/derive'
 import type { ShiftEvent } from '../store/store'
 import { ANCHOR, MIN } from '../time/clock'
-import { activityFeed, familyOf, groupByHour } from './derive'
+import { historyFeed, familyOf, groupByHour } from './derive'
 
 const fleet = makeFleet(ANCHOR)
 const d = derive(fleet, ANCHOR, {})
@@ -14,8 +14,8 @@ const call: ShiftEvent = { seq: 2, at: ANCHOR - 3 * MIN, kind: 'action', label: 
 const undo: ShiftEvent = { seq: 3, at: ANCHOR - 2 * MIN, kind: 'undo', label: 'Undone: Call to Dre W. logged', driverId: 'drv-03', detail: { type: 'undo', targetSeq: 2 } }
 const reassign: ShiftEvent = { seq: 4, at: ANCHOR - 1 * MIN, kind: 'action', label: "Marcus R.'s stops reassigned to Ana L.", driverId: 'drv-01', detail: { type: 'reassign', fromId: 'drv-01', toId: 'drv-08', stops: [{ id: 's1', seq: 14, customer: 'Harbor Foods' }], spareAfterMin: 300 } }
 
-describe('activityFeed', () => {
-  const feed = activityFeed([system, call, undo, reassign], d)
+describe('historyFeed', () => {
+  const feed = historyFeed([system, call, undo, reassign], d)
   it('folds an undo onto the card it reversed instead of listing it', () => {
     const item = feed.find((i) => i.kind === 'card' && i.event.seq === 2)
     expect(item?.kind === 'card' && item.undoneAt).toBe(undo.at)
@@ -52,7 +52,7 @@ describe('familyOf', () => {
 
 describe('groupByHour', () => {
   it('buckets by the hour the item landed in, newest hour first', () => {
-    const feed = activityFeed([system, call, reassign], d)
+    const feed = historyFeed([system, call, reassign], d)
     const groups = groupByHour(feed)
     expect(groups[0].items.map((i) => i.at)).toContain(reassign.at)
     expect(groups.every((g) => g.items.every((i) => i.at >= g.hourStart && i.at < g.hourStart + HOUR))).toBe(true)

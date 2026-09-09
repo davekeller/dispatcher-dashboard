@@ -30,7 +30,7 @@ export interface StopRef {
 }
 
 /** What she did, typed per action. Every figure is the dialog's own number from the same helper,
- *  captured before the mutation, so the Activity card shows what she was shown. */
+ *  captured before the mutation, so the History card shows what she was shown. */
 export type EventDetail =
   | { type: 'reassign'; fromId: string; toId: string; stops: StopRef[]; spareAfterMin: number }
   | { type: 'schedule_reset'; afterStop: StopRef | null; resetStartsAt: number; resetEndsAt: number; orphaned: StopRef[] }
