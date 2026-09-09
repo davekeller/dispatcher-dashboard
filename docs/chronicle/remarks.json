@@ -6,5 +6,25 @@
   "2026-09-04": {
     "headline": "Lookout gets a face, then a voice",
     "body": "The morning is all co-pilot. The route rail becomes a case file — a vertical, proportional duty timeline with the stops as nodes and the active one following scroll (decision 35, superseding the horizontal ribbon shipped the night before). Lookout gains an illustrated face, a one-line read of the shift, and tabs; by midday those tabs have settled on Chat and Timeline, with recommendations as a sticky bar over the chat and the shift's append-only log beside it. The neutrals get retinted twice — warm to blue-slate, then onto the bento key — on the same argument each time: leave coral and the status bands as the only warmth on the board. Then the header clock stops being a readout and becomes the demo control itself, carrying the scrubber and the explained demo actions. The Lookout bar's recommendation cards are compacted to fit beside the chat, and the reassign picker gets pure, tested candidate ordering and filters."
+  },
+  "2026-09-05": {
+    "headline": "One grid language across the whole product",
+    "body": "A short, single-purpose pass: the board card grid, the route stop grid and the driver summary metrics are all rebuilt on the same ruled logic, the shared card radius comes down, and over-limit driver details get their own flag. Route details and stop status end the day speaking one visual language instead of three."
+  },
+  "2026-09-06": {
+    "headline": "The long polish — and the map learns to answer back",
+    "body": "The heaviest day by far. It opens on the fleet map becoming interactive: picking a driver draws their whole route. Then a sustained visual pass — route rail and stop numbering, alerts separated from the driver summary, stop cards connected by a timeline spine, board cards keylined by limit status, route details aligned to the board palette. Lookout gets a crisp pixel face and a monospaced voice. Late in the day the route timeline is reversed to lead with remaining work rather than history, stop selection moves beside the actions, and receipts are re-cut to read pick-then-act. Board and Map become one segmented control, and a route file remembers where it was opened from."
+  },
+  "2026-09-07": {
+    "headline": "Lookout keeps receipts; the shift runs on the real clock",
+    "body": "Lookout's recommendations are summarized as actions, its alert borders take colour by severity, and an Artifacts tab replaces the Timeline with a reserved empty state. The product navigation flattens, and the simulated shift starts playing against the real clock rather than a frozen anchor. Late on, the fleet map grows a driver list beside it with the zoom moved clear to the bottom right, stop receipts lead their identity column with a status chip, and Lookout's recommendation wash is retuned. The night runs long on the route workspace: route cards animate into their detail view, route status moves into a Stops bar that spans the pane, and the stop receipts get real interaction states."
+  },
+  "2026-09-08": {
+    "headline": "It ships, it gets a name, and it learns to explain itself",
+    "body": "The build goes public: deployed to Vercel with the live link in the README. Then three things arrive that were never in the brief. A Metrics lens turns the board into a chart surface with sections, a chooser and a limit forecast. Lena's avatar in the product bar opens a settings page that walks Project, Lena, Problems, Solutions, Why — the case for the work, inside the work. And the product takes an identity: a Dispatch logistics mark, then the Sora Fleet Echo brand applied across the chrome. Underneath, motion tokens land and Lookout learns to slide rather than snap."
+  },
+  "2026-09-09": {
+    "headline": "The last pass is all restraint",
+    "body": "Almost nothing is added; things are taken away or settled down. Drop shadows leave the board's controls, the Filters menu's headings drop to plain groups, the Metrics lens collapses to one header row, and the route file's content column caps at 64rem so it stops sprawling on wide screens. What does get added is explanation: Lookout introduces itself when Lena clicks its name, and its pick chip opens a dialog on how it orders the shift. Late in the day Lookout gains an Activity tab — the shift's own record — and every shift event starts remembering what Lena did and what was true when she did it."
   }
 }

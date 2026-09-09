@@ -1,7 +1,7 @@
 /** The story of this build, as data for the settings page: the project, the problems, what was built,
  *  and why. Copy lives here so the page only lays it out; the decks it points at live in `data/designFiles.ts`. */
 
-export type SettingsSection = 'project' | 'lena' | 'problems' | 'solutions' | 'why'
+export type SettingsSection = 'project' | 'lena' | 'problems' | 'solutions' | 'why' | 'progress'
 
 export const SECTIONS: { id: SettingsSection; label: string; eyebrow: string }[] = [
   { id: 'project', label: 'Project', eyebrow: 'What this is' },
@@ -9,6 +9,7 @@ export const SECTIONS: { id: SettingsSection; label: string; eyebrow: string }[]
   { id: 'problems', label: 'Problems', eyebrow: 'What her shift asks' },
   { id: 'solutions', label: 'Solutions', eyebrow: 'What was built' },
   { id: 'why', label: 'Why', eyebrow: 'The reasons behind it' },
+  { id: 'progress', label: 'Progress', eyebrow: 'How it was built' },
 ]
 
 export function isSettingsSection(value: string | null): value is SettingsSection {

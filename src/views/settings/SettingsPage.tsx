@@ -1,9 +1,10 @@
-import { ArrowSquareOut, Lightbulb, Path, SquaresFour, UserCircle, WarningDiamond, type Icon } from '@phosphor-icons/react'
+import { ArrowSquareOut, ChartLineUp, Lightbulb, Path, SquaresFour, UserCircle, WarningDiamond, type Icon } from '@phosphor-icons/react'
 import { useEffect, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router'
 import { RULES } from '../../alerts/rules'
 import type { Severity } from '../../alerts/types'
 import { BAND_LABEL, BAND_ORDER } from '../../bands'
+import { BUILD_LOG, type BuildDay } from '../../data/buildLog'
 import { DESIGN_FILES, type DesignFile } from '../../data/designFiles'
 import { DISPATCHER, shiftWindow } from '../../data/dispatcher'
 import { REGIONS } from '../../data/regions'
@@ -28,6 +29,7 @@ const SECTION_ICON: Record<SettingsSection, Icon> = {
   problems: WarningDiamond,
   solutions: Lightbulb,
   why: Path,
+  progress: ChartLineUp,
 }
 
 /** Lena's working settings and the story of the build around her. The left rail is persistent;
@@ -102,7 +104,7 @@ export default function SettingsPage() {
                 <p className="text-[10px] font-semibold uppercase tracking-[0.11em] text-label">{current.eyebrow}</p>
                 <h1 className="mt-1 font-display text-[28px] font-semibold leading-none tracking-[-0.035em] text-ink">{title}</h1>
               </div>
-              <p className="tnum shrink-0 text-[10px] font-semibold uppercase tracking-[0.08em] text-label">Chapter 0{currentIndex + 1} / 05</p>
+              <p className="tnum shrink-0 text-[10px] font-semibold uppercase tracking-[0.08em] text-label">Chapter 0{currentIndex + 1} / 0{SECTIONS.length}</p>
             </header>
 
             <div className="settings-section-enter flex flex-col gap-4" key={section}>
@@ -112,6 +114,7 @@ export default function SettingsPage() {
               {section === 'problems' && <ProblemsSection />}
               {section === 'solutions' && <SolutionsSection />}
               {section === 'why' && <WhySection />}
+              {section === 'progress' && <ProgressSection />}
             </div>
           </div>
         </main>
@@ -300,6 +303,131 @@ function WhySection() {
         <div className="mt-3"><ExternalLink href={WHY.logHref}>The decision log</ExternalLink></div>
       </Section>
     </>
+  )
+}
+
+const NUMBER_WORD = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
+const dayLabel = (day: string) => new Date(`${day}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+const stampLabel = (at: string) => new Date(at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' · ' + new Date(at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+
+/** The build record, generated from git history and the session transcripts by the chronicle.
+ *  Numbers are never typed in here; the chapter only lays out `data/buildLog.ts`. */
+function ProgressSection() {
+  const log = BUILD_LOG
+  const days = log.totals.days
+  const daysWord = NUMBER_WORD[days] ?? String(days)
+  const credited = log.crew.reduce((n, c) => n + c.commits, 0)
+  return (
+    <>
+      <Card className="overflow-hidden border-nav-selected-line">
+        <div className="bg-nav-selected-ink px-5 py-5 text-on-accent">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="max-w-[38rem]">
+              <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-on-accent/60">Build record</p>
+              <h2 className="mt-2 font-display text-[25px] font-semibold leading-[1.05] tracking-[-0.035em]">{daysWord[0].toUpperCase() + daysWord.slice(1)} days, {log.totals.commits} commits.</h2>
+              <p className="mt-3 text-[12px] leading-relaxed text-on-accent/75">Drawn from git history, the decision log, and the Claude Code session transcripts. Nothing on this page is typed in by hand; it is regenerated from the repository as the build goes.</p>
+            </div>
+            {log.remote && <ExternalLink href={log.remote} inverse>Source</ExternalLink>}
+          </div>
+        </div>
+        <dl className="grid divide-y divide-line bg-panel sm:grid-cols-2 sm:divide-x sm:divide-y-0 md:grid-cols-4">
+          <Stat label="Commits" value={log.totals.commits} detail={`+${log.totals.insertions.toLocaleString()} / −${log.totals.deletions.toLocaleString()} lines`} />
+          <Stat label="Days" value={days} detail={`${log.span.first?.slice(5, 10).replace('-', '/')} to ${log.span.last?.slice(5, 10).replace('-', '/')}`} />
+          <Stat label="Decisions logged" value={log.totals.decisions} detail="rows in the decision log" />
+          <Stat label="Source files" value={log.totals.sourceFiles} detail={`${log.totals.sessions} sessions · ${log.totals.screenshots} captures`} />
+        </dl>
+      </Card>
+
+      <Section title="Day by day" body="What each day was about, and what the app looked like when it ended.">
+        <ol className="divide-y divide-line">
+          {log.days.map((d) => <DayRow key={d.day} day={d} />)}
+        </ol>
+      </Section>
+
+      <Section title="Milestones" body="The commits that changed what the product was. Each one names its hash.">
+        <ol className="divide-y divide-line">
+          {log.milestones.map((m, index) => (
+            <li key={m.hash} className="grid grid-cols-[2.25rem_minmax(0,1fr)] gap-3 py-3 first:pt-0 last:pb-0">
+              <span className="tnum flex h-8 w-8 items-center justify-center rounded-control bg-nav-selected text-[10px] font-semibold text-nav-selected-ink">0{index + 1}</span>
+              <span className="min-w-0 pt-0.5">
+                <span className="flex flex-wrap items-baseline justify-between gap-x-3">
+                  <span className="text-[13px] font-semibold text-ink">{m.title}</span>
+                  <span className="tnum font-mono text-[9px] text-label">{stampLabel(m.at)} · {m.hash}</span>
+                </span>
+                <span className="mt-1 block text-[11px] leading-relaxed text-muted">{m.body}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+      </Section>
+
+      <Section title="Decisions over time" body="Rows in the decision log at the end of each day, against that day's commits.">
+        <DecisionsChart days={log.days} />
+      </Section>
+
+      <Section title="Who flew" body={`${credited} of ${log.totals.commits} commits carry a credit; ${log.totals.uncredited} do not.`}>
+        <Facts rows={[
+          ...log.crew.map((c) => [c.name, `${c.commits} commit${c.commits === 1 ? '' : 's'}${c.byHand ? ` (${c.byHand} credited by hand)` : ''} · ${c.turns.toLocaleString()} turns`] as [string, string]),
+          ['Uncredited', `${log.totals.uncredited} commit${log.totals.uncredited === 1 ? '' : 's'} with no trailer and no confirmed author`],
+        ]} />
+        <p className="mt-3 text-[10px] leading-snug text-muted">Commits are credited from their <code className="font-mono">Co-Authored-By</code> trailer. Where a tool left no trailer, the credit was confirmed by hand and is marked as such. Turns are assistant messages in the session transcripts.</p>
+      </Section>
+    </>
+  )
+}
+
+function Stat({ label, value, detail }: { label: string; value: number; detail: string }) {
+  return (
+    <div className="min-w-0 px-4 py-4">
+      <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-label">{label}</dt>
+      <dd className="tnum mt-2 font-display text-[28px] font-semibold leading-none tracking-[-0.04em] text-ink">{value.toLocaleString()}</dd>
+      <dd className="tnum mt-1.5 truncate text-[9px] text-muted" title={detail}>{detail}</dd>
+    </div>
+  )
+}
+
+function DayRow({ day }: { day: BuildDay }) {
+  return (
+    <li className="grid gap-4 py-4 first:pt-0 last:pb-0 md:grid-cols-[7.5rem_minmax(0,1fr)]">
+      <div className="md:pt-0.5">
+        <span className="block font-display text-[16px] font-semibold leading-none tracking-tight text-ink">{dayLabel(day.day)}</span>
+        <span className="tnum mt-1.5 block text-[11px] font-semibold text-ink">{day.commits} commit{day.commits === 1 ? '' : 's'}</span>
+        <span className="tnum mt-0.5 block text-[9px] text-label">+{day.insertions.toLocaleString()} / −{day.deletions.toLocaleString()}</span>
+      </div>
+      <div className="min-w-0">
+        <h3 className="text-[13px] font-semibold text-ink">{day.headline}</h3>
+        {day.body && <p className="mt-1 text-[11px] leading-relaxed text-muted">{day.body}</p>}
+        {day.shots.length > 0 && (
+          <ul className="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-4">
+            {day.shots.map((shot) => (
+              <li key={shot.src} className="min-w-0">
+                <img src={shot.src} alt={`${shot.view} on ${dayLabel(day.day)}`} loading="lazy" className="aspect-[16/10] w-full rounded-control border border-line bg-canvas object-cover object-top" />
+                <span className="mt-1 flex justify-between gap-2 text-[9px] font-semibold uppercase tracking-[0.06em] text-label"><span className="truncate">{shot.view.replace(/-/g, ' ')}</span>{shot.at && <span className="tnum shrink-0">{shot.at.slice(11)}</span>}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </li>
+  )
+}
+
+/** Cumulative decisions as columns, commits as the caption under each — one glance at how the log grew. */
+function DecisionsChart({ days }: { days: BuildDay[] }) {
+  const max = Math.max(1, ...days.map((d) => d.decisions))
+  return (
+    <div className="flex items-end gap-2" role="img" aria-label={days.map((d) => `${dayLabel(d.day)}: ${d.decisions} decisions, ${d.commits} commits`).join('; ')}>
+      {days.map((d) => (
+        <div key={d.day} className="flex min-w-0 flex-1 flex-col items-center gap-1.5">
+          <span className="tnum text-[11px] font-semibold text-ink">{d.decisions}</span>
+          <div className="flex h-28 w-full items-end rounded-control bg-board/55 px-1.5 pt-1.5">
+            <span className="block w-full rounded-t-[3px] bg-nav-selected-ink" style={{ height: `${(d.decisions / max) * 100}%` }} />
+          </div>
+          <span className="text-[9px] font-semibold uppercase tracking-[0.06em] text-label">{dayLabel(d.day).slice(0, 3)} {d.day.slice(8)}</span>
+          <span className="tnum text-[9px] text-muted">{d.commits} commits</span>
+        </div>
+      ))}
+    </div>
   )
 }
 
