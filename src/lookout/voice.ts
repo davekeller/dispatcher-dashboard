@@ -17,6 +17,13 @@ export const LOOKOUT = {
     `I'm Lookout, the shift co-pilot. Every ${tick} seconds I re-read all ${trucks} trucks against the clock, from the same ranked list the board draws. Right now ${urgent === 0 ? 'nobody needs you' : urgent === 1 ? 'one needs you' : `${urgent} need you`}, ${watch === 0 ? 'nothing' : watch === 1 ? 'one' : String(watch)} to watch.`,
   aboutWatching: (labels: string[]) => `Watching for: ${labels.join(' · ')}.`,
   aboutOrder: 'How I order: whoever breaks first comes first. Over the limit, then act now, then watch; inside a band, the least drive time left. A quiet truck near the limit sorts up, not down. Snoozed cards drop but never vanish, and ties never reorder on a tick.',
-  aboutTrust: "Every figure is the route file's own math, so the board and I cannot disagree. Ask me anything below.",
+  aboutTrust: "Every figure is the route file's own math, so the board and I cannot disagree.",
+  aboutAsk: 'Ask me anything below.',
+  /** The pick dialog, opened from the ✦ chip on the board's top card. */
+  pickTitle: "Lookout's pick",
+  pickWhy: (name: string) => `Why ${name} is first`,
+  pickTop: 'Top of the order right now. The chip moves the moment someone else needs you more.',
+  pickBehind: (snoozed: number) => `First unsnoozed card; ${snoozed === 1 ? 'one snoozed card sits' : `${snoozed} snoozed cards sit`} above it.`,
+  directive: 'Have a directive? A driver to leave alone, a region that comes first, a stop that cannot move: tell me in the chat and I will work it into what I surface.',
   noMatch: "I didn't catch that. Here's what I can do:",
 } as const

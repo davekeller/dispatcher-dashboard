@@ -1,4 +1,4 @@
-import { useState, type MouseEvent } from 'react'
+import { useState, type KeyboardEvent, type MouseEvent } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { navigateWithTransition } from '../../lib/viewTransition'
 import type { DriverCard } from '../../alerts/types'
@@ -6,24 +6,29 @@ import { routeHosSignal } from '../../lib/routeProgress'
 import { stopsPastLimit } from '../../store/actions'
 import { useStore } from '../../store/store'
 import type { DriverView } from '../../store/view'
-import Chip from '../../ui/Chip'
 import CorrectionChip from '../../ui/CorrectionChip'
 import DriverAvatar from '../../ui/DriverAvatar'
 import RouteHeader, { PRIORITY_RULES } from '../../ui/RouteHeader'
-import { LOOKOUT_TONE, severityTone } from '../../ui/tones'
+import { severityTone } from '../../ui/tones'
 import RouteTimelineMini from './RouteTimelineMini'
 
 const TITLE_STATUS_RULES = new Set(['wont_finish', 'offline_near_limit', 'offline'])
 
 /** The route is the card's primary entity; its driver and truck are assignment metadata.
  * Color is attention, clear work stays quiet, and nothing drags because bands are derived. */
-export default function RouteCard({ view, card, pick = false }: { view: DriverView; card: DriverCard; pick?: boolean }) {
+export default function RouteCard({ view, card, pick = false, onPick }: { view: DriverView; card: DriverCard; pick?: boolean; onPick?: () => void }) {
   const routeHref = `/routes/${view.driver.id}`
   const navigate = useNavigate()
   const [transitioning, setTransitioning] = useState(false)
   // The card names itself the shared element just before the old-state snapshot, then morphs into the route file's driver card.
   const openRoute = (event: MouseEvent<HTMLAnchorElement>) => {
     navigateWithTransition(event, navigate, routeHref, () => setTransitioning(true))
+  }
+  // The pick chip sits inside the card's link, so it stops the click at itself and opens the dialog instead of the route file.
+  const explainPick = (event: MouseEvent | KeyboardEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+    onPick?.()
   }
   const quiet = card.band === 'clear' && !pick
   const surface = quiet ? 'border-line/70 bg-panel/80 opacity-80 hover:opacity-100' : 'border-line bg-panel shadow-card'
@@ -91,11 +96,22 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
           </dl>
           {(footerAlerts.length > 0 || pick || hasCorrection) && (
             <div className="flex flex-wrap gap-1 border-t border-line/80 px-2.5 py-1.5">
-              {pick && <Chip tone={LOOKOUT_TONE} title="Lookout's top pick across the fleet" className="font-lookout">✦ Lookout's pick</Chip>}
               <CorrectionChip driverId={view.driver.id} />
               {footerAlerts.map((a) => (
                 <span key={a.id} className={`text-[9px] font-semibold leading-4 ${severityTone(a.severity).text}`} title={a.title}>{a.label}</span>
               ))}
+              {pick && (
+                <span
+                  role="button"
+                  tabIndex={0}
+                  onClick={explainPick}
+                  onKeyDown={(event) => (event.key === 'Enter' || event.key === ' ') && explainPick(event)}
+                  title="Lookout's top pick across the fleet. Why, and how Lookout orders the board."
+                  className="lookout-input-wash ml-auto inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-full border px-2 py-0.5 font-lookout text-[11px] font-semibold leading-4 text-ink transition hover:brightness-[.97] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ink/40"
+                >
+                  ✦ Lookout's pick
+                </span>
+              )}
             </div>
           )}
         </div>

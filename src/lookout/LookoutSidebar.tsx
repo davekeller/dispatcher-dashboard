@@ -1,5 +1,5 @@
 import { CaretDoubleRight } from '@phosphor-icons/react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useActions } from '../actions/ActionContext'
 import { useDerived } from '../store/hooks'
 import Button from '../ui/Button'
@@ -23,7 +23,7 @@ const FOCUS_TOP_N = 1
 /** Lookout never has its own data. It reads `ranked` and nothing else. Chat carries the live
  * recommendations; Artifacts is deliberately reserved as an empty workspace for later. */
 export default function LookoutSidebar() {
-  const { collapsed, setCollapsed, focusDriverId } = useLookout()
+  const { collapsed, setCollapsed, focusDriverId, composeRequest } = useLookout()
   const { open } = useActions()
   const d = useDerived()
   const { ranked, byId } = d
@@ -51,6 +51,11 @@ export default function LookoutSidebar() {
     setMessages((m) => [...m, { role: 'lookout', text: reply.text, reply }])
     setTab('chat')
   }
+
+  // A compose request from outside the rail lands on the chat tab; the composer focuses itself off the same counter.
+  useEffect(() => {
+    if (composeRequest > 0) setTab('chat')
+  }, [composeRequest])
 
   const send = (text: string) => {
     const trimmed = text.trim()
@@ -107,7 +112,7 @@ export default function LookoutSidebar() {
       ) : (
         <ArtifactsPanel />
       )}
-      <Composer onSend={send} />
+      <Composer onSend={send} focusKey={composeRequest} />
     </aside>
     </div>
   )
