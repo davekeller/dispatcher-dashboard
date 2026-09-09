@@ -1,4 +1,4 @@
-import { CaretRight, MapTrifold, SquaresFour } from '@phosphor-icons/react'
+import { CaretRight, Kanban, MapPin } from '@phosphor-icons/react'
 import { Link, useLocation } from 'react-router'
 import { DISPATCHER } from '../data/dispatcher'
 import LookoutAvatar from '../lookout/LookoutAvatar'
@@ -41,12 +41,13 @@ export default function Header() {
         </Link>
       </div>
       <Link to="/" className="-ml-3.5 whitespace-nowrap font-brand text-[17px] font-bold leading-none tracking-[-0.035em] text-nav-selected-ink">Dispatch</Link>
-      <nav aria-label="Workspace view" className="ml-5 flex h-8 w-48 shrink-0 items-stretch overflow-hidden rounded-control border border-nav-selected-ink bg-panel">
+      {/* The shell's keyline is an inset ring at partial alpha; the selected half paints over it, so its edge is its own dark fill. Filled glyphs stay crisp at 15px. */}
+      <nav aria-label="Workspace view" className="workspace-shell ml-5 flex h-8 w-48 shrink-0 items-stretch overflow-hidden rounded-control bg-panel">
         <Link to="/" aria-current={onBoard ? 'page' : undefined} className={segment(onBoard)}>
-          <SquaresFour size={14} weight={onBoard ? 'fill' : 'regular'} /> Board
+          <Kanban size={15} weight="fill" /> Board
         </Link>
-        <Link to={mapTo} aria-current={onMap ? 'page' : undefined} className={`${segment(onMap)} border-l border-nav-selected-ink`}>
-          <MapTrifold size={14} weight={onMap ? 'fill' : 'regular'} /> Map
+        <Link to={mapTo} aria-current={onMap ? 'page' : undefined} className={`${segment(onMap)} ${!onBoard && !onMap ? 'border-l border-nav-selected-ink/45' : ''}`}>
+          <MapPin size={15} weight="fill" /> Map
         </Link>
       </nav>
       {focused && (
