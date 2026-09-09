@@ -228,7 +228,13 @@ body { @apply bg-canvas text-ink font-sans; }
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ai-cool) 14%, transparent), 0 7px 22px color-mix(in srgb, var(--color-ai-rose) 12%, transparent);
 }
 
+/* The selected hero cell underlines in its own band color, over the same color's wash. */
 .lookout-metric-active { box-shadow: inset 0 -2px 0 var(--color-on-accent); }
+.lookout-metric-active[data-band='act_now'] { box-shadow: inset 0 -2px 0 var(--color-act-now-fill); }
+.lookout-metric-active[data-band='watch'] { box-shadow: inset 0 -2px 0 var(--color-watch-fill); }
+.lookout-metric-active[data-band='break'] { box-shadow: inset 0 -2px 0 var(--color-break-fill); }
+.lookout-metric-active[data-band='offline'] { box-shadow: inset 0 -2px 0 var(--color-offline-fill); }
+.lookout-metric-active[data-band='clear'] { box-shadow: inset 0 -2px 0 var(--color-clear-fill); }
 
 .route-history-progress {
   background: linear-gradient(to top, var(--color-route-done-start), var(--color-route-done-end));
