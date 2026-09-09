@@ -52,6 +52,21 @@ export function drivingMinutes(driver: Driver, now: number): number {
   return minutesOfStatus(knownSegments(driver, now), 'driving', now)
 }
 
+/** When the driver's driving minutes reached `minutes`; undefined if they have not yet. The same
+ *  known segments as drivingMinutes, so a dark truck is projected as still driving and the caller
+ *  marks the moment as an estimate. */
+export function drivingReachedAt(driver: Driver, minutes: number, now: number): number | undefined {
+  const known = knownSegments(driver, now)
+  let total = 0
+  for (const s of known) {
+    if (s.status !== 'driving') continue
+    const span = (segmentEnd(s, known, now) - s.startedAt) / MIN
+    if (total + span >= minutes) return s.startedAt + (minutes - total) * MIN
+    total += span
+  }
+  return undefined
+}
+
 export function minutesUntilLimit(driver: Driver, now: number): number {
   return LIMIT_MIN - drivingMinutes(driver, now)
 }

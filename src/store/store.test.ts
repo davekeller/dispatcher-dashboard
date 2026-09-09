@@ -1,6 +1,8 @@
 import { SCRUB_MIN_MS } from '../time/clock'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { remainingDriveMinutes } from '../hos/compute'
+import { reassignCandidates } from './actions'
+import { derive } from './derive'
 import { useStore } from './store'
 
 describe('store', () => {
@@ -29,6 +31,49 @@ describe('store', () => {
     expect(useStore.getState().events[2].label).toBe('Undone: Call to Dre W. logged')
     useStore.getState().resetFleet()
     expect(useStore.getState().events).toHaveLength(1)
+  })
+
+  it('a reassign event remembers the stops, both drivers, the spare time, and the driver as he was', () => {
+    const s = useStore.getState()
+    const d = derive(s.fleet, s.now(), s.snoozes)
+    const marcus = d.byId.get('drv-01')!
+    const ids = marcus.route.stops.filter((x) => x.status === 'pending').map((x) => x.id)
+    const spare = reassignCandidates(d.views, marcus, ids).find((c) => c.view.driver.id === 'drv-08')!.spare
+    s.reassignStops('drv-01', 'drv-08', ids)
+    const e = useStore.getState().events[1]
+    expect(e.detail).toMatchObject({ type: 'reassign', fromId: 'drv-01', toId: 'drv-08' })
+    expect(e.detail?.type === 'reassign' && e.detail.spareAfterMin).toBeCloseTo(spare, 1)
+    expect(e.detail?.type === 'reassign' && e.detail.stops.map((x) => x.seq)).toEqual(ids.map((id) => marcus.route.stops.find((x) => x.id === id)!.seq))
+    expect(e.detail?.type === 'reassign' && e.detail.stops[0].customer).toBeTruthy()
+    expect(e.context).toMatchObject({ hos: 'act_now', staleness: 'fresh' })
+    expect(e.context!.minutesUntilLimit).toBeCloseTo(12, 0)
+    expect(e.context!.alerts.length).toBeGreaterThan(0)
+    expect(e.context!.severity).toBe('act_now')
+  })
+
+  it('an undo names the event it reversed; a call remembers the ping age; a snooze remembers the rule', () => {
+    const s = useStore.getState()
+    s.callDriver('drv-03')
+    useStore.getState().undo()
+    useStore.getState().acknowledge('offline_near_limit:drv-03')
+    const [, call, undo, snooze] = useStore.getState().events
+    expect(call.detail).toMatchObject({ type: 'call_driver' })
+    expect(call.detail?.type === 'call_driver' && Math.round(call.detail.pingAgeMin)).toBe(25)
+    expect(call.context?.staleness).toBe('offline')
+    expect(undo.detail).toEqual({ type: 'undo', targetSeq: 2 })
+    expect(snooze.detail?.type === 'snooze' && snooze.detail.ruleLabel).toBe('Offline')
+    expect(snooze.detail?.type === 'snooze' && snooze.detail.until - s.now()).toBeGreaterThan(9 * 60_000)
+  })
+
+  it('a notify event carries the stops with their windows and the driver, so the card can link', () => {
+    const s = useStore.getState()
+    const tomas = s.fleet.routes.find((r) => r.driverId === 'drv-07')!
+    const ids = tomas.stops.filter((x) => x.status === 'pending').slice(0, 2).map((x) => x.id)
+    s.notifyCustomer(ids)
+    const e = useStore.getState().events[1]
+    expect(e.driverId).toBe('drv-07')
+    expect(e.detail?.type === 'notify_customer' && e.detail.stops.map((x) => x.id)).toEqual(ids)
+    expect(e.detail?.type === 'notify_customer' && e.detail.stops[0].windowEnd).toBeGreaterThan(0)
   })
 
   it('acknowledge snoozes for ten minutes on the simulated clock', () => {

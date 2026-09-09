@@ -25,8 +25,8 @@ export interface FilterDef {
   apply: (v: DriverView, c: DriverCard, value: FilterValue) => boolean
 }
 
-const multi = (value: FilterValue): string[] => (Array.isArray(value) ? value : [])
-const text = (value: FilterValue): string => (typeof value === 'string' ? value.trim().toLowerCase() : '')
+export const multi = (value: FilterValue): string[] => (Array.isArray(value) ? value : [])
+export const text = (value: FilterValue): string => (typeof value === 'string' ? value.trim().toLowerCase() : '')
 
 const SEVERITY_WORD: Record<Severity, string> = { critical: 'over', act_now: 'act now', watch: 'watch', info: 'info' }
 // One option per rule, wearing its severity; rules that share a label carry a note so the two Approaching limits and two Offlines stay apart.

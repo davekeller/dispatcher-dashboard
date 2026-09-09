@@ -43,3 +43,8 @@ export function fmtDrift(minutes: number): string {
   if (Math.abs(minutes) <= 5) return 'On time'
   return minutes > 0 ? `Behind ${fmtMinutes(minutes)}` : `Ahead ${fmtMinutes(-minutes)}`
 }
+
+/** The hour alone, for timeline headings: "2 PM". */
+export function fmtHour(t: number): string {
+  return new Date(t).toLocaleTimeString('en-US', { hour: 'numeric' })
+}
