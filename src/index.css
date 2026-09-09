@@ -341,6 +341,45 @@ body { @apply bg-canvas text-ink font-sans; }
   }
 }
 
+/* The route file's parts arrive in order on the entrance curve: the Stops bar drops in, the rail slides in from
+   the left, the alerts and the stops rise; the driver card is the morph target. The same choreography runs as
+   View Transition parts when the API is there and as element animations when it is not. Leaving, the parts
+   settle down and out on the gentle curve while the board returns. */
+@keyframes route-part-down { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes route-part-left { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes route-part-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes route-part-out { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(6px); } }
+
+.route-part-bar { animation: route-part-down 240ms var(--ease-out-soft) both; }
+.route-part-rail { animation: route-part-left 300ms var(--ease-out-soft) 40ms both; }
+.route-part-alerts { animation: route-part-up 240ms var(--ease-out-soft) 90ms both; }
+.route-part-stops { animation: route-part-up 320ms var(--ease-out-soft) 120ms both; }
+
+@supports (view-transition-name: route-card-expand) {
+  .route-part-bar, .route-part-rail, .route-part-alerts, .route-part-stops { animation: none; }
+  .route-part-bar { view-transition-name: route-stops-bar; }
+  .route-part-rail { view-transition-name: route-rail; }
+  .route-part-alerts { view-transition-name: route-alerts; }
+  .route-part-stops { view-transition-name: route-stops; }
+
+  ::view-transition-new(route-stops-bar) { animation: route-part-down 240ms var(--ease-out-soft) both; }
+  ::view-transition-new(route-rail) { animation: route-part-left 300ms var(--ease-out-soft) 40ms both; }
+  ::view-transition-new(route-alerts) { animation: route-part-up 240ms var(--ease-out-soft) 90ms both; }
+  ::view-transition-new(route-stops) { animation: route-part-up 320ms var(--ease-out-soft) 120ms both; }
+
+  ::view-transition-old(route-workspace),
+  ::view-transition-old(route-stops-bar),
+  ::view-transition-old(route-rail),
+  ::view-transition-old(route-alerts),
+  ::view-transition-old(route-stops) { animation: route-part-out 200ms var(--ease-gentle) both; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-part-bar, .route-part-rail, .route-part-alerts, .route-part-stops { animation: none; }
+  ::view-transition-new(route-stops-bar), ::view-transition-new(route-rail), ::view-transition-new(route-alerts), ::view-transition-new(route-stops),
+  ::view-transition-old(route-workspace), ::view-transition-old(route-stops-bar), ::view-transition-old(route-rail), ::view-transition-old(route-alerts), ::view-transition-old(route-stops) { animation: none; }
+}
+
 @keyframes lane-content-enter {
   from { opacity: 0; transform: translateY(3px); }
   to { opacity: 1; transform: translateY(0); }
