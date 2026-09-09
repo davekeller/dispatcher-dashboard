@@ -16,7 +16,8 @@ export function isSettingsSection(value: string | null): value is SettingsSectio
 }
 
 export const PROJECT = {
-  name: 'Dispatch',
+  /** The product's full name in the project file; the wordmark in the product bar stays Dispatch. */
+  name: 'Dispatch Dashboard',
   line: 'An Active Shift board for a fleet dispatcher running about fifty heavy-duty trucks and a thousand deliveries a day. Her job is not monitoring; it is intervening in time. The board is built around one exception: the 11-hour Hours of Service driving limit.',
   facts: [
     ['Fleet', '50 trucks · 4 regions · ~1,000 stops a day'],
@@ -24,7 +25,7 @@ export const PROJECT = {
     ['What is real', 'A deterministic seeded fleet, one clock, pure derivation. Time to the limit is computed against the clock, never typed in.'],
     ['Stack', 'Vite · React 19 · TypeScript · Tailwind v4 · Zustand · react-router · Leaflet, lazy'],
   ] as [string, string][],
-  author: { name: 'Dave Keller', email: 'dave@kidastro.com' },
+  author: { name: 'Dave Keller', site: 'kidastro.com', href: 'https://kidastro.com' },
   links: [
     { label: 'Live', href: 'https://dispatch.kidastro.com' },
     { label: 'Source', href: 'https://github.com/davekeller/dispatcher-dashboard' },
