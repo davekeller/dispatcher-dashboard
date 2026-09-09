@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { Driver, DutySegment, Route, Stop } from '../data/types'
 import { MIN } from '../time/clock'
 import {
-  drivingMinutes, drivingSinceBreak, effectiveLastPingAt, hosStatusOf, knownSegments, limitHitAt,
+  drivingMinutes, drivingReachedAt, drivingSinceBreak, effectiveLastPingAt, hosStatusOf, knownSegments, limitHitAt,
   minutesUntilLimit, remainingDriveMinutes, scheduleDrift, segmentsKnownAt, stalenessOf, currentStatus,
 } from './compute'
 
@@ -136,5 +136,25 @@ describe('drivingSinceBreak', () => {
       { status: 'driving', startedAt: m(215) },
     ], m(300))
     expect(drivingSinceBreak(d, m(300))).toBeCloseTo(285)
+  })
+})
+
+describe('drivingReachedAt', () => {
+  const segs: DutySegment[] = [
+    { status: 'driving', startedAt: m(0), endedAt: m(50) },
+    { status: 'on_break', startedAt: m(50), endedAt: m(80) },
+    { status: 'driving', startedAt: m(80) },
+  ]
+  it('finds the moment the known driving minutes crossed a threshold, across a break', () => {
+    expect(drivingReachedAt(driver(segs, m(120)), 70, m(120))).toBe(m(100))
+    expect(drivingReachedAt(driver(segs, m(120)), 20, m(120))).toBe(m(20))
+  })
+  it('is undefined when the threshold has not been reached yet', () => {
+    expect(drivingReachedAt(driver(segs, m(120)), 200, m(120))).toBeUndefined()
+  })
+  it('projects a dark truck as still driving, the same way drivingMinutes does', () => {
+    // Dark since m(90) and last seen driving: the projection keeps the segment open to now.
+    expect(drivingReachedAt(driver(segs, m(90), true), 70, m(120))).toBe(m(100))
+    expect(drivingMinutes(driver(segs, m(90), true), m(120))).toBe(90)
   })
 })

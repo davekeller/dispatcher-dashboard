@@ -150,6 +150,13 @@ export function bringOnline(fleet: Fleet, driverId: string, now: number): Fleet 
   return withDriver(fleet, { ...driverOf(fleet, driverId), pingsSuspended: false, lastPingAt: now })
 }
 
+/** The target's drive time left after taking these stops, before the capacity margin. The
+ *  candidate list and the shift log's reassign receipt both read this, so they cannot differ. */
+export function spareAfterMove(to: DriverView, from: DriverView, stopIds: string[]): number {
+  const moved = from.route.stops.filter((s) => stopIds.includes(s.id)).reduce((t, s) => t + s.driveMinutesFromPrev, 0)
+  return to.minutesUntilLimit - (to.remainingDriveMin + moved)
+}
+
 export interface Candidate {
   view: DriverView
   spare: number
@@ -160,12 +167,11 @@ export interface Candidate {
  *  act-now or over, and still holding CAPACITY_MARGIN_MIN after the move. Same region
  *  first, then most spare drive time. */
 export function reassignCandidates(views: DriverView[], from: DriverView, stopIds: string[]): Candidate[] {
-  const moved = from.route.stops.filter((s) => stopIds.includes(s.id)).reduce((t, s) => t + s.driveMinutesFromPrev, 0)
   return views
     .filter((v) => v.driver.id !== from.driver.id)
     .filter((v) => v.staleness === 'fresh' && (v.status === 'driving' || v.status === 'on_duty'))
     .filter((v) => v.hos !== 'over' && v.hos !== 'act_now')
-    .map((v) => ({ view: v, spare: v.minutesUntilLimit - (v.remainingDriveMin + moved), sameRegion: v.driver.region === from.driver.region }))
+    .map((v) => ({ view: v, spare: spareAfterMove(v, from, stopIds), sameRegion: v.driver.region === from.driver.region }))
     .filter((c) => c.spare >= CAPACITY_MARGIN_MIN)
     .sort((a, b) => Number(b.sameRegion) - Number(a.sameRegion) || b.spare - a.spare)
 }

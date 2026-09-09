@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fmtAge, fmtCompactAge, fmtCountdown, fmtDrift, fmtHm, fmtMinutes } from './format'
+import { fmtHour, fmtAge, fmtCompactAge, fmtCountdown, fmtDrift, fmtHm, fmtMinutes } from './format'
 
 describe('fmtHm', () => {
   it('renders hours:minutes with a two-digit minute', () => {
@@ -43,5 +43,12 @@ describe('fmtDrift', () => {
     expect(fmtDrift(-5)).toBe('On time')
     expect(fmtDrift(14)).toBe('Behind 14 min')
     expect(fmtDrift(-9)).toBe('Ahead 9 min')
+  })
+})
+
+describe('fmtHour', () => {
+  it('names the hour only', () => {
+    expect(fmtHour(new Date(2026, 8, 9, 14, 0).getTime())).toBe('2 PM')
+    expect(fmtHour(new Date(2026, 8, 9, 9, 30).getTime())).toBe('9 AM')
   })
 })
