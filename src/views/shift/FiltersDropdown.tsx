@@ -66,7 +66,7 @@ export default function FiltersDropdown({ value, onChange, filters = FILTERS, co
 
   return (
     <div ref={ref} className="relative">
-      <button type="button" onClick={() => setOpen((current) => !current)} aria-haspopup="listbox" aria-expanded={open} aria-label={`${copy.aria}: ${buttonLabel}`} className={`inline-flex h-9 items-center gap-2 rounded-control border px-3 text-[12px] font-semibold shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/10 ${selectedCount > 0 ? 'border-ink/25 bg-well text-ink' : 'border-line bg-panel text-ink hover:border-ink/20'}`}>
+      <button type="button" onClick={() => setOpen((current) => !current)} aria-haspopup="listbox" aria-expanded={open} aria-label={`${copy.aria}: ${buttonLabel}`} className={`inline-flex h-9 items-center gap-2 rounded-control border px-3 text-[12px] font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/10 ${selectedCount > 0 ? 'border-ink/25 bg-well text-ink' : 'border-line bg-panel text-ink hover:border-ink/20'}`}>
         <Funnel size={14} weight={selectedCount > 0 ? 'fill' : 'regular'} />
         {buttonLabel}
         <CaretDown size={12} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
