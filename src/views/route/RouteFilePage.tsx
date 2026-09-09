@@ -1,12 +1,13 @@
 import { ArrowLeft, ListBullets, MapTrifold } from '@phosphor-icons/react'
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useLocation, useParams, useSearchParams } from 'react-router'
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router'
 import { useActions } from '../../actions/ActionContext'
 import { BAND_LABEL } from '../../bands'
 import { originOf } from '../../app/origin'
 import { stopsPastLimit } from '../../store/actions'
 import { useLookout } from '../../lookout/LookoutContext'
 import { fmtAge } from '../../lib/format'
+import { navigateWithTransition } from '../../lib/viewTransition'
 import { routeCompletionPct, routeHosSignal, routeScheduleSignal, type RouteSignalTone } from '../../lib/routeProgress'
 import { useDerived } from '../../store/hooks'
 import { useStore } from '../../store/store'
@@ -62,6 +63,7 @@ export default function RouteFilePage() {
   const selectionAnchor = useRef<string | null>(null)
   const [railCollapsed, setRailCollapsed] = useState(true)
   const [params, setParams] = useSearchParams()
+  const navigate = useNavigate()
   const mode: StopsMode = params.get('view') === 'map' ? 'map' : 'list'
   const setMode = (next: StopsMode) => setParams((prev) => {
     const q = new URLSearchParams(prev)
@@ -128,8 +130,8 @@ export default function RouteFilePage() {
   return (
     <div className="route-workspace flex h-full min-h-0 flex-col">
       {/* The secondary nav: part of the chrome, not the scroll. Back is its first column; the rail has no arrow of its own. */}
-      <nav aria-label="Route" className="stops-navbar nav-shadow-below relative z-20 flex h-[3.25rem] shrink-0 items-stretch border-b border-line">
-        <Link to={origin.to} title={`Back to the ${origin.view}`} aria-label={`Back to the ${origin.view}`} className="flex w-16 shrink-0 items-center justify-center border-r border-line text-muted transition hover:bg-board hover:text-ink">
+      <nav aria-label="Route" className="stops-navbar route-part-bar nav-shadow-below relative z-20 flex h-[3.25rem] shrink-0 items-stretch border-b border-line">
+        <Link to={origin.to} onClick={(event) => navigateWithTransition(event, navigate, origin.to)} title={`Back to the ${origin.view}`} aria-label={`Back to the ${origin.view}`} className="flex w-16 shrink-0 items-center justify-center border-r border-line text-muted transition hover:bg-board hover:text-ink">
           <ArrowLeft size={16} weight="bold" />
         </Link>
         <div className="flex shrink-0 items-center gap-2.5 border-r border-line pl-4 pr-5">
@@ -193,13 +195,13 @@ export default function RouteFilePage() {
           <section className="flex flex-col gap-4">
             <DriverCard view={view} card={card} />
           {(card.alerts.length > 0 || stale) && (
-            <div className="flex flex-col gap-3">
+            <div className="route-part-alerts flex flex-col gap-3">
               {card.alerts.length > 0 && <AlertStrip view={view} card={card} />}
               {stale && <StaleBanner view={view} />}
             </div>
           )}
           </section>
-          <section>
+          <section className="route-part-stops">
             {mode === 'map' ? (
               <Suspense fallback={<div className="flex h-[22rem] items-center justify-center rounded-card border border-line bg-panel text-[12px] text-muted">Loading the map…</div>}>
                 <RouteMap view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} selectedStopId={mapSelection} onSelectStop={setSelectedStop} />
