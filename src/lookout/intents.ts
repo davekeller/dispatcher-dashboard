@@ -1,4 +1,6 @@
+import { RULES } from '../alerts/rules'
 import type { Derived } from '../store/derive'
+import { TICK_MS } from '../time/clock'
 import { routePlans } from './plans'
 import { LOOKOUT } from './voice'
 
@@ -7,6 +9,8 @@ import { LOOKOUT } from './voice'
 
 export interface Reply {
   text: string
+  /** Short follow-on lines under the text, for a reply with more than one thing to say. */
+  notes?: string[]
   driverIds?: string[]
   open?: { action: 'reassign'; driverId: string }
   examples?: string[]
@@ -17,6 +21,19 @@ export interface Intent {
   example: string
   patterns: RegExp[]
   reply: (input: string, d: Derived) => Reply
+}
+
+/** Who Lookout is, what it watches for (the rules, read from the array), and how it orders (the rank's own
+ *  sort). One reply for the header click and the chat question, so the two can never drift apart. */
+export function aboutReply(d: Derived): Reply {
+  const urgent = d.ranked.filter((c) => c.alerts.length > 0 && (c.severity === 'critical' || c.severity === 'act_now')).length
+  const watch = d.ranked.filter((c) => c.band === 'watch').length
+  const labels = [...new Set(RULES.map((r) => r.label))]
+  return {
+    text: LOOKOUT.aboutIntro(d.views.length, Math.round(TICK_MS / 1000), urgent, watch),
+    notes: [LOOKOUT.aboutWatching(labels), LOOKOUT.aboutOrder, LOOKOUT.aboutTrust],
+    examples: INTENTS.filter((i) => i.id !== 'about').map((i) => i.example),
+  }
 }
 
 export const INTENTS: Intent[] = [
@@ -63,6 +80,12 @@ export const INTENTS: Intent[] = [
       if (!hit) return { text: "Whose stops? Give me a driver's first name.", examples: ["Reassign Marcus's stops"] }
       return { text: `Opening the reassign picker for ${hit.driver.name}.`, open: { action: 'reassign', driverId: hit.driver.id } }
     },
+  },
+  {
+    id: 'about',
+    example: 'How do you order the board?',
+    patterns: [/who are you/i, /what are you/i, /what do you (do|watch)/i, /how do you (order|rank|sort)/i, /introduce/i, /trust/i, /watching for/i],
+    reply: (_input, d) => aboutReply(d),
   },
 ]
 

@@ -7,7 +7,7 @@ import { NAV_ITEM_BASE, navigationItemState } from '../ui/navigation'
 import ArtifactsPanel from './ArtifactsPanel'
 import ChatThread, { type Message } from './ChatThread'
 import Composer from './Composer'
-import { INTENTS, matchIntent } from './intents'
+import { aboutReply, INTENTS, matchIntent } from './intents'
 import LookoutAvatar from './LookoutAvatar'
 import { useLookout } from './LookoutContext'
 import PlanCard from './PlanCard'
@@ -45,6 +45,13 @@ export default function LookoutSidebar() {
   const first = urgentCards[0] ? byId.get(urgentCards[0].driverId)?.driver.name : undefined
   const summary = LOOKOUT.summary(urgentCards.length, first)
 
+  // Clicking Lookout's name or face posts the introduction: who this is, what it watches for, how it orders.
+  const introduce = () => {
+    const reply = aboutReply(d)
+    setMessages((m) => [...m, { role: 'lookout', text: reply.text, reply }])
+    setTab('chat')
+  }
+
   const send = (text: string) => {
     const trimmed = text.trim()
     if (!trimmed) return
@@ -68,11 +75,13 @@ export default function LookoutSidebar() {
             </button>
           ))}
         </div>
-        <div className="ml-auto min-w-0 text-right font-lookout">
-          <p className="text-[14px] font-semibold leading-tight text-ink">{LOOKOUT.name}</p>
-          <p className="text-[10px] leading-tight text-muted">{LOOKOUT.role}</p>
-        </div>
-        <LookoutAvatar size={30} className="shrink-0" />
+        <button type="button" onClick={introduce} title={`Who ${LOOKOUT.name} is and how it orders the shift`} className="ml-auto flex min-w-0 items-center gap-2 rounded-control py-0.5 pl-2 pr-1 text-right font-lookout transition hover:bg-well focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/40">
+          <span className="min-w-0">
+            <span className="block text-[14px] font-semibold leading-tight text-ink">{LOOKOUT.name}</span>
+            <span className="block text-[10px] leading-tight text-muted">{LOOKOUT.role}</span>
+          </span>
+          <LookoutAvatar size={30} className="shrink-0" />
+        </button>
         <button type="button" onClick={() => setCollapsed(true)} className="rounded-control p-0.5 text-muted hover:bg-well hover:text-ink" aria-label={`Collapse ${LOOKOUT.name}`}>
           <CaretDoubleRight size={16} />
         </button>
