@@ -380,6 +380,14 @@ body { @apply bg-canvas text-ink font-sans; }
   ::view-transition-old(route-workspace), ::view-transition-old(route-stops-bar), ::view-transition-old(route-rail), ::view-transition-old(route-alerts), ::view-transition-old(route-stops) { animation: none; }
 }
 
+/* The result toast: centered at the bottom, it rises in on the entrance curve and settles back down on the gentle one. */
+.toast { transform: translate(-50%, 0); }
+.toast-enter { animation: toast-rise 300ms var(--ease-out-soft) both; }
+.toast-leave { animation: toast-settle 200ms var(--ease-gentle) both; pointer-events: none; }
+@keyframes toast-rise { from { opacity: 0; transform: translate(-50%, 16px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@keyframes toast-settle { from { opacity: 1; transform: translate(-50%, 0); } to { opacity: 0; transform: translate(-50%, 12px); } }
+@media (prefers-reduced-motion: reduce) { .toast-enter, .toast-leave { animation: none; } }
+
 @keyframes lane-content-enter {
   from { opacity: 0; transform: translateY(3px); }
   to { opacity: 1; transform: translateY(0); }
