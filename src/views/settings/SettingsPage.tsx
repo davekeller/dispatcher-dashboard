@@ -47,16 +47,24 @@ export default function SettingsPage() {
 
   return (
     <div className="settings-page min-h-full">
-      <div className="grid min-h-full md:grid-cols-[13.5rem_minmax(0,1fr)]">
+      <div className="grid min-h-full md:grid-cols-[15rem_minmax(0,1fr)]">
         <aside className="border-b border-nav-selected-line bg-panel/95 md:sticky md:top-0 md:h-[calc(100vh-3.5rem)] md:self-start md:border-b-0 md:border-r">
           <div className="flex h-full flex-col px-4 py-5">
             <div className="px-2">
               <p className="text-[9px] font-semibold uppercase tracking-[0.13em] text-label">Project file</p>
-              <p className="mt-1 font-brand text-[20px] font-bold tracking-[-0.04em] text-nav-selected-ink">Dispatch</p>
-              <p className="mt-1 text-[11px] leading-snug text-muted">Active-shift intervention system</p>
+              <p className="mt-1 whitespace-nowrap font-brand text-[18px] font-bold leading-tight tracking-[-0.04em] text-nav-selected-ink">{PROJECT.name}</p>
             </div>
 
-            <nav aria-label="About this build" className="mt-6">
+            {/* The dispatcher sits right under the product's name: the project file is hers. */}
+            <button type="button" onClick={() => setSection('lena')} aria-current={section === 'lena' ? 'page' : undefined} className="mt-4 flex w-full items-center gap-2.5 rounded-control px-2 py-2 text-left transition hover:bg-board/70">
+              <DispatcherAvatar dispatcher={DISPATCHER} size={36} />
+              <span className="min-w-0">
+                <span className="block truncate text-[12px] font-semibold text-ink">{DISPATCHER.name}</span>
+                <span className="block truncate text-[10px] text-muted">The dispatcher</span>
+              </span>
+            </button>
+
+            <nav aria-label="About this build" className="mt-4">
               <ol className="flex flex-col gap-1">
                 {SECTIONS.map((item, index) => {
                   const on = item.id === section
@@ -75,14 +83,7 @@ export default function SettingsPage() {
             </nav>
 
             <div className="mt-6 border-t border-line pt-4 md:mt-auto">
-              <button type="button" onClick={() => setSection('lena')} className="flex w-full items-center gap-2.5 rounded-control px-2 py-2 text-left transition hover:bg-board/70">
-                <DispatcherAvatar dispatcher={DISPATCHER} size={36} />
-                <span className="min-w-0">
-                  <span className="block truncate text-[12px] font-semibold text-ink">{DISPATCHER.name}</span>
-                  <span className="block truncate text-[10px] text-muted">The dispatcher</span>
-                </span>
-              </button>
-              <p className="mt-3 px-2 text-[10px] leading-snug text-muted">Designed by {PROJECT.author.name}<br /><a href={`mailto:${PROJECT.author.email}`} className="text-ink underline-offset-2 hover:underline">{PROJECT.author.email}</a></p>
+              <p className="px-2 text-[10px] leading-snug text-muted">Designed by {PROJECT.author.name}<br /><a href={PROJECT.author.href} target="_blank" rel="noreferrer" className="text-ink underline-offset-2 hover:underline">{PROJECT.author.site}</a></p>
             </div>
           </div>
         </aside>
