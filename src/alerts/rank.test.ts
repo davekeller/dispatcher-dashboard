@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { makeFleet } from '../data/seed'
 import { MIN } from '../time/clock'
 import { buildViews } from '../store/view'
-import { evaluateRules, rankDrivers } from './rank'
+import { evaluateRules, RANK_KEYS, rankDrivers } from './rank'
 
 const anchor = new Date(2026, 8, 3, 12, 47, 0, 0).getTime()
 const fleet = makeFleet(anchor)
@@ -44,5 +44,12 @@ describe('rankDrivers', () => {
   it('snooze expires with the clock', () => {
     const snoozes = { 'limit_act_now:drv-01': anchor + 1 * MIN, 'wont_finish:drv-01': anchor + 1 * MIN, 'behind_schedule:drv-01': anchor + 1 * MIN }
     expect(rankedAt(anchor + 2 * MIN, snoozes).find((c) => c.driverId === 'drv-01')!.snoozed).toBe(false)
+  })
+})
+
+describe('RANK_KEYS', () => {
+  it('names the five comparator keys in the order the sort applies them', () => {
+    expect(RANK_KEYS.map((k) => k.label)).toEqual(['Whoever breaks first', 'Snoozed cards drop', 'Least drive time left', 'Quiet trucks sort up', 'Ties stay put'])
+    for (const key of RANK_KEYS) expect(key.detail.length).toBeGreaterThan(20)
   })
 })
