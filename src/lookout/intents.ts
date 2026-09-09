@@ -31,7 +31,7 @@ export function aboutReply(d: Derived): Reply {
   const labels = [...new Set(RULES.map((r) => r.label))]
   return {
     text: LOOKOUT.aboutIntro(d.views.length, Math.round(TICK_MS / 1000), urgent, watch),
-    notes: [LOOKOUT.aboutWatching(labels), LOOKOUT.aboutOrder, LOOKOUT.aboutTrust],
+    notes: [LOOKOUT.aboutWatching(labels), LOOKOUT.aboutOrder, `${LOOKOUT.aboutTrust} ${LOOKOUT.aboutAsk}`],
     examples: INTENTS.filter((i) => i.id !== 'about').map((i) => i.example),
   }
 }

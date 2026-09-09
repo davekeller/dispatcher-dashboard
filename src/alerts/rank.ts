@@ -24,6 +24,16 @@ export function topSeverity(alerts: Alert[]): Severity | 'none' {
   return top
 }
 
+/** The comparator below, in words, in order. Lookout's pick dialog reads this list, so the
+ *  explanation and the sort live in one file and cannot drift apart. */
+export const RANK_KEYS: { label: string; detail: string }[] = [
+  { label: 'Whoever breaks first', detail: 'Over the limit, then act now, then watch, then info. Clear routes last.' },
+  { label: 'Snoozed cards drop', detail: 'A snoozed card sorts below the others in its band. It never disappears.' },
+  { label: 'Least drive time left', detail: 'Inside a band, the driver closest to the 11-hour limit comes first, to the whole minute, so a tick never jostles cards.' },
+  { label: 'Quiet trucks sort up', detail: 'On a tie, offline before stale before fresh: a truck that stopped reporting near the limit is the riskier one.' },
+  { label: 'Ties stay put', detail: 'Anything still tied keeps its id order, so the board never reorders on its own.' },
+]
+
 /** One card per driver. Sort: severity, then unsnoozed before snoozed, then time to
  *  violation (offline continuation counts), then staleness (offline first), then id so
  *  ties never reorder on a tick. Snooze de-emphasizes; it never removes a card. */

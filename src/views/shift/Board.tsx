@@ -1,10 +1,12 @@
 import { CaretLeft } from '@phosphor-icons/react'
+import { useState } from 'react'
 import type { DriverCard } from '../../alerts/types'
 import { BAND_ORDER, type Band } from '../../bands'
 import type { Grouping } from '../../groupBy'
 import type { DriverView } from '../../store/view'
 import EmptyState from '../../ui/EmptyState'
 import { BAND_TONE } from '../../ui/tones'
+import LookoutPickModal from '../../lookout/LookoutPickModal'
 import RouteCard from './RouteCard'
 import { useStore } from '../../store/store'
 import { useColumnTracks } from './useColumnTracks'
@@ -14,6 +16,10 @@ import { useColumnTracks } from './useColumnTracks'
 export default function Board({ cards, byId, grouping, pickId, filtering = false }: { cards: DriverCard[]; byId: Map<string, DriverView>; grouping: Grouping; pickId: string | null; filtering?: boolean }) {
   const columns = grouping.columns.map((col) => ({ ...col, cards: cards.filter((c) => grouping.keyOf(byId.get(c.driverId)!, c) === col.key) }))
   // Open/closed per column lives in the store so the Filters menu can set it too; a user's picks survive a lens change.
+  // The pick dialog lives here, outside the card's link, so its clicks never open the route file.
+  const [explainPick, setExplainPick] = useState(false)
+  const pickCard = pickId ? cards.find((c) => c.driverId === pickId) : undefined
+  const pickView = pickId ? byId.get(pickId) : undefined
   const columnOpen = useStore((s) => s.columnOpen)
   const setColumnOpen = useStore((s) => s.setColumnOpen)
   const isExpanded = (key: string) => columnOpen[key] !== false
@@ -49,7 +55,7 @@ export default function Board({ cards, byId, grouping, pickId, filtering = false
                     {col.cards.length === 0 ? (
                       <EmptyState title={grouping.id === 'band' ? `No routes in ${col.label.toLowerCase()}` : `No routes in ${col.label}`} body={filtering ? 'Nothing here matches the current filters.' : grouping.id === 'band' ? 'Nothing needs you here right now.' : 'No routes are assigned here.'} />
                     ) : (
-                      col.cards.map((card) => <RouteCard key={card.driverId} view={byId.get(card.driverId)!} card={card} pick={card.driverId === pickId} />)
+                      col.cards.map((card) => <RouteCard key={card.driverId} view={byId.get(card.driverId)!} card={card} pick={card.driverId === pickId} onPick={() => setExplainPick(true)} />)
                     )}
                   </div>
                 </div>
@@ -70,6 +76,7 @@ export default function Board({ cards, byId, grouping, pickId, filtering = false
           )
         })}
       </div>
+      {explainPick && pickCard && pickView && <LookoutPickModal view={pickView} card={pickCard} onClose={() => setExplainPick(false)} />}
     </div>
   )
 }
