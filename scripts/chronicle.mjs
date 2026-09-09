@@ -17,10 +17,12 @@ const safe = (fn, fallback) => { try { return fn() } catch { return fallback } }
 
 // ---------------------------------------------------------------- commits
 
-// --all so work on any branch counts; the build thread lives on phase-1 today and
-// may not tomorrow. Merges are bookkeeping, not story.
-const meta = git('log', '--all', '--no-merges', `--format=%H${US}%aI${US}%an${US}%s${US}%b${RS}`)
-const churn = git('log', '--all', '--no-merges', '--format=%x1d%H', '--numstat')
+// Work on any branch counts; the build thread moves between them. Merges are
+// bookkeeping, not story. --branches --tags --remotes rather than --all: --all also walks refs/stash and its index
+// and untracked-files commits, which are working-state snapshots, not commits of work.
+const REFS = ['--branches', '--tags', '--remotes']
+const meta = git('log', ...REFS, '--no-merges', `--format=%H${US}%aI${US}%an${US}%s${US}%b${RS}`)
+const churn = git('log', ...REFS, '--no-merges', '--format=%x1d%H', '--numstat')
 
 const churnByHash = new Map()
 for (const block of churn.split('\x1d').slice(1)) {
@@ -61,6 +63,12 @@ function creditsOf(body) {
   return [...new Set(out)]
 }
 
+// Commits that carry no trailer can be credited by hand in attribution.json. Dave
+// confirms these; the chronicle never infers a tool from a commit's wording.
+const ATTR = existsSync(join(REPO, 'docs/chronicle/attribution.json'))
+  ? JSON.parse(readFileSync(join(REPO, 'docs/chronicle/attribution.json'), 'utf8')).commits ?? {}
+  : {}
+
 const commits = []
 for (const rec of meta.split(RS)) {
   const line = rec.replace(/^\n/, '')
@@ -68,8 +76,11 @@ for (const rec of meta.split(RS)) {
   const [hash, date, author, subject, body = ''] = line.split(US)
   const conv = subject.match(/^(\w+)(?:\(([^)]*)\))?!?:\s*(.*)$/)
   const c = churnByHash.get(hash) ?? { files: [], ins: 0, del: 0 }
+  const short = hash.slice(0, 7)
+  const signed = creditsOf(body)
+  const byHand = signed.length === 0 && ATTR[short] ? ATTR[short] : null
   commits.push({
-    hash: hash.slice(0, 7),
+    hash: short,
     date,
     day: date.slice(0, 10),
     hour: +date.slice(11, 13),
@@ -78,7 +89,8 @@ for (const rec of meta.split(RS)) {
     type: conv ? conv[1] : 'other',
     scope: conv?.[2] ?? null,
     title: conv ? conv[3] : subject,
-    credits: creditsOf(body),
+    credits: byHand ? [byHand] : signed,
+    attributedByHand: Boolean(byHand),
     insertions: c.ins,
     deletions: c.del,
     fileCount: c.files.length,
@@ -109,8 +121,11 @@ const byDay = [...new Set(commits.map((c) => c.day))].sort().map((day) => {
 const byHour = Array.from({ length: 24 }, (_, h) => commits.filter((c) => c.hour === h).length)
 const byArea = {}
 for (const c of commits) for (const a of c.areas) byArea[a] = (byArea[a] ?? 0) + 1
-const commitsByModel = {}
-for (const c of commits) for (const m of (c.credits.length ? c.credits : ['uncredited'])) commitsByModel[m] = (commitsByModel[m] ?? 0) + 1
+const commitsByModel = {}, byHandCount = {}
+for (const c of commits) {
+  for (const m of (c.credits.length ? c.credits : ['uncredited'])) commitsByModel[m] = (commitsByModel[m] ?? 0) + 1
+  if (c.attributedByHand) byHandCount[c.credits[0]] = (byHandCount[c.credits[0]] ?? 0) + 1
+}
 
 // ---------------------------------------------------------------- transcripts
 
@@ -202,6 +217,7 @@ const chronicle = {
   byArea,
   models: {
     commits: commitsByModel,
+    attributedByHand: byHandCount,
     turns: turnsByModel,
     tokens: tokensByModel,
     sessions: sessions.size,

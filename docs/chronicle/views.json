@@ -1,12 +1,15 @@
 {
   "baseUrl": "http://localhost:5173",
-  "viewport": { "width": 1440, "height": 900 },
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
   "settleMs": 1200,
   "views": [
     {
       "name": "shift-board",
       "path": "/",
-      "note": "The Active Shift board — metrics strip, filters, route columns, Lookout rail."
+      "note": "The Active Shift board \u2014 metrics strip, filters, route columns, Lookout rail."
     },
     {
       "name": "route-file",
@@ -14,10 +17,34 @@
       "note": "The HOS drill-in. drv-01 is planted closest to the 11-hour limit; if the seed changes, point this at whichever driver the Approaching-limit alert names."
     },
     {
-      "name": "lookout-timeline",
+      "name": "lookout-activity",
       "path": "/",
-      "steps": [{ "click": "timeline" }],
-      "note": "Lookout's Timeline tab — the shift log."
+      "steps": [
+        {
+          "click": "activity"
+        }
+      ],
+      "note": "Lookout's second tab. Timeline until 2026-09-07, Artifacts until 2026-09-09 14:59, then Activity \u2014 the shift's record. Each rename starts a new strip in the progression; the earlier strips end where the tab did."
+    },
+    {
+      "name": "fleet-map",
+      "path": "/map",
+      "note": "The fleet map, shipped 2026-09-04 17:23 \u2014 same ranked list as the board."
+    },
+    {
+      "name": "board-metrics",
+      "path": "/",
+      "steps": [
+        {
+          "click": "Metrics"
+        }
+      ],
+      "note": "The Metrics lens on the board, shipped 2026-09-08 12:22. A board mode, not a route."
+    },
+    {
+      "name": "settings",
+      "path": "/settings",
+      "note": "Lena's settings page \u2014 Project, Lena, Problems, Solutions, Why; shipped 2026-09-08."
     }
   ]
 }

@@ -8,6 +8,10 @@ import { join, resolve } from 'node:path'
 const REPO = resolve(process.cwd())
 const DIR = join(REPO, 'docs/chronicle')
 const EMBED = process.argv.includes('--embed')
+const outArg = process.argv.indexOf('--out')
+const OUT = outArg !== -1 && process.argv[outArg + 1]
+  ? resolve(process.cwd(), process.argv[outArg + 1])
+  : join(DIR, 'flight-log.html')
 
 const c = JSON.parse(readFileSync(join(DIR, 'chronicle.json'), 'utf8'))
 const remarks = existsSync(join(DIR, 'remarks.json')) ? JSON.parse(readFileSync(join(DIR, 'remarks.json'), 'utf8')) : {}
@@ -100,13 +104,14 @@ const models = [...new Set([...Object.keys(c.models.turns), ...Object.keys(c.mod
 const crew = models.map((m) => {
   const commits = Object.entries(c.models.commits).find(([k]) => k.replace(/^Claude\s+/, '') === m)?.[1] ?? 0
   const t = c.models.tokens[m] ?? {}
-  return { m, commits, turns: c.models.turns[m] ?? 0, out: t.output ?? 0 }
+  return { m, commits, turns: c.models.turns[m] ?? 0, out: t.output ?? 0, byHand: c.models.attributedByHand?.[m] ?? 0 }
 }).sort((a, b) => b.commits - a.commits || b.turns - a.turns)
 
 // --------------------------------------------------------------- screenshots
-// A long loop makes hundreds of captures. A progression wants roughly eight per
-// view — evenly spaced, always including the first and the most recent.
-const PER_VIEW = 8
+// A long loop makes hundreds of captures. A progression wants roughly four per
+// view — evenly spaced, always including the first and the most recent. Four keeps
+// the embedded file draggable into Figma; eight pushed it past 20MB.
+const PER_VIEW = 4
 const srcOf = (file) => {
   const path = join(DIR, 'progress', file)
   return EMBED && existsSync(path) ? `data:image/png;base64,${readFileSync(path).toString('base64')}` : `progress/${file}`
@@ -283,10 +288,10 @@ a:focus-visible,.mk:focus-visible{outline:2px solid var(--stamp);outline-offset:
     <section class="crewbox">
       <h3 class="lab" style="font-size:11px;letter-spacing:.18em;color:var(--muted);margin:0 0 12px">Co-drivers</h3>
       <ul class="crew">${crew.map((k) => `<li>
-        <span class="who">${esc(k.m)}<em>${k.commits ? 'signed the commits' : 'no commits signed'}</em></span>
+        <span class="who">${esc(k.m)}<em>${k.byHand ? `${k.byHand} attributed by hand` : k.commits ? 'signed the commits' : 'no commits signed'}</em></span>
         <span class="fig"><b>${n(k.commits)}</b><br>${n(k.turns)} turns</span></li>`).join('')}
       </ul>
-      <p class="unit">From <code style="font-family:var(--mono)">Co-Authored-By</code> trailers and session transcripts</p>
+      <p class="unit">From <code style="font-family:var(--mono)">Co-Authored-By</code> trailers and session transcripts${Object.keys(c.models.attributedByHand ?? {}).length ? ', plus commits credited by hand where a tool left no trailer' : ''}</p>
     </section>
     ${recap('Where the work landed', Object.entries(c.byArea).sort((a, b) => b[1] - a[1]).slice(0, 9), 'commits touching each area')}
     ${recap('What the work was', Object.entries(c.byType).sort((a, b) => b[1] - a[1]), 'commits by type')}
@@ -320,5 +325,5 @@ a:focus-visible,.mk:focus-visible{outline:2px solid var(--stamp);outline-offset:
   </footer>
 </main></body></html>`
 
-writeFileSync(join(DIR, 'flight-log.html'), html)
+writeFileSync(OUT, html)
 console.log(`flight-log: ${c.totals.commits} commits · ${c.byDay.length} days · ${crew.length} co-drivers · ${shotCount}/${c.screenshots.length} shots${EMBED ? ' (embedded)' : ''}`)

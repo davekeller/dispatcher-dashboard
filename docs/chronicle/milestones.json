@@ -1,0 +1,13 @@
+{
+  "_note": "Curated by hand from the commit history. Each entry names the commit it stands on so the claim can be checked.",
+  "milestones": [
+    { "at": "2026-09-03T17:06", "hash": "db6168f", "title": "Design docs before a line of code", "body": "The brief, layout, flows, architecture spec and decision log land first. The app is designed on paper for an hour before the scaffold exists." },
+    { "at": "2026-09-03T18:36", "hash": "78591da", "title": "A running board ninety minutes after the scaffold", "body": "Seeded fleet, pure HOS math with tests, rules as data, the three-pane shell, Lookout, the route file — and the generated fleet moving against the clock." },
+    { "at": "2026-09-04T13:23", "hash": "af71be0", "title": "A second tool signs the log", "body": "Codex takes its first design pass across the board, cards, route rail and Lookout. From here the build is two tools working the same tree." },
+    { "at": "2026-09-04T17:05", "hash": "978a691", "title": "The map ships", "body": "A map view on the route file with the truck as a live fix — the Phase 2 feature the brief said never to put on the critical path, kept behind a toggle." },
+    { "at": "2026-09-06T22:29", "hash": "24a2638", "title": "Board and Map become one control", "body": "One segmented switch, and a route file that remembers where it was opened from. The product stops being two pages and becomes one workspace." },
+    { "at": "2026-09-08T09:02", "hash": "2da6859", "title": "Live on Vercel", "body": "Deployed with the Vite preset, the live link in the README. From this commit on, every change is public within a minute." },
+    { "at": "2026-09-08T15:05", "hash": "147dcce", "title": "The project file", "body": "Lena's avatar opens a settings page that walks Project, Lena, Problems, Solutions, Why — the case for the work, made inside the work." },
+    { "at": "2026-09-09T14:14", "hash": "40ad763", "title": "Lookout explains itself", "body": "Its pick chip opens a dialog on how it orders the shift. The co-pilot's last feature is accountability for its own ranking." }
+  ]
+}
