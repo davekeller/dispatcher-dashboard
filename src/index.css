@@ -157,6 +157,12 @@ body { @apply bg-canvas text-ink font-sans; }
   background: var(--color-panel);
 }
 
+/* Dialogs fill a short window, but on a tall one stop at 78% of its height and never pass 58rem, so a long list scrolls inside the panel instead of the panel towering. */
+.dialog-panel { max-height: 100%; }
+@media (min-height: 880px) {
+  .dialog-panel { max-height: min(78vh, 58rem); }
+}
+
 /* The Board/Map shell: a 1px keyline drawn inside at partial alpha, so a selected half's dark fill covers it and reads as one color to the edge. */
 .workspace-shell {
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-nav-selected-ink) 45%, transparent);

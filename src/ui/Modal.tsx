@@ -9,7 +9,8 @@ export default function Modal({ title, onClose, children, footer }: { title: str
   }, [onClose])
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-ink/30 p-6" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div role="dialog" aria-modal="true" aria-label={title} className="flex max-h-full w-full max-w-2xl flex-col rounded-card border border-line bg-panel shadow-card">
+      {/* The panel fills a short window; on a tall one it stops at about three quarters of the height (`.dialog-panel`), so a long picker scrolls inside instead of towering. */}
+      <div role="dialog" aria-modal="true" aria-label={title} className="dialog-panel flex w-full max-w-2xl flex-col rounded-card border border-line bg-panel shadow-card">
         <header className="flex items-center gap-3 border-b border-line px-5 py-3">
           <h2 className="font-display text-lg font-semibold tracking-tight">{title}</h2>
           <button type="button" onClick={onClose} className="ml-auto rounded-control p-1 text-muted hover:bg-well hover:text-ink" aria-label="Close">
