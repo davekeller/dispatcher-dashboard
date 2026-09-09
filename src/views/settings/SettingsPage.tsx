@@ -1,5 +1,5 @@
 import { ArrowSquareOut, Lightbulb, Path, SquaresFour, UserCircle, WarningDiamond, type Icon } from '@phosphor-icons/react'
-import type { ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router'
 import { RULES } from '../../alerts/rules'
 import type { Severity } from '../../alerts/types'
@@ -9,6 +9,7 @@ import { DISPATCHER, shiftWindow } from '../../data/dispatcher'
 import { REGIONS } from '../../data/regions'
 import { LIMIT_MIN, WATCH_MIN } from '../../hos/constants'
 import { fmtClock } from '../../lib/format'
+import { useLookout } from '../../lookout/LookoutContext'
 import { useDerived } from '../../store/hooks'
 import { useStore } from '../../store/store'
 import Card from '../../ui/Card'
@@ -32,6 +33,12 @@ const SECTION_ICON: Record<SettingsSection, Icon> = {
 /** Lena's working settings and the story of the build around her. The left rail is persistent;
  * each centered chapter stays driven by dispatcher, fleet, rule, design-file, and story data. */
 export default function SettingsPage() {
+  const { setCollapsed } = useLookout()
+  // Lena's page is reading, not dispatching: the rail closes on arrival and reopens on the way back to the shift. She can still pull it open here.
+  useEffect(() => {
+    setCollapsed(true)
+    return () => setCollapsed(false)
+  }, [setCollapsed])
   const [params, setParams] = useSearchParams()
   const raw = params.get('section')
   const section: SettingsSection = isSettingsSection(raw) ? raw : 'project'

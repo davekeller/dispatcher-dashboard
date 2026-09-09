@@ -7,7 +7,7 @@ import type { EventDetail } from '../store/store'
 import Chip from '../ui/Chip'
 import { STALENESS_TONE, severityTone } from '../ui/tones'
 import { describeEvent } from './copy'
-import type { ActivityItem } from './derive'
+import type { HistoryItem } from './derive'
 
 const ICON: Record<EventDetail['type'], Icon> = {
   reassign: ArrowsLeftRight, schedule_reset: Moon, notify_customer: BellRinging, call_driver: Phone, stop_note: NotePencil,
@@ -18,7 +18,7 @@ const ICON: Record<EventDetail['type'], Icon> = {
 const countdown = (minutes: number, stale: boolean) => `${fmtCountdown(Math.abs(minutes), stale)} ${minutes <= 0 ? 'over' : 'left'}`
 
 /** One of her actions as a receipt: what she did, the figures she was shown, the driver as he was, and the way back to the route. */
-export default function ActivityCard({ item, d }: { item: Extract<ActivityItem, { kind: 'card' }>; d: Derived }) {
+export default function HistoryCard({ item, d }: { item: Extract<HistoryItem, { kind: 'card' }>; d: Derived }) {
   const { event, undoneAt } = item
   const copy = describeEvent(event, d)
   const Glyph = event.detail ? ICON[event.detail.type] : Flag

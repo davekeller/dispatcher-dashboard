@@ -1,7 +1,7 @@
 import { CaretDoubleRight } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { useActions } from '../actions/ActionContext'
-import ActivityPanel from '../activity/ActivityPanel'
+import HistoryPanel from '../history/HistoryPanel'
 import { useDerived } from '../store/hooks'
 import Button from '../ui/Button'
 import { NAV_ITEM_BASE, navigationItemState } from '../ui/navigation'
@@ -21,13 +21,13 @@ const TOP_N = 3
 const FOCUS_TOP_N = 1
 
 /** Lookout never has its own data. It reads `ranked` and nothing else. Chat carries the live
- * recommendations; Activity is the shift's record, read from the store's event log. */
+ * recommendations; History is the shift's record, read from the store's event log. */
 export default function LookoutSidebar() {
   const { collapsed, setCollapsed, focusDriverId, composeRequest } = useLookout()
   const { open } = useActions()
   const d = useDerived()
   const { ranked, byId } = d
-  const [tab, setTab] = useState<'chat' | 'activity'>('chat')
+  const [tab, setTab] = useState<'chat' | 'history'>('chat')
   const [recOpen, setRecOpen] = useState(true)
   const [showAll, setShowAll] = useState(false)
   const [messages, setMessages] = useState<Message[]>([{ role: 'lookout', text: LOOKOUT.chatIntro, reply: { text: '', examples: INTENTS.map((i) => i.example) } }])
@@ -69,11 +69,11 @@ export default function LookoutSidebar() {
 
   return (
     // Collapsed, the slot closes to zero and the panel slides off to the right; the product bar's Ask Lookout pill brings it back.
-    <div className={`lookout-slot min-w-0 shrink-0 ${collapsed ? 'is-closed w-0' : 'w-[26rem]'}`} aria-hidden={collapsed}>
-    <aside className="lookout-panel flex h-full w-[26rem] shrink-0 flex-col border-l border-line" aria-label={`${LOOKOUT.name}, the shift co-pilot`} inert={collapsed || undefined}>
+    <div className={`lookout-slot min-w-0 shrink-0 ${collapsed ? 'is-closed w-0' : 'w-[20rem]'}`} aria-hidden={collapsed}>
+    <aside className="lookout-panel flex h-full w-[20rem] shrink-0 flex-col border-l border-line" aria-label={`${LOOKOUT.name}, the shift co-pilot`} inert={collapsed || undefined}>
       <header className="flex h-14 shrink-0 items-center gap-2 border-b border-line bg-panel/90 pl-2 pr-1.5 backdrop-blur">
         <div className="flex items-center gap-0.5" role="tablist" aria-label={`${LOOKOUT.name} views`}>
-          {(['chat', 'activity'] as const).map((t) => (
+          {(['chat', 'history'] as const).map((t) => (
             <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`${NAV_ITEM_BASE} font-lookout text-[12px] capitalize ${navigationItemState(tab === t)}`}>
               {t}
               {t === 'chat' && urgentCards.length > 0 && <span className={`tnum inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold leading-none ${tab === t ? 'bg-on-accent text-act-now' : 'bg-act-now text-on-accent'}`} title={`${urgentCards.length} need action now`}>{urgentCards.length}</span>}
@@ -110,7 +110,7 @@ export default function LookoutSidebar() {
           <ChatThread messages={recOpen && messages.length === 1 ? [] : messages} d={d} onExample={send} />
         </div>
       ) : (
-        <ActivityPanel />
+        <HistoryPanel />
       )}
       <Composer onSend={send} focusKey={composeRequest} />
     </aside>
