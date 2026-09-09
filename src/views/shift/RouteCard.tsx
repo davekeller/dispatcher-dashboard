@@ -1,6 +1,6 @@
 import { useState, type MouseEvent } from 'react'
-import { flushSync } from 'react-dom'
 import { Link, useNavigate } from 'react-router'
+import { navigateWithTransition } from '../../lib/viewTransition'
 import type { DriverCard } from '../../alerts/types'
 import { routeHosSignal } from '../../lib/routeProgress'
 import { stopsPastLimit } from '../../store/actions'
@@ -21,12 +21,9 @@ export default function RouteCard({ view, card, pick = false }: { view: DriverVi
   const routeHref = `/routes/${view.driver.id}`
   const navigate = useNavigate()
   const [transitioning, setTransitioning] = useState(false)
+  // The card names itself the shared element just before the old-state snapshot, then morphs into the route file's driver card.
   const openRoute = (event: MouseEvent<HTMLAnchorElement>) => {
-    const modified = event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
-    if (event.defaultPrevented || modified || event.currentTarget.target === '_blank' || !document.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    event.preventDefault()
-    flushSync(() => setTransitioning(true))
-    document.startViewTransition(() => flushSync(() => navigate(routeHref)))
+    navigateWithTransition(event, navigate, routeHref, () => setTransitioning(true))
   }
   const quiet = card.band === 'clear' && !pick
   const surface = quiet ? 'border-line/70 bg-panel/80 opacity-80 hover:opacity-100' : 'border-line bg-panel shadow-card'

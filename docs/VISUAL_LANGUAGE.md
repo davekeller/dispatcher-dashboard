@@ -259,12 +259,12 @@ Where it appears:
 
 - Lookout closes by sliding off to the right over 300ms on the gentle curve while the workspace regains its width; it stays mounted, so a reopened chat keeps its thread. Reduced motion cuts the slide;
 - 200ms lane expand/collapse and content entry, 300ms for the route rail;
-- a route-card press compresses to 98.5%, then the selected card expands into the route's driver summary over 380ms while the remaining workspace fades up behind it;
+- a route-card press compresses to 98.5%, then the selected card expands into the route's driver summary over 380ms while the workspace fades up behind it and its parts arrive in order on the entrance curve: the Stops bar drops in over 240ms, the rail slides in from the left over 300ms starting 40ms later, the alerts rise over 240ms from 90ms, the stops over 320ms from 120ms; the back arrow leaves the same way in reverse, the workspace and its parts settling down and out over 200ms on the gentle curve while the board returns;
 - live countdown updates without layout shift;
 - timeline selection follows the receipt in view;
 - no ambient gradient motion, bounce, or decorative shimmer.
 
-The shared-element route transition uses the native View Transitions API when available. Unsupported browsers fall back to a 280ms route-workspace fade and lift; `prefers-reduced-motion` removes both paths and leaves ordinary client-side navigation.
+The shared-element route transition uses the native View Transitions API when available. Unsupported browsers run the same choreography as element animations over a 280ms route-workspace fade and lift; `prefers-reduced-motion` removes both paths and leaves ordinary client-side navigation.
 
 ---
 
