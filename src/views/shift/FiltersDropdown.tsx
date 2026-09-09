@@ -87,13 +87,12 @@ export default function FiltersDropdown({ value, onChange, filters = FILTERS, co
               // Alert options render as the badges she sees on cards, two to a row; everything else is a plain list or pills.
               const badges = (filter.options ?? []).some((option) => option.severity)
               return (
-                <fieldset key={filter.id} className={columns ? 'min-w-0 px-5 py-4' : 'min-w-0 px-2 pt-1 first:pl-2 last:pr-2'}>
-                  <legend className="mb-2 w-full px-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-label">
-                    <span className="flex items-baseline justify-between gap-3">
-                      <span>{filter.label}</span>
-                      {isColumns && <span className="font-medium normal-case tracking-normal text-muted">Board columns</span>}
-                    </span>
-                  </legend>
+                // A plain group, not a fieldset: a legend sits in the fieldset's border line and ignores its padding, which is what made the headings hug the divider.
+                <div key={filter.id} role="group" aria-labelledby={`filter-group-${filter.id}`} className={columns ? 'min-w-0 px-5 pb-4 pt-3.5' : 'min-w-0 px-2 pt-1 first:pl-2 last:pr-2'}>
+                  <div className={`flex items-baseline justify-between gap-3 px-2 ${columns ? 'mb-2.5' : 'mb-1.5'}`}>
+                    <h4 id={`filter-group-${filter.id}`} className={`font-display font-semibold leading-none tracking-[-0.01em] text-muted ${columns ? 'text-[15px]' : 'text-[13px]'}`}>{filter.label}</h4>
+                    {isColumns && <span className="text-[11px] font-medium text-label">Board columns</span>}
+                  </div>
                   <div className={badges ? 'grid grid-cols-2 gap-x-3 gap-y-0.5' : isColumns ? 'flex flex-col gap-0.5' : columns ? 'flex flex-wrap gap-1.5' : 'flex flex-col gap-0.5'}>
                     {(filter.options ?? []).map((option) => {
                       const selected = ((value[filter.id] as string[] | undefined) ?? []).includes(option.value)
@@ -127,7 +126,7 @@ export default function FiltersDropdown({ value, onChange, filters = FILTERS, co
                       )
                     })}
                   </div>
-                </fieldset>
+                </div>
               )
             })}
           </div>
