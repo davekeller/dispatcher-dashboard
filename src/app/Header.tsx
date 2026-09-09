@@ -40,7 +40,7 @@ export default function Header() {
           <DispatchMark className="h-[29px] w-[29px]" />
         </Link>
       </div>
-      <Link to="/" className="-ml-3.5 whitespace-nowrap font-brand text-[17px] font-bold leading-none tracking-[-0.035em] text-nav-selected-ink">Dispatch</Link>
+      <Link to="/" className="-ml-3.5 translate-y-px whitespace-nowrap font-brand text-[17px] font-bold leading-none tracking-[-0.035em] text-nav-selected-ink">Dispatch</Link>
       {/* The shell's keyline is an inset ring at partial alpha; the selected half paints over it, so its edge is its own dark fill. Filled glyphs stay crisp at 15px. */}
       <nav aria-label="Workspace view" className="workspace-shell ml-5 flex h-8 w-48 shrink-0 items-stretch overflow-hidden rounded-control bg-panel">
         <Link to="/" aria-current={onBoard ? 'page' : undefined} className={segment(onBoard)}>
