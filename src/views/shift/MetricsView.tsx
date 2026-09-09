@@ -93,19 +93,17 @@ export default function MetricsView({ cards, d, filters, onPreset }: { cards: Dr
 
   return (
     <div className="space-y-8 pb-2">
-      <header className="flex min-w-0 items-center justify-between gap-4">
-        <h1 className="font-display text-[22px] font-semibold leading-none tracking-[-0.03em] text-ink">Shift metrics</h1>
-        <p className="tnum shrink-0 text-[10px] font-medium text-label">{rows.length} trucks in view · {fmtClock(d.now)}</p>
-      </header>
-
-      <div className="!mt-4 flex flex-wrap items-center gap-2 border-y border-line py-2.5">
+      {/* One header row: the title, the chart menu and the search beside it, and the count with the shift time at the right. */}
+      <header className="flex min-w-0 flex-wrap items-center gap-3">
+        <h1 className="mr-1 font-display text-[22px] font-semibold leading-none tracking-[-0.03em] text-ink">Shift metrics</h1>
         <OrderDropdown value={pick ?? 'all'} onChange={(id) => setPick(id === 'all' ? null : id)} options={CHART_OPTIONS} label="Charts shown" />
-        <label className="relative ml-auto min-w-44 lg:max-w-56">
+        <label className="relative min-w-44 lg:max-w-56">
           <span className="sr-only">Search charts</span>
           <MagnifyingGlass size={14} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" />
           <input value={query} onChange={(e) => { setQuery(e.target.value); setPick(null) }} placeholder="Search charts" className="h-9 w-full rounded-control border border-line bg-panel pl-8 pr-2 text-[12px] text-ink placeholder:text-label focus:border-ink/40 focus:outline-none" />
         </label>
-      </div>
+        <p className="tnum ml-auto shrink-0 text-[12px] font-medium text-muted">{rows.length} trucks in view · {fmtClock(d.now)}</p>
+      </header>
       {!anyShown && <p className="text-[12px] text-muted">No chart matches "{query}".</p>}
 
       {sectionShows('hos-exposure') && (
