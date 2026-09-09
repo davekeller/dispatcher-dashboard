@@ -27,10 +27,10 @@ export default function FilterBar({ filters, onChange, sort, onSortChange, group
           <label key={f.id} className="relative min-w-44 flex-1 lg:max-w-56">
             <span className="sr-only">{f.label}</span>
             <MagnifyingGlass size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-            <input value={(filters[f.id] as string | undefined) ?? ''} onChange={(e) => onChange({ ...filters, [f.id]: e.target.value })} placeholder={f.label} className="h-9 w-full rounded-control border border-line bg-panel pl-9 pr-3 text-[12px] text-ink outline-none transition placeholder:text-muted focus:border-ink/35 focus:ring-2 focus:ring-ink/10" aria-label={f.label} />
+            <input value={(filters[f.id] as string | undefined) ?? ''} onChange={(e) => onChange({ ...filters, [f.id]: e.target.value })} placeholder={f.label} className="h-9 w-full rounded-control border border-nav-selected-line bg-panel pl-9 pr-3 text-[12px] text-ink outline-none transition placeholder:text-muted focus:border-ink/35 focus:ring-2 focus:ring-ink/10" aria-label={f.label} />
           </label>
         ))}
-        <div className="ml-auto flex shrink-0 items-center gap-0.5 rounded-control border border-line bg-panel p-1" role="group" aria-label="Board lens">
+        <div className="ml-auto flex shrink-0 items-center gap-0.5 rounded-control border border-nav-selected-line bg-panel p-1" role="group" aria-label="Board lens">
           {BOARD_LENSES.map((grouping) => {
             const selected = groupBy === grouping.id
             const Glyph = grouping.id === 'band' ? Columns : grouping.id === 'region' ? MapPin : ChartBar
