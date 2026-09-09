@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import type { Derived } from '../store/derive'
 import type { Reply } from './intents'
 import LookoutAvatar from './LookoutAvatar'
@@ -12,6 +13,11 @@ export interface Message {
 /** The conversation. Replies render the same cards the recommendations bar shows, so the two
  *  can never disagree. */
 export default function ChatThread({ messages, d, onExample }: { messages: Message[]; d: Derived; onExample: (text: string) => void }) {
+  const endRef = useRef<HTMLDivElement>(null)
+  // Once the conversation has started, a new message scrolls into view; the intro alone never moves the rail.
+  useEffect(() => {
+    if (messages.length > 1) endRef.current?.scrollIntoView({ block: 'nearest' })
+  }, [messages.length])
   return (
     <div className="flex flex-col gap-3 p-3">
       {messages.map((m, i) =>
@@ -22,6 +28,11 @@ export default function ChatThread({ messages, d, onExample }: { messages: Messa
             <LookoutAvatar size={22} className="mt-0.5 shrink-0" />
             <div className="min-w-0 flex-1">
               {m.text && <p className="font-lookout text-[12px] leading-snug text-ink">{m.text}</p>}
+              {m.reply?.notes && (
+                <ul className="mt-2 flex flex-col gap-1.5 border-l-2 border-line pl-2.5">
+                  {m.reply.notes.map((note) => <li key={note} className="font-lookout text-[11px] leading-snug text-muted">{note}</li>)}
+                </ul>
+              )}
               {m.reply?.examples && (
                 <div className="mt-1.5 flex flex-wrap gap-1">
                   {m.reply.examples.map((e) => (
@@ -43,6 +54,7 @@ export default function ChatThread({ messages, d, onExample }: { messages: Messa
           </div>
         ),
       )}
+      <div ref={endRef} />
     </div>
   )
 }

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { makeFleet } from '../data/seed'
 import { derive } from '../store/derive'
-import { INTENTS, matchIntent } from './intents'
+import { RULES } from '../alerts/rules'
+import { aboutReply, INTENTS, matchIntent } from './intents'
 
 const anchor = new Date(2026, 8, 3, 14, 47, 0, 0).getTime()
 const d = derive(makeFleet(anchor), anchor, {})
@@ -18,6 +19,17 @@ describe('matchIntent', () => {
   it('reassign opens the picker for a named driver and asks otherwise', () => {
     expect(matchIntent("reassign Marcus's stops", d).open).toEqual({ action: 'reassign', driverId: 'drv-01' })
     expect(matchIntent('reassign the stops', d).open).toBeUndefined()
+  })
+  it('the introduction names every rule, the tick, the live counts, and the order; the same reply answers the chat', () => {
+    const r = aboutReply(d)
+    expect(r.text).toContain(`all ${d.views.length} trucks`)
+    expect(r.text).toContain('Every 5 seconds')
+    expect(r.text).toContain('3 need you')
+    for (const label of RULES.map((rule) => rule.label)) expect(r.notes?.[0]).toContain(label)
+    expect(r.notes?.[1]).toMatch(/whoever breaks first/)
+    expect(r.examples).not.toContain('How do you order the board?')
+    expect(matchIntent('who are you?', d)).toEqual(r)
+    expect(matchIntent('How do you order the board?', d)).toEqual(r)
   })
   it('no match lists what Lookout can do', () => {
     const r = matchIntent('what is the weather', d)
