@@ -124,7 +124,7 @@ export default function ReassignDialog({ driverId, initialStopIds, initialToId, 
               <label className="relative ml-auto min-w-44 flex-1 sm:max-w-56">
                 <span className="sr-only">{SEARCH_LABEL}</span>
                 <MagnifyingGlass size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-                <input value={filters.search} onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))} placeholder={SEARCH_LABEL} className="h-9 w-full rounded-control border border-line bg-panel pl-9 pr-3 text-[12px] text-ink shadow-sm outline-none transition placeholder:text-muted focus:border-ink/35 focus:ring-2 focus:ring-ink/10" aria-label={SEARCH_LABEL} />
+                <input value={filters.search} onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))} placeholder={SEARCH_LABEL} className="h-9 w-full rounded-control border border-line bg-panel pl-9 pr-3 text-[12px] text-ink outline-none transition placeholder:text-muted focus:border-ink/35 focus:ring-2 focus:ring-ink/10" aria-label={SEARCH_LABEL} />
               </label>
             </div>
             <div className="min-h-48">
