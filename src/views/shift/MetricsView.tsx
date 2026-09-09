@@ -100,7 +100,7 @@ export default function MetricsView({ cards, d, filters, onPreset }: { cards: Dr
         <label className="relative min-w-44 lg:max-w-56">
           <span className="sr-only">Search charts</span>
           <MagnifyingGlass size={14} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" />
-          <input value={query} onChange={(e) => { setQuery(e.target.value); setPick(null) }} placeholder="Search charts" className="h-9 w-full rounded-control border border-line bg-panel pl-8 pr-2 text-[12px] text-ink placeholder:text-label focus:border-ink/40 focus:outline-none" />
+          <input value={query} onChange={(e) => { setQuery(e.target.value); setPick(null) }} placeholder="Search charts" className="h-9 w-full rounded-control border border-nav-selected-line bg-panel pl-8 pr-2 text-[12px] text-ink placeholder:text-label focus:border-ink/40 focus:outline-none" />
         </label>
         <p className="tnum ml-auto shrink-0 text-[12px] font-medium text-muted">{rows.length} trucks in view · {fmtClock(d.now)}</p>
       </header>
