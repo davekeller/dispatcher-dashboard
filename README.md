@@ -33,7 +33,7 @@ The visual system is documented separately in [`docs/VISUAL_LANGUAGE.md`](docs/V
 
 ## Scope
 
-Phase 1 is the board, the route file with receipts and a schedule ribbon, and the Lookout rail. The core was scoped with discipline; the extras are labeled as extras in `docs/DECISIONS.md`. Not built yet: the driver's phone view, routing, auth, dark mode, mobile layouts. Chat is three matched intents, not a model.
+Phase 1 is the board, the route file with receipts and a timeline rail, and the Lookout rail. The core was scoped with discipline; the extras are labeled as extras in `docs/DECISIONS.md`. Not built yet: the driver's phone view, routing, auth, dark mode, mobile layouts. Chat is three matched intents, not a model.
 
 ## Adding a rule
 

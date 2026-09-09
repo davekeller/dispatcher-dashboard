@@ -1,6 +1,7 @@
-import { MagnifyingGlass } from '@phosphor-icons/react'
+import { ChartBar, ClockCountdown, type Icon, MagnifyingGlass, Pulse, Truck } from '@phosphor-icons/react'
 import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
+import OrderDropdown, { type OrderOption } from './OrderDropdown'
 import type { DriverCard } from '../../alerts/types'
 import { BAND_LABEL, BAND_ORDER, type Band } from '../../bands'
 import { EMPTY_FILTERS, type FilterState } from '../../filters'
@@ -51,7 +52,14 @@ const CHARTS = [
   { id: 'freshness', title: 'Data freshness', section: 'driver-readiness' },
 ] as const
 type ChartId = (typeof CHARTS)[number]['id']
+type ChartPick = ChartId | 'all'
 const SECTION_TITLE: Record<string, string> = { 'hos-exposure': 'Hours of service', 'shift-operations': 'Shift operations', 'driver-readiness': 'Driver readiness' }
+const SECTION_GLYPH: Record<string, Icon> = { 'hos-exposure': ClockCountdown, 'shift-operations': Truck, 'driver-readiness': Pulse }
+// The chart menu: every chart, or one alone. Same menu as the board's order and the reassign picker.
+const CHART_OPTIONS: OrderOption<ChartPick>[] = [
+  { id: 'all', label: 'All charts', description: 'Every chart, in its section.', Glyph: ChartBar },
+  ...CHARTS.map((c) => ({ id: c.id, label: c.title, description: SECTION_TITLE[c.section], Glyph: SECTION_GLYPH[c.section] })),
+]
 
 function chartMatches(chart: (typeof CHARTS)[number], query: string): boolean {
   const q = query.trim().toLowerCase()
@@ -91,16 +99,11 @@ export default function MetricsView({ cards, d, filters, onPreset }: { cards: Dr
       </header>
 
       <div className="!mt-4 flex flex-wrap items-center gap-2 border-y border-line py-2.5">
-        <div className="flex flex-wrap items-center gap-1" role="group" aria-label="Charts shown">
-          <ChartChip on={pick === null} onClick={() => setPick(null)}>All charts</ChartChip>
-          {CHARTS.filter((c) => chartMatches(c, query)).map((c) => (
-            <ChartChip key={c.id} on={pick === c.id} onClick={() => setPick(pick === c.id ? null : c.id)}>{c.title}</ChartChip>
-          ))}
-        </div>
+        <OrderDropdown value={pick ?? 'all'} onChange={(id) => setPick(id === 'all' ? null : id)} options={CHART_OPTIONS} label="Charts shown" />
         <label className="relative ml-auto min-w-44 lg:max-w-56">
           <span className="sr-only">Search charts</span>
           <MagnifyingGlass size={14} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" />
-          <input value={query} onChange={(e) => { setQuery(e.target.value); setPick(null) }} placeholder="Search charts" className="h-8 w-full rounded-control border border-line bg-panel pl-8 pr-2 text-[12px] text-ink placeholder:text-label focus:border-ink/40 focus:outline-none" />
+          <input value={query} onChange={(e) => { setQuery(e.target.value); setPick(null) }} placeholder="Search charts" className="h-9 w-full rounded-control border border-line bg-panel pl-8 pr-2 text-[12px] text-ink placeholder:text-label focus:border-ink/40 focus:outline-none" />
         </label>
       </div>
       {!anyShown && <p className="text-[12px] text-muted">No chart matches "{query}".</p>}
@@ -436,13 +439,5 @@ function Legend({ items, className = '' }: { items: { label: string; fill: strin
         <span key={item.label} className="flex items-center gap-1.5"><span className={`h-2 w-2 rounded-sm ${item.fill}`} /> {item.label}</span>
       ))}
     </div>
-  )
-}
-
-function ChartChip({ on, onClick, children }: { on: boolean; onClick: () => void; children: ReactNode }) {
-  return (
-    <button type="button" aria-pressed={on} onClick={onClick} className={`inline-flex h-7 items-center rounded-full border px-2.5 text-[11px] font-semibold transition ${on ? 'border-ink bg-ink text-on-accent' : 'border-line bg-panel text-muted hover:border-ink/25 hover:text-ink'}`}>
-      {children}
-    </button>
   )
 }
