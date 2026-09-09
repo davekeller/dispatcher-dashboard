@@ -191,7 +191,8 @@ export default function RouteFilePage() {
         <RouteRail view={view} deliveryById={deliveryById} pastLimitIds={pastLimitIds} collapsed={railCollapsed} onCollapsedChange={setRailCollapsed} activeStopId={mode === 'map' ? mapSelection : undefined} onSelectStop={mode === 'map' ? setSelectedStop : undefined} hiddenStopIds={mode === 'list' ? hiddenStopIds : undefined} onRevealStop={() => setStopFilter('all')} listKey={`${mode}:${stopFilter}`} />
         {/* The scroll box is a plain block so nothing inside it can flex-shrink; the column of cards sits one level down. */}
         <div className="min-w-0 flex-1 overflow-y-auto py-5">
-          <div className="flex flex-col gap-5">
+          {/* The column caps at 64rem and centers in the scroll area, so a wide window does not stretch the receipts. */}
+          <div className="mx-auto flex w-full max-w-[64rem] flex-col gap-5">
           <section className="flex flex-col gap-4">
             <DriverCard view={view} card={card} />
           {(card.alerts.length > 0 || stale) && (

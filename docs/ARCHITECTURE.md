@@ -338,7 +338,7 @@ The miniature card timeline uses shared route-completion endpoints, grading comp
 
 ### Route file (`/routes/:driverId`)
 
-A page in the main pane; Lookout stays open and focuses on the driver currently assigned to this route. The route is the parent record. Its driver assignment can change, and each unresolved stop can move to another route (and therefore to that route's assigned driver) without changing the page's identity. The view has the shape of a case file: a **route rail** down the left, the content to its right.
+A page in the main pane; Lookout stays open and focuses on the driver currently assigned to this route. The route is the parent record. Its driver assignment can change, and each unresolved stop can move to another route (and therefore to that route's assigned driver) without changing the page's identity. The view has the shape of a case file: a **route rail** down the left, the content to its right. The content column caps at 64rem and centers in the scroll area beside the rail, so a wide window does not stretch the driver card and the receipts.
 
 The route rail shares the miniature timeline's reverse route order and completed-path gradient. The route end, newly reassigned stops, and remaining work appear first; completed history descends toward the route origin. Delivered rows tighten to 32px expanded and 20px collapsed so completed history gives more vertical room to remaining work; labels and click targets remain intact, failed history stays full-size and red, and every node still maps one-to-one to its receipt.
 
