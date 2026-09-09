@@ -19,8 +19,8 @@ export const BOARD_ORDERS: OrderOption<BoardSort>[] = [
 
 const isLookout = (id: string) => id === 'lookout'
 
-/** One order menu for every surface that has an order: the board and the reassign picker.
- *  The `lookout` option is the AI-ordered default wherever it appears and wears the ring. */
+/** One option menu for every surface that picks one thing: the board's order, the reassign picker's
+ *  order, the Metrics chart. The `lookout` option is the AI-ordered default wherever it appears and wears the ring. */
 export default function OrderDropdown<T extends string>({ value, onChange, options, label = 'Order routes by' }: { value: T; onChange: (value: T) => void; options: OrderOption<T>[]; label?: string }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
