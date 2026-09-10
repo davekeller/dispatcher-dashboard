@@ -31,7 +31,7 @@ export default function AlertActions({ driverId, actions, alertIds, positionDepe
   const unique = [...new Set(actions)]
   const labels = compact ? COMPACT_LABEL : LABEL
   return (
-    <div className={`flex gap-1.5 ${singleLine ? 'flex-nowrap whitespace-nowrap' : 'flex-wrap'}`}>
+    <div className={`flex justify-end gap-1.5 ${singleLine ? 'flex-nowrap whitespace-nowrap' : 'flex-wrap'}`}>
       {unique.map((a) => {
         if (a === 'call_driver') return <ActionConfirm key={a} label={labels[a]} confirmLabel="Place call" doneLabel="Call logged" compact={compact} onConfirm={() => callDriver(driverId)} />
         if (a === 'acknowledge') return <ActionConfirm key={a} label={labels[a]} confirmLabel="Snooze" doneLabel="Snoozed" compact={compact} onConfirm={() => alertIds.forEach((id) => acknowledge(id))} />
